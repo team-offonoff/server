@@ -5,7 +5,6 @@ import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.Member;
 import life.offonoff.ab.domain.topic.choice.Choices;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +25,10 @@ public abstract class Topic extends BaseEntity {
 
     private String title;
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Embedded
     private Choices choices;
