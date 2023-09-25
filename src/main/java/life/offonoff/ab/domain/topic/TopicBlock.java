@@ -14,6 +14,13 @@ public class TopicBlock {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_ic")
+    @JoinColumn(name = "topic_id")
     private Topic topic;
+
+    public void associate(Member member, Topic topic) {
+        this.member = member;
+        member.addTopicBlock(this);
+        this.topic = topic;
+        topic.addTopicBlock(this);
+    }
 }
