@@ -7,6 +7,9 @@ import life.offonoff.ab.domain.topic.Topic;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Comment extends BaseEntity {
@@ -24,6 +27,10 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
+    @OneToMany(mappedBy = "comment")
+    private List<CommentLike> likes = new ArrayList<>();
+
+    private int likeCount = 0;
     private int active = 1;
 
     // Constructor
@@ -41,5 +48,10 @@ public class Comment extends BaseEntity {
 
     public void cancel() {
         this.active = 0;
+    }
+
+    public void addCommentLike(CommentLike like) {
+        likes.add(like);
+        likeCount++;
     }
 }
