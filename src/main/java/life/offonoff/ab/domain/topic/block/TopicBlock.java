@@ -1,10 +1,11 @@
 package life.offonoff.ab.domain.topic;
 
 import jakarta.persistence.*;
-import life.offonoff.ab.domain.Member;
+import life.offonoff.ab.domain.BaseEntity;
+import life.offonoff.ab.domain.member.Member;
 
 @Entity
-public class TopicBlock {
+public class TopicBlock extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
