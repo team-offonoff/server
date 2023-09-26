@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.config;
+package life.offonoff.ab.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
