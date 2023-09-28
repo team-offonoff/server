@@ -42,7 +42,6 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "choice_b_id")
     private Choice choiceB;
 
-
     @Enumerated(EnumType.STRING)
     private TopicSide side;
 

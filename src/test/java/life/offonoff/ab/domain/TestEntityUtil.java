@@ -5,10 +5,7 @@ import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.TopicSide;
-import life.offonoff.ab.domain.topic.choice.Choice;
-import life.offonoff.ab.domain.topic.choice.content.TextAndImageChoiceContent;
 import life.offonoff.ab.domain.topic.choice.ChoiceType;
 import life.offonoff.ab.domain.vote.Vote;
 
@@ -23,18 +20,9 @@ public class TestEntityUtil {
     }
 
     //== Topic ==//
-    public static Topic createTextTopic(int seq, TopicSide side) {
+    public static Topic createTopic(int seq, TopicSide side) {
         String topicTitle = "TITLE_" + seq;
-        String topicDescription = "DESCRIPTION_" + seq;
-
-        String choiceAText = "A_TEXT_" + seq;
-        String choiceBText = "B_TEXT_" + seq;
-
-        Choice choiceA = Choice.createChoiceA(TextAndImageChoiceContent.ofText(choiceAText));
-        Choice choiceB = Choice.createChoiceB(TextAndImageChoiceContent.ofText(choiceBText));
-
-        TopicContent content = new TopicContent(topicTitle, topicDescription, choiceA, choiceB);
-        return new Topic(side, content);
+        return new Topic(topicTitle, side);
     }
 
     //== Category ==//
