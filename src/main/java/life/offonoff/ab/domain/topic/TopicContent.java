@@ -23,6 +23,10 @@ public class TopicContent extends BaseEntity {
     @OneToOne(mappedBy = "content", orphanRemoval = true)
     private Topic topic;
 
+    /**
+     * TopicContent - Choice 연관관계의 주인은 TopicContent로 설정
+     * topiccontent -> choice 로의 참조만 필요하기에 검색 성능 향상
+      */
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "choice_a_id")
     private Choice choiceA;
