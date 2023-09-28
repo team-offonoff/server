@@ -3,7 +3,7 @@ package life.offonoff.ab.vote;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
-import life.offonoff.ab.domain.topic.choice.ChoiceSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceType;
 import life.offonoff.ab.domain.vote.Vote;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class VoteTest {
         Topic topic = createTextTopic(seq, TopicSide.TOPIC_A);
 
         // when
-        Vote vote = createVote(ChoiceSide.CHOICE_A);
+        Vote vote = createVote(ChoiceType.CHOICE_A);
         vote.associate(member, topic);
 
         // then

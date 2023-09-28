@@ -19,19 +19,15 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
-    @OneToMany(mappedBy = "comment")
-    private List<CommentLike> likes = new ArrayList<>();
-
     private int likeCount = 0;
-    private int active = 1;
 
     // Constructor
     public Comment(String content) {
@@ -46,12 +42,7 @@ public class Comment extends BaseEntity {
         topic.addComment(this);
     }
 
-    public void cancel() {
-        this.active = 0;
-    }
-
-    public void addCommentLike(CommentLike like) {
-        likes.add(like);
+    public void liked() {
         likeCount++;
     }
 }
