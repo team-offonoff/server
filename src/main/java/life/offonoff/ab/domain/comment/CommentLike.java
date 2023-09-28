@@ -23,16 +23,11 @@ public class CommentLike extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    private int active = 1;
-
     public void associate(Member member, Comment comment) {
         this.member = member;
         this.comment = comment;
-        comment.addCommentLike(this);
+        comment.liked();
     }
 
     //== Method ==//
-    public void remove() {
-        active = 0;
-    }
 }

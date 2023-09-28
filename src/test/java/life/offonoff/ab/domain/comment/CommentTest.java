@@ -17,7 +17,7 @@ class CommentTest {
         // given
         int seq = 0;
         Member member = TestEntityUtil.createMember(seq);
-        Topic topic = TestEntityUtil.createTextTopic(seq, TopicSide.TOPIC_A);
+        Topic topic = TestEntityUtil.createTopic(seq, TopicSide.TOPIC_A);
 
         // when
         Comment comment = TestEntityUtil.createComment(seq);

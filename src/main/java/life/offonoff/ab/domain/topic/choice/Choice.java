@@ -1,35 +1,36 @@
 package life.offonoff.ab.domain.topic.choice;
 
 import jakarta.persistence.*;
+import life.offonoff.ab.domain.BaseEntity;
+import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static life.offonoff.ab.domain.topic.choice.ChoiceSide.*;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Embeddable
-public class Choice {
+@Entity
+public class Choice extends BaseEntity {
 
-    @Transient
-    private ChoiceSide side;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Embedded
+    @Enumerated(EnumType.STRING)
+    private ChoiceOption type;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "choice_content_id")
     private ChoiceContent content;
 
     //== Constructor ==//
-    private Choice(ChoiceSide side, ChoiceContent content) {
-        this.side = side;
-        this.content = content;
+    public Choice(ChoiceOption type) {
+        this.type = type;
+    }
+
+    //== 연관관계 매핑 ==//
+    public void associate(ChoiceContent contentA) {
+        this.content = contentA;
     }
 
     //== Method ==//
-    public static Choice createChoiceA(ChoiceContent content) {
-        return new Choice(CHOICE_A, content);
-    }
-
-    public static Choice createChoiceB(ChoiceContent content) {
-        return new Choice(CHOICE_B, content);
-    }
 }

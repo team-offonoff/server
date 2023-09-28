@@ -2,14 +2,13 @@ package life.offonoff.ab.domain;
 
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.member.AlarmEnables;
+import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicContent;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
-import life.offonoff.ab.domain.topic.choice.ChoiceContent;
-import life.offonoff.ab.domain.topic.choice.ChoiceSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.vote.Vote;
 
 public class TestEntityUtil {
@@ -18,23 +17,14 @@ public class TestEntityUtil {
     public static Member createMember(int seq) {
         String name = "MEMBER_" + seq;
         String nickname = "NICKNAME_" + seq;
-        AlarmEnables alarmEnables = new AlarmEnables(true, true, true, true);
-        return new Member(name, nickname, alarmEnables);
+        NotificationEnabled notificationEnabled = new NotificationEnabled(true, true, true, true);
+        return new Member(name, nickname, notificationEnabled);
     }
 
     //== Topic ==//
-    public static Topic createTextTopic(int seq, TopicSide side) {
+    public static Topic createTopic(int seq, TopicSide side) {
         String topicTitle = "TITLE_" + seq;
-        String topicDescription = "DESCRIPTION_" + seq;
-
-        String choiceAText = "A_TEXT_" + seq;
-        String choiceBText = "B_TEXT_" + seq;
-
-        Choice choiceA = Choice.createChoiceA(ChoiceContent.ofText(choiceAText));
-        Choice choiceB = Choice.createChoiceB(ChoiceContent.ofText(choiceBText));
-
-        TopicContent content = new TopicContent(topicTitle, topicDescription, choiceA, choiceB);
-        return new Topic(side, content);
+        return new Topic(topicTitle, side);
     }
 
     //== Category ==//
@@ -50,7 +40,12 @@ public class TestEntityUtil {
     }
 
     //== Vote ==//
-    public static Vote createVote(ChoiceSide side) {
-        return new Vote(side);
+    public static Vote createVote(ChoiceOption option) {
+        return new Vote(option);
+    }
+
+    //== Choice ==//
+    public static Choice createChoice(ChoiceOption option) {
+        return new Choice(option);
     }
 }

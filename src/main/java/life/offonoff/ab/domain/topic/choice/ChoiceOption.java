@@ -1,5 +1,5 @@
 package life.offonoff.ab.domain.topic.choice;
 
-public enum ChoiceSide {
+public enum ChoiceOption {
     CHOICE_A, CHOICE_B
 }

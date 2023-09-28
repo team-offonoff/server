@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.choice.ChoiceSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,13 +27,11 @@ public class Vote extends BaseEntity {
     private Topic topic;
 
     @Enumerated(EnumType.STRING)
-    private ChoiceSide choiceSide;
-
-    private int active = 1;
+    private ChoiceOption selectedOption;
 
     //== Constructor ==//
-    public Vote(ChoiceSide choiceSide) {
-        this.choiceSide = choiceSide;
+    public Vote(ChoiceOption choiceOption) {
+        this.selectedOption = choiceOption;
     }
 
     //== Method ==//
@@ -42,9 +40,5 @@ public class Vote extends BaseEntity {
         member.addVote(this);
         this.topic = topic;
         topic.addVote(this);
-    }
-
-    public void cancel() {
-        this.active = 0;
     }
 }

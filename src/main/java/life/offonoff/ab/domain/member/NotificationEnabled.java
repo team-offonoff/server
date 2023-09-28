@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class AlarmEnables {
+public class NotificationEnabled {
     private boolean topicExpiration;
     private boolean likeInComment;
     private boolean voteOnTopic;
     private boolean commentOnTopic;
 
-    public AlarmEnables(boolean topicExpiration, boolean likeInComment, boolean voteOnTopic, boolean commentOnTopic) {
+    public NotificationEnabled(boolean topicExpiration, boolean likeInComment, boolean voteOnTopic, boolean commentOnTopic) {
         this.topicExpiration = topicExpiration;
         this.likeInComment = likeInComment;
         this.voteOnTopic = voteOnTopic;

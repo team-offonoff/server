@@ -1,12 +1,14 @@
-package life.offonoff.ab.domain.topic.block;
+package life.offonoff.ab.domain.topic.hide;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import lombok.Getter;
 
+@Getter
 @Entity
-public class TopicBlock extends BaseEntity{
+public class HiddenTopic extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,17 +21,11 @@ public class TopicBlock extends BaseEntity{
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
-    private int active = 1;
-
     //== Method ==//
     public void associate(Member member, Topic topic) {
         this.member = member;
-        member.addTopicBlock(this);
+        member.hideTopic(this);
         this.topic = topic;
-        topic.addTopicBlock(this);
-    }
-
-    public void cancel() {
-        this.active = 0;
+        topic.addHide(this);
     }
 }
