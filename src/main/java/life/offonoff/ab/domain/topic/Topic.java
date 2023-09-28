@@ -5,7 +5,8 @@ import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.domain.topic.choice.Choice;
+import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import lombok.AccessLevel;
@@ -23,6 +24,8 @@ public class Topic extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -30,6 +33,15 @@ public class Topic extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_content_id")
     private TopicContent content;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "choice_a_id")
+    private Choice choiceA;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "choice_b_id")
+    private Choice choiceB;
+
 
     @Enumerated(EnumType.STRING)
     private TopicSide side;
@@ -58,14 +70,15 @@ public class Topic extends BaseEntity {
     private int active = 1;
 
     // Constructor
-    public Topic(TopicSide side) {
+    public Topic(String title, TopicSide side) {
+        this.title = title;
         this.side = side;
         this.expiresAt = LocalDateTime.now()
                                       .plusHours(24);
     }
 
     //== 연관관계 매핑 ==//
-    public void associate(Member member, Category category, TopicContent content) {
+    public void associate(Member member, Category category, TopicContent content, Choice choiceA, Choice choiceB) {
         this.publishMember = member;
         member.publishTopic(this);
 
@@ -74,6 +87,9 @@ public class Topic extends BaseEntity {
 
         this.content = content;
         content.setTopic(this);
+
+        this.choiceA = choiceA;
+        this.choiceB = choiceB;
     }
 
     public void addHide(HiddenTopic hiddenTopic) {

@@ -5,7 +5,7 @@ import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicContent;
+import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.TextAndImageChoiceContent;
