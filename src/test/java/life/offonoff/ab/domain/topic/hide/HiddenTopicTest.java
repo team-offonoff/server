@@ -16,7 +16,7 @@ class HiddenTopicTest {
     void block_count_increase() {
         // given
         int seq = 0;
-        Topic topic = TestEntityUtil.createTextTopic(seq, TopicSide.TOPIC_A);
+        Topic topic = TestEntityUtil.createTopic(seq, TopicSide.TOPIC_A);
         Member member = TestEntityUtil.createMember(seq);
 
         // when
@@ -26,7 +26,7 @@ class HiddenTopicTest {
         // then
         assertAll(
                 () -> assertThat(topic.getBlockCount()).isEqualTo(1),
-                () -> assertThat(member.getHiddenBlocks()).contains(block)
+                () -> assertThat(member.getHiddenTopics()).contains(block)
         );
     }
 }

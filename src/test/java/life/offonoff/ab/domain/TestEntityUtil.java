@@ -6,7 +6,9 @@ import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
-import life.offonoff.ab.domain.topic.choice.ChoiceType;
+import life.offonoff.ab.domain.topic.choice.Choice;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.vote.Vote;
 
 public class TestEntityUtil {
@@ -38,7 +40,12 @@ public class TestEntityUtil {
     }
 
     //== Vote ==//
-    public static Vote createVote(ChoiceType side) {
-        return new Vote(side);
+    public static Vote createVote(ChoiceOption option) {
+        return new Vote(option);
+    }
+
+    //== Choice ==//
+    public static Choice createChoice(ChoiceOption option) {
+        return new Choice(option);
     }
 }

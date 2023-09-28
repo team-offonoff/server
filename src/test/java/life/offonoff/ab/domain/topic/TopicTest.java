@@ -3,6 +3,9 @@ package life.offonoff.ab.domain.topic;
 import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.topic.choice.Choice;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.topic.content.TopicContent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
@@ -17,12 +20,14 @@ class TopicTest {
         int seq = 0;
         TopicSide side = TopicSide.TOPIC_A;
 
-        Topic topic = TestEntityUtil.createTextTopic(seq, side);
+        Topic topic = TestEntityUtil.createTopic(seq, side);
         Category category = TestEntityUtil.createCategory(seq);
         Member member = TestEntityUtil.createMember(seq);
+        Choice choiceA = TestEntityUtil.createChoice(ChoiceOption.CHOICE_A);
+        Choice choiceB = TestEntityUtil.createChoice(ChoiceOption.CHOICE_A);
 
         // when
-        topic.associate(member, category);
+        topic.associate(member, category, null, choiceA, choiceB);
 
         // then
         assertAll(
