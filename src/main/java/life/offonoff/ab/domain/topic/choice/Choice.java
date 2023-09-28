@@ -16,21 +16,20 @@ public class Choice extends BaseEntity {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private ChoiceType type;
+    private ChoiceOption type;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "choice_content_id")
     private ChoiceContent content;
 
     //== Constructor ==//
-    public Choice(ChoiceType type) {
+    public Choice(ChoiceOption type) {
         this.type = type;
     }
 
     //== 연관관계 매핑 ==//
     public void associate(ChoiceContent contentA) {
         this.content = contentA;
-        content.setChoice(this);
     }
 
     //== Method ==//

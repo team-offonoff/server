@@ -85,8 +85,6 @@ public class Topic extends BaseEntity {
         category.addTopic(this);
 
         this.content = content;
-        content.setTopic(this);
-
         this.choiceA = choiceA;
         this.choiceB = choiceB;
     }
