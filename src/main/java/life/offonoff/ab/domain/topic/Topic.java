@@ -5,7 +5,8 @@ import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.topic.block.TopicBlock;
+import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,7 +27,8 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Embedded
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "topic_content_id")
     private TopicContent content;
 
     @Enumerated(EnumType.STRING)
@@ -42,8 +44,9 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic")
     private List<Vote> votes = new ArrayList<>();
 
+    // 운영 측면에서 hide 정보 추적
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
-    private List<TopicBlock> blocks = new ArrayList<>();
+    private List<HiddenTopic> hides = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private TopicStatus status = TopicStatus.VOTING;
@@ -55,24 +58,26 @@ public class Topic extends BaseEntity {
     private int active = 1;
 
     // Constructor
-    public Topic(TopicSide side, TopicContent content) {
+    public Topic(TopicSide side) {
         this.side = side;
-        this.content = content;
         this.expiresAt = LocalDateTime.now()
                                       .plusHours(24);
     }
 
     //== 연관관계 매핑 ==//
-    public void associate(Member member, Category category) {
+    public void associate(Member member, Category category, TopicContent content) {
         this.publishMember = member;
         member.publishTopic(this);
 
         this.category = category;
         category.addTopic(this);
+
+        this.content = content;
+        content.setTopic(this);
     }
 
-    public void addTopicBlock(TopicBlock topicBlock) {
-        this.blocks.add(topicBlock);
+    public void addHide(HiddenTopic hiddenTopic) {
+        this.hides.add(hiddenTopic);
         blockCount++;
     }
 
