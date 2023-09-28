@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.block.TopicBlock;
+import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,9 +22,12 @@ public class Member extends BaseEntity {
     private Long id;
 
     private String name;
+
+    @Column(length = 40)
     private String nickname;
+
     @Embedded
-    private AlarmEnables alarmEnables;
+    private NotificationEnabled notificationEnabled;
 
     @OneToMany(mappedBy = "publishMember")
     private List<Topic> publishedTopics = new ArrayList<>();
@@ -36,15 +39,15 @@ public class Member extends BaseEntity {
     private List<Vote> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<TopicBlock> topicBlocks = new ArrayList<>();
+    private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
     private int active = 1;
 
     //== Constructor ==//
-    public Member(String name, String nickname, AlarmEnables alarmEnables) {
+    public Member(String name, String nickname, NotificationEnabled notificationEnabled) {
         this.name = name;
         this.nickname = nickname;
-        this.alarmEnables = alarmEnables;
+        this.notificationEnabled = notificationEnabled;
     }
 
     //== 연관관계 매핑 ==//
@@ -52,8 +55,8 @@ public class Member extends BaseEntity {
         publishedTopics.add(topic);
     }
 
-    public void addTopicBlock(TopicBlock topicBlock) {
-        topicBlocks.add(topicBlock);
+    public void hideTopic(HiddenTopic hiddenTopic) {
+        hiddenTopics.add(hiddenTopic);
     }
 
     public void addComment(Comment comment) {
