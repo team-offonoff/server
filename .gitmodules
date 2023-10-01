@@ -1,7 +1,4 @@
-[submodule "config"]
-	path = config
-	url = https://github.com/team-offonoff/server-config
-	branch = main
 [submodule "server-config"]
 	path = server-config
 	url = https://github.com/team-offonoff/server-config
+	branch = main

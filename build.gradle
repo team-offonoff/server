@@ -36,3 +36,32 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// YML 등 submodule로 관리되는 파일들 복사
+task copyMainResources {
+    doLast {
+        println '*********** main copy start ***********'
+        copy {
+            from './config'
+            include '*.yml'
+            into './src/main/resources'
+        }
+        println '*********** main copy end *************'
+    }
+}
+processResources.dependsOn copyMainResources
+
+// TODO: 추후에 db 연결 후, 테스트용 파일 따로 추가하여 사용
+//task copyTestResources {
+//    doLast {
+//        println '*********** test copy start ***********'
+//        copy {
+//            from './config/application-local-h2.yml'
+//            into './src/test/resources'
+//            rename 'application-local-h2.yml', 'application.yml'
+//        }
+//        println '*********** test copy end *************'
+//    }
+//}
+//
+//processTestResources.dependsOn copyTestResources
