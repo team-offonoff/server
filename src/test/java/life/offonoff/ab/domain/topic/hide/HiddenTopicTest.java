@@ -25,7 +25,7 @@ class HiddenTopicTest {
 
         // then
         assertAll(
-                () -> assertThat(topic.getBlockCount()).isEqualTo(1),
+                () -> assertThat(topic.getHideCount()).isEqualTo(1),
                 () -> assertThat(member.getHiddenTopics()).contains(block)
         );
     }
