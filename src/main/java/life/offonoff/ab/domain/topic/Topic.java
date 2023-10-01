@@ -64,7 +64,7 @@ public class Topic extends BaseEntity {
 
     private int commentCount = 0;
     private int voteCount = 0;
-    private int blockCount = 0;
+    private int hideCount = 0;
     private LocalDateTime expiresAt;
     private int active = 1;
 
@@ -91,7 +91,7 @@ public class Topic extends BaseEntity {
 
     public void addHide(HiddenTopic hiddenTopic) {
         this.hides.add(hiddenTopic);
-        blockCount++;
+        hideCount++;
     }
 
     public void addComment(Comment comment) {
