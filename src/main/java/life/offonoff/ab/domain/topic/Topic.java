@@ -34,13 +34,8 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "topic_content_id")
     private TopicContent content;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "choice_a_id")
-    private Choice choiceA;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "choice_b_id")
-    private Choice choiceB;
+    @OneToMany(mappedBy = "topic")
+    private List<Choice> choices = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private TopicSide side;
@@ -65,19 +60,22 @@ public class Topic extends BaseEntity {
     private int commentCount = 0;
     private int voteCount = 0;
     private int blockCount = 0;
-    private LocalDateTime expiresAt;
+    private LocalDateTime deadline;
     private int active = 1;
 
     // Constructor
-    public Topic(String title, TopicSide side) {
+    public Topic(String title, TopicSide side, LocalDateTime deadline) {
         this.title = title;
         this.side = side;
-        this.expiresAt = LocalDateTime.now()
-                                      .plusHours(24);
+        this.deadline = deadline;
+    }
+
+    public Topic(String title, TopicSide side) {
+        this(title, side, LocalDateTime.now().plusHours(24));
     }
 
     //== 연관관계 매핑 ==//
-    public void associate(Member member, Category category, TopicContent content, Choice choiceA, Choice choiceB) {
+    public void associate(Member member, Category category, TopicContent content) {
         this.publishMember = member;
         member.publishTopic(this);
 
@@ -85,8 +83,6 @@ public class Topic extends BaseEntity {
         category.addTopic(this);
 
         this.content = content;
-        this.choiceA = choiceA;
-        this.choiceB = choiceB;
     }
 
     public void addHide(HiddenTopic hiddenTopic) {
@@ -106,5 +102,9 @@ public class Topic extends BaseEntity {
 
     public void remove() {
         this.active = 0;
+    }
+
+    public void addChoice(Choice choice) {
+        this.choices.add(choice);
     }
 }

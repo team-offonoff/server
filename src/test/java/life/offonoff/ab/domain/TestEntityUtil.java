@@ -8,7 +8,7 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
-import life.offonoff.ab.domain.topic.content.TopicContent;
+import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.vote.Vote;
 
 public class TestEntityUtil {
@@ -45,7 +45,7 @@ public class TestEntityUtil {
     }
 
     //== Choice ==//
-    public static Choice createChoice(ChoiceOption option) {
-        return new Choice(option);
+    public static Choice createChoice(Topic topic, ChoiceOption option, ChoiceContent content) {
+        return new Choice(topic, option, content);
     }
 }
