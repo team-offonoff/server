@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.content.TopicContent;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
@@ -33,6 +34,19 @@ class TopicTest {
         assertAll(
                 () -> assertThat(topic.getCategory()).isEqualTo(category),
                 () -> assertThat(topic.getPublishMember()).isEqualTo(member)
+        );
+    }
+
+    @Test
+    void get_remaining_time() {
+        int seq = 0;
+        long timeMillisOf24Hours = 24 * 60 * 60 * 1000;
+
+        Topic topic = TestEntityUtil.createTopic(seq, TopicSide.TOPIC_A);
+
+        assertAll(
+                () -> assertThat(topic.getRemainingTimeMillis()).isGreaterThan(0),
+                () -> assertThat(topic.getRemainingTimeMillis()).isLessThan(timeMillisOf24Hours)
         );
     }
 }

@@ -13,6 +13,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +76,15 @@ public class Topic extends BaseEntity {
         this.side = side;
         this.expiresAt = LocalDateTime.now()
                                       .plusHours(24);
+    }
+
+    //== Getter ==//
+    public Long getRemainingTimeMillis() {
+        long expireTimeMillis = expiresAt.atZone(ZoneId.of("Asia/Seoul"))
+                .toInstant()
+                .toEpochMilli();
+
+        return expireTimeMillis - System.currentTimeMillis();
     }
 
     //== 연관관계 매핑 ==//

@@ -14,7 +14,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
      * Paging, 모든 Topic조회 + Not Hidden by a Member
      */
     @Query("select t from Topic t " +
-            "join fetch t.category c " +
+            "join fetch t.publishMember m " +
             "where t.status = :status " +
             "and not exists(select 1 from HiddenTopic ht " +
                             "where ht.member.id = :memberId " +
@@ -29,7 +29,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
      * Paging, 모든 Topic조회 (category별) + Not Hidden by a Member
      */
     @Query("select t from Topic t " +
-            "join fetch t.category c " +
+            "join fetch t.publishMember m " +
+            "join t.category c " +
             "where t.status = :status " +
             "and c.id = :categoryId " +
             "and not exists(select 1 from HiddenTopic ht " +

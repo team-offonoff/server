@@ -56,14 +56,18 @@ public class TopicController {
 
         private Long topicId;
         private String title;
-        private String categoryName;
+        private Long publishMemberId;
+        private String publishMemberNickname;
+        private Long remainingTimeMillis;
         private int voteCount;
         private int commentCount;
 
         public TopicInfoResponse(Topic topic) {
             this.topicId = topic.getId();
             this.title = topic.getTitle();
-            this.categoryName = topic.getCategory().getName();
+            this.publishMemberId = topic.getPublishMember().getId();
+            this.publishMemberNickname = topic.getPublishMember().getNickname();
+            this.remainingTimeMillis = topic.getRemainingTimeMillis();
             this.voteCount = topic.getVoteCount();
             this.commentCount = topic.getCommentCount();
         }
