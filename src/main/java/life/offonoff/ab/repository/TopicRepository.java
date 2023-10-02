@@ -1,4 +1,4 @@
-package life.offonoff.ab.repository.topic;
+package life.offonoff.ab.repository;
 
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;

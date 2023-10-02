@@ -1,12 +1,11 @@
-package life.offonoff.ab.service.topic;
+package life.offonoff.ab.service;
 
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
-import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.repository.TopicRepository;
 import life.offonoff.ab.service.dto.TopicSearchParams;
-import life.offonoff.ab.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

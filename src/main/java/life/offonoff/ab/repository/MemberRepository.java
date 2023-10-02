@@ -1,4 +1,4 @@
-package life.offonoff.ab.repository.member;
+package life.offonoff.ab.repository;
 
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.domain.member.Member;

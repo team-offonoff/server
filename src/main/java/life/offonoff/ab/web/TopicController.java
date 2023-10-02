@@ -1,10 +1,10 @@
-package life.offonoff.ab.api.topic;
+package life.offonoff.ab.web;
 
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.api.common.response.PageResponse;
+import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.service.dto.TopicSearchParams;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.service.topic.TopicService;
+import life.offonoff.ab.service.TopicService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;

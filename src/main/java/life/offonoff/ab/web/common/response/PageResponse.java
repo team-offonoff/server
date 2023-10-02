@@ -1,4 +1,4 @@
-package life.offonoff.ab.api.common.response;
+package life.offonoff.ab.web.common.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
