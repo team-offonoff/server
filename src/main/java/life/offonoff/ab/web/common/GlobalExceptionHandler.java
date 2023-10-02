@@ -38,10 +38,10 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(ex -> ex.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        final String hint = "잘못된 요청 바디입니다.";
+        final String message = "잘못된 요청 바디입니다.";
         final ErrorWrapper errors = new ErrorWrapper(
                 INVALID_FIELD,
-                ErrorContent.of(errorFields, hint, HttpStatus.BAD_REQUEST.value())
+                ErrorContent.of(message, errorFields, HttpStatus.BAD_REQUEST.value())
         );
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -52,10 +52,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorWrapper> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException = ", e);
 
-        final String hint = "잘못된 타입의 요청입니다. | 인자 이름: " + e.getName() + " 필요한 타입: " + e.getRequiredType();
+        final String message = "잘못된 타입의 요청입니다. | 인자 이름: " + e.getName() + " 필요한 타입: " + e.getRequiredType();
         final ErrorWrapper errorWrapper = new ErrorWrapper(
                 INVALID_FIELD,
-                ErrorContent.of(hint, HttpStatus.BAD_REQUEST.value())
+                ErrorContent.of(message, HttpStatus.BAD_REQUEST.value())
         );
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

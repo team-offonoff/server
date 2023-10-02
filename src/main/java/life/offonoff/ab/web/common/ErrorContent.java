@@ -5,7 +5,7 @@ public record ErrorContent(String message, String hint, int httpCode) {
         return new ErrorContent(message, hint, httpCode);
     }
 
-    public static ErrorContent of(final String hint, final int httpCode) {
-        return new ErrorContent(null, hint, httpCode);
+    public static ErrorContent of(final String message, final int httpCode) {
+        return new ErrorContent(null, message, httpCode);
     }
 }
