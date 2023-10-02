@@ -13,6 +13,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.data.domain.Sort.Direction.*;
 
 @RequiredArgsConstructor
@@ -41,12 +43,13 @@ public class TopicController {
         );
     }
 
-    @PostMapping("/{topicId}/hide")
+    @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
             @PathVariable("topicId") Long topicId,
+            @RequestParam Boolean hide,
             @RequestParam Long memberId // memberId는 임시로 query string
     ) {
-        topicService.hide(memberId, topicId);
+        topicService.hide(memberId, topicId, hide);
         return ResponseEntity.ok().build();
     }
 
@@ -58,7 +61,7 @@ public class TopicController {
         private String title;
         private Long publishMemberId;
         private String publishMemberNickname;
-        private Long remainingTimeMillis;
+        private LocalDateTime deadline;
         private int voteCount;
         private int commentCount;
 
@@ -67,7 +70,7 @@ public class TopicController {
             this.title = topic.getTitle();
             this.publishMemberId = topic.getPublishMember().getId();
             this.publishMemberNickname = topic.getPublishMember().getNickname();
-            this.remainingTimeMillis = topic.getRemainingTimeMillis();
+            this.deadline = topic.getDeadline();
             this.voteCount = topic.getVoteCount();
             this.commentCount = topic.getCommentCount();
         }

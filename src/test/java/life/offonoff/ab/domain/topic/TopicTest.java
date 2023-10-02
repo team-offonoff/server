@@ -36,17 +36,4 @@ class TopicTest {
                 () -> assertThat(topic.getPublishMember()).isEqualTo(member)
         );
     }
-
-    @Test
-    void get_remaining_time() {
-        int seq = 0;
-        long timeMillisOf24Hours = 24 * 60 * 60 * 1000;
-
-        Topic topic = TestEntityUtil.createTopic(seq, TopicSide.TOPIC_A);
-
-        assertAll(
-                () -> assertThat(topic.getRemainingTimeMillis()).isGreaterThan(0),
-                () -> assertThat(topic.getRemainingTimeMillis()).isLessThan(timeMillisOf24Hours)
-        );
-    }
 }

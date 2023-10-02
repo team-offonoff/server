@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -58,7 +59,7 @@ public class Topic extends BaseEntity {
     private List<Vote> votes = new ArrayList<>();
 
     // 운영 측면에서 hide 정보 추적
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hides = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -67,24 +68,15 @@ public class Topic extends BaseEntity {
     private int commentCount = 0;
     private int voteCount = 0;
     private int hideCount = 0;
-    private LocalDateTime expiresAt;
+    private LocalDateTime deadline;
     private int active = 1;
 
     // Constructor
     public Topic(String title, TopicSide side) {
         this.title = title;
         this.side = side;
-        this.expiresAt = LocalDateTime.now()
-                                      .plusHours(24);
-    }
-
-    //== Getter ==//
-    public Long getRemainingTimeMillis() {
-        long expireTimeMillis = expiresAt.atZone(ZoneId.of("Asia/Seoul"))
-                .toInstant()
-                .toEpochMilli();
-
-        return expireTimeMillis - System.currentTimeMillis();
+        this.deadline = LocalDateTime.now()
+                                     .plusHours(24);
     }
 
     //== 연관관계 매핑 ==//
@@ -119,8 +111,9 @@ public class Topic extends BaseEntity {
         this.active = 0;
     }
 
-    public boolean hidedBy(Member member) {
-        return hides.stream()
-                    .anyMatch(h -> h.has(member));
+    public void removeHiddenBy(Member member) {
+        this.hides.removeIf(h -> h.has(member));
+        member.cancelHide(this);
+        hideCount--;
     }
 }

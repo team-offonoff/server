@@ -37,16 +37,27 @@ public class TopicService {
     }
 
     @Transactional
-    public void hide(Long memberId, Long topicId) {
+    public void hide(Long memberId, Long topicId, Boolean hide) {
         Member member = memberService.searchById(memberId);
         Topic topic = this.searchById(topicId);
 
-        // 이미 hide한 member면 hide 삭제
-        if (topic.hidedBy(member)) {
-
+        if (hide) {
+            doHide(member, topic);
+            return;
         }
+        cancelHide(member, topic);
+    }
 
-        HiddenTopic hiddenTopic = new HiddenTopic();
-        hiddenTopic.associate(member, topic);
+    private void doHide(Member member, Topic topic) {
+        if (!member.hideAlready(topic)) {
+            HiddenTopic hiddenTopic = new HiddenTopic();
+            hiddenTopic.associate(member, topic);
+        }
+    }
+
+    private void cancelHide(Member member, Topic topic) {
+        if (member.hideAlready(topic)) {
+            topic.removeHiddenBy(member);
+        }
     }
 }
