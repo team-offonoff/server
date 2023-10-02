@@ -10,6 +10,13 @@ import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.vote.Vote;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TestEntityUtil {
 
@@ -25,6 +32,26 @@ public class TestEntityUtil {
     public static Topic createTopic(int seq, TopicSide side) {
         String topicTitle = "TITLE_" + seq;
         return new Topic(topicTitle, side);
+    }
+
+    public static Topic createAssociatedTopic(int seq, TopicSide side) {
+        Member member = createMember(seq);
+        Category category = createCategory(seq);
+        Choice choiceA = createChoice(ChoiceOption.CHOICE_A);
+        Choice choiceB = createChoice(ChoiceOption.CHOICE_B);
+
+        Topic topic = createTopic(seq, side);
+        topic.associate(member, category, null, choiceA, choiceB);
+        return topic;
+    }
+
+    public static List<Topic> creatAssociatedTopicList(int length, TopicSide side) {
+        List<Topic> topics = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            topics.add(createAssociatedTopic(i, side));
+        }
+
+        return topics;
     }
 
     //== Category ==//
@@ -47,5 +74,10 @@ public class TestEntityUtil {
     //== Choice ==//
     public static Choice createChoice(ChoiceOption option) {
         return new Choice(option);
+    }
+
+    //== Pageable ==//
+    public static Pageable createPageableDesc(int page, int size, String property) {
+        return PageRequest.of(page, size, Sort.Direction.DESC, property);
     }
 }
