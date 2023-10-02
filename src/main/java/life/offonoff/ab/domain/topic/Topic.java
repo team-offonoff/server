@@ -107,4 +107,9 @@ public class Topic extends BaseEntity {
     public void remove() {
         this.active = 0;
     }
+
+    public boolean hidedBy(Member member) {
+        return hides.stream()
+                    .anyMatch(h -> h.has(member));
+    }
 }

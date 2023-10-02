@@ -37,9 +37,8 @@ public class TopicController {
         TopicSearchParams params = new TopicSearchParams(TopicStatus.VOTING, memberId, categoryId);
 
         return ResponseEntity.ok(PageResponse.of(topicService.searchAllNotHidden(params, pageable)
-                                                           .map(TopicInfoResponse::new))
+                                                             .map(TopicInfoResponse::new))
         );
-
     }
 
     @PostMapping("/{topicId}/hide")

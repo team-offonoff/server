@@ -28,4 +28,8 @@ public class HiddenTopic extends BaseEntity{
         this.topic = topic;
         topic.addHide(this);
     }
+
+    public boolean has(Member member) {
+        return this.member == member;
+    }
 }

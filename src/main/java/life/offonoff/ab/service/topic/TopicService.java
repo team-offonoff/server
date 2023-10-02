@@ -42,6 +42,11 @@ public class TopicService {
         Member member = memberService.searchById(memberId);
         Topic topic = this.searchById(topicId);
 
+        // 이미 hide한 member면 예외
+        if (topic.hidedBy(member)) {
+            return; // 예외처리 필요
+        }
+
         HiddenTopic hiddenTopic = new HiddenTopic();
         hiddenTopic.associate(member, topic);
     }
