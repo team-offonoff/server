@@ -35,10 +35,10 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
     private int active = 1;
@@ -67,7 +67,17 @@ public class Member extends BaseEntity {
         votes.add(vote);
     }
 
+    //== Method ==//
     public void inactive() {
         this.active = 0;
+    }
+
+    public boolean hideAlready(Topic topic) {
+        return hiddenTopics.stream()
+                           .anyMatch(h -> h.has(topic));
+    }
+
+    public void cancelHide(Topic topic) {
+        hiddenTopics.removeIf(h -> h.has(topic));
     }
 }

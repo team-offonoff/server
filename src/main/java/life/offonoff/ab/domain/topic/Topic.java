@@ -13,8 +13,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -51,7 +54,7 @@ public class Topic extends BaseEntity {
     private List<Vote> votes = new ArrayList<>();
 
     // 운영 측면에서 hide 정보 추적
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hides = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -59,7 +62,7 @@ public class Topic extends BaseEntity {
 
     private int commentCount = 0;
     private int voteCount = 0;
-    private int blockCount = 0;
+    private int hideCount = 0;
     private LocalDateTime deadline;
     private int active = 1;
 
@@ -87,7 +90,7 @@ public class Topic extends BaseEntity {
 
     public void addHide(HiddenTopic hiddenTopic) {
         this.hides.add(hiddenTopic);
-        blockCount++;
+        hideCount++;
     }
 
     public void addComment(Comment comment) {
@@ -106,5 +109,11 @@ public class Topic extends BaseEntity {
 
     public void addChoice(Choice choice) {
         this.choices.add(choice);
+    }
+
+  public void removeHiddenBy(Member member) {
+        this.hides.removeIf(h -> h.has(member));
+        member.cancelHide(this);
+        hideCount--;
     }
 }

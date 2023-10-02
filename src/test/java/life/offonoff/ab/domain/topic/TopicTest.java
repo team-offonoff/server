@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.content.TopicContent;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

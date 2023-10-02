@@ -13,7 +13,7 @@ public class HiddenTopic extends BaseEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -27,5 +27,13 @@ public class HiddenTopic extends BaseEntity{
         member.hideTopic(this);
         this.topic = topic;
         topic.addHide(this);
+    }
+
+    public boolean has(Topic topic) {
+        return this.topic == topic;
+    }
+
+    public boolean has(Member member) {
+        return this.member == member;
     }
 }
