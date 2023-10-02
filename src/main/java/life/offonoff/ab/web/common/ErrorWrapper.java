@@ -1,4 +1,6 @@
 package life.offonoff.ab.web.common;
 
-public record ErrorWrapper(ErrorContent errorContent) {
+import life.offonoff.ab.exception.AbCode;
+
+public record ErrorWrapper(AbCode abCode, ErrorContent errorContent) {
 }
