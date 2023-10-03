@@ -34,7 +34,7 @@ public class TopicControllerTest extends RestDocsTest {
         when(topicService.createMembersTopic(any(), any()))
                 .thenReturn(builder.build().createResponse());
 
-        mvc.perform(post(TopicUri.BASE).with(csrf())
+        mvc.perform(post(TopicUri.BASE).with(csrf().asHeader())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                              .writeValueAsString(request)))

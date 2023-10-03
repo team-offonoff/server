@@ -26,7 +26,7 @@ class CategoryControllerTest extends RestDocsTest {
     void categoryCreateRequest_withNonBlankName_ok() throws Exception {
         CategoryCreateRequest request = new CategoryCreateRequest("ok");
 
-        MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf())
+        MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
                                                .contentType(MediaType.APPLICATION_JSON)
                                                .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -38,7 +38,7 @@ class CategoryControllerTest extends RestDocsTest {
     void categoryCreateRequest_withBlankName_badRequest() throws Exception {
         CategoryCreateRequest request = new CategoryCreateRequest("  ");
 
-        MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf())
+        MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
                                                .contentType(MediaType.APPLICATION_JSON)
                                                .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
