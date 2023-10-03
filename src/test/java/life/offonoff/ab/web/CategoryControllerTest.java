@@ -28,7 +28,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser
-    void categoryCreateRequest_withNonBlankName_Ok() throws Exception {
+    void categoryCreateRequest_withNonBlankName_ok() throws Exception {
         CategoryCreateRequest request = new CategoryCreateRequest("ok");
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf())
@@ -40,7 +40,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser
-    void categoryCreateRequest_withBlankName_BadRequest() throws Exception {
+    void categoryCreateRequest_withBlankName_badRequest() throws Exception {
         CategoryCreateRequest request = new CategoryCreateRequest("  ");
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf())

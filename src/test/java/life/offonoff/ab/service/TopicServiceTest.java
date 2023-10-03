@@ -8,7 +8,8 @@ import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.service.request.ChoiceCreateRequest;
 import life.offonoff.ab.service.request.ImageTextChoiceContentCreateRequest;
 import life.offonoff.ab.service.request.TopicCreateRequest;
-import life.offonoff.ab.service.request.TopicCreateRequest.TopicCreateRequestBuilder;
+import life.offonoff.ab.web.response.ChoiceResponse;
+import life.offonoff.ab.web.response.ImageTextChoiceContentResponse;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.Builder;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Transactional
 @SpringBootTest
@@ -33,7 +35,7 @@ public class TopicServiceTest {
 
     @Test
     void TopicCreateRequest_equalOrLessThanMaxLength25_success() {
-        assertDoesNotThrow(() -> TopicCreateRequestTestBuilder.builder()
+        assertDoesNotThrow(() -> TopicTestDtoHelper.builder()
                 .topicTitle("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
                 .build().createRequest()
         );
@@ -41,7 +43,7 @@ public class TopicServiceTest {
 
     @Test
     void TopicCreateRequest_greaterThanMaxLength25_throwsError() {
-        assertThatThrownBy(() -> TopicCreateRequestTestBuilder.builder()
+        assertThatThrownBy(() -> TopicTestDtoHelper.builder()
                 .topicTitle("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
                 .build().createRequest()
         ).isInstanceOf(LengthInvalidException.class);
@@ -52,7 +54,7 @@ public class TopicServiceTest {
         Category category = createCategory();
         TopicResponse topicResponse = topicService.createMembersTopic(
                 0L,
-                TopicCreateRequestTestBuilder.builder()
+                TopicTestDtoHelper.builder()
                         .category(category)
                         .build().createRequest());
         System.out.println("topicResponse = " + topicResponse);
@@ -65,11 +67,8 @@ public class TopicServiceTest {
     }
 
     @Builder
-    public static class TopicCreateRequestTestBuilder {
+    public static class TopicTestDtoHelper {
         private Category category;
-
-        @Builder.Default
-        private final TopicCreateRequestBuilder builder = TopicCreateRequest.builder();
 
         @Builder.Default
         private TopicSide topicSide = TopicSide.TOPIC_A;
@@ -95,12 +94,37 @@ public class TopicServiceTest {
             if (category != null) {
                 categoryId = category.getId();
             }
-            return builder
+            return TopicCreateRequest.builder()
                     .topicSide(topicSide)
                     .categoryId(categoryId)
                     .topicTitle(topicTitle)
                     .choices(choices)
                     .deadline(deadline)
+                    .build();
+        }
+
+        public TopicResponse createResponse() {
+            List<ChoiceResponse> choiceResponses = new ArrayList<>();
+            for (int i = 0; i < choices.size(); i++) {
+                ChoiceCreateRequest choice = choices.get(i);
+                choiceResponses.add(new ChoiceResponse(
+                        (long) i,
+                        new ImageTextChoiceContentResponse(
+                                ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).text(),
+                                ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).imageUrl()),
+                        choice.choiceOption()));
+            }
+
+            Long categoryId = 0L;
+            if (category != null) {
+                categoryId = category.getId();
+            }
+            return TopicResponse.builder()
+                    .topicId(0L)
+                    .topicSide(topicSide)
+                    .topicTitle(topicTitle)
+                    .categoryId(categoryId)
+                    .choices(choiceResponses)
                     .build();
         }
     }

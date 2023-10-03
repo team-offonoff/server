@@ -2,9 +2,9 @@ package life.offonoff.ab.domain.topic;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
-import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
@@ -12,12 +12,10 @@ import life.offonoff.ab.domain.vote.Vote;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -75,6 +73,17 @@ public class Topic extends BaseEntity {
 
     public Topic(String title, TopicSide side) {
         this(title, side, LocalDateTime.now().plusHours(24));
+    }
+
+    public Topic(Member member, Category category, String title, TopicSide side) {
+        this(member, category, title, side, LocalDateTime.now().plusHours(24));
+    }
+
+    public Topic(Member member, Category category, String title, TopicSide side, LocalDateTime deadline) {
+        this.title = title;
+        this.side = side;
+        this.deadline = deadline;
+        associate(member, category, null);
     }
 
     //== 연관관계 매핑 ==//

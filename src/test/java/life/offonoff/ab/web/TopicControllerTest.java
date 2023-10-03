@@ -3,7 +3,8 @@ package life.offonoff.ab.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.service.TopicService;
-import life.offonoff.ab.service.TopicServiceTest.TopicCreateRequestTestBuilder;
+import life.offonoff.ab.service.TopicServiceTest.TopicTestDtoHelper;
+import life.offonoff.ab.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.service.request.TopicCreateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -29,8 +32,10 @@ public class TopicControllerTest {
     @Test
     @WithMockUser
     void createCategory() throws Exception {
-        TopicCreateRequest request = TopicCreateRequestTestBuilder.builder()
-                .build().createRequest();
+        TopicTestDtoHelperBuilder builder = TopicTestDtoHelper.builder();
+        TopicCreateRequest request = builder.build().createRequest();
+        when(topicService.createMembersTopic(any(), any()))
+                .thenReturn(builder.build().createResponse());
 
         mvc.perform(post(TopicUri.BASE).with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)

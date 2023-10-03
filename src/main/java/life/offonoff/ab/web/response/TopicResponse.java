@@ -2,13 +2,15 @@ package life.offonoff.ab.web.response;
 
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record TopicResponse(
         Long topicId,
         TopicSide topicSide,
-        String title,
+        String topicTitle,
         Long categoryId,
         List<ChoiceResponse> choices
 ) {

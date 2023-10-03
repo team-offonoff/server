@@ -35,8 +35,7 @@ public class TopicService {
     public TopicResponse createMembersTopic(final Long memberId, final TopicCreateRequest request) {
         Member member = findMember(memberId);
         Category category = findCategory(request.categoryId());
-        Topic topic = new Topic(request.topicTitle(), request.topicSide(), request.deadline());
-        topic.associate(member, category, null);
+        Topic topic = new Topic(member, category, request.topicTitle(), request.topicSide(), request.deadline());
         topicRepository.save(topic);
 
         request.choices().stream()
