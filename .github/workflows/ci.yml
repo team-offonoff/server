@@ -37,9 +37,6 @@ jobs:
       run: chmod +x ./gradlew
       shell: bash
 
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test
+    - name: Build and Test with Gradle
+      run: ./gradlew clean build
       shell: bash
-      
-    - name: Test with Gradle
-      run: ./gradlew test
