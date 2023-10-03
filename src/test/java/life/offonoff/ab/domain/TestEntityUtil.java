@@ -8,7 +8,7 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
-import life.offonoff.ab.domain.topic.content.TopicContent;
+import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.vote.Vote;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,11 +37,8 @@ public class TestEntityUtil {
     public static Topic createAssociatedTopic(int seq, TopicSide side) {
         Member member = createMember(seq);
         Category category = createCategory(seq);
-        Choice choiceA = createChoice(ChoiceOption.CHOICE_A);
-        Choice choiceB = createChoice(ChoiceOption.CHOICE_B);
-
         Topic topic = createTopic(seq, side);
-        topic.associate(member, category, null, choiceA, choiceB);
+        topic.associate(member, category, null);
         return topic;
     }
 
@@ -72,8 +69,8 @@ public class TestEntityUtil {
     }
 
     //== Choice ==//
-    public static Choice createChoice(ChoiceOption option) {
-        return new Choice(option);
+    public static Choice createChoice(Topic topic, ChoiceOption option, ChoiceContent content) {
+        return new Choice(topic, option, content);
     }
 
     //== Pageable ==//

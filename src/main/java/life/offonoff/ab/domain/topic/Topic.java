@@ -2,9 +2,9 @@ package life.offonoff.ab.domain.topic;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
-import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
@@ -12,12 +12,10 @@ import life.offonoff.ab.domain.vote.Vote;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,13 +35,8 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "topic_content_id")
     private TopicContent content;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "choice_a_id")
-    private Choice choiceA;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "choice_b_id")
-    private Choice choiceB;
+    @OneToMany(mappedBy = "topic")
+    private List<Choice> choices = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private TopicSide side;
@@ -72,15 +65,29 @@ public class Topic extends BaseEntity {
     private int active = 1;
 
     // Constructor
-    public Topic(String title, TopicSide side) {
+    public Topic(String title, TopicSide side, LocalDateTime deadline) {
         this.title = title;
         this.side = side;
-        this.deadline = LocalDateTime.now()
-                                     .plusHours(24);
+        this.deadline = deadline;
+    }
+
+    public Topic(String title, TopicSide side) {
+        this(title, side, LocalDateTime.now().plusHours(24));
+    }
+
+    public Topic(Member member, Category category, String title, TopicSide side) {
+        this(member, category, title, side, LocalDateTime.now().plusHours(24));
+    }
+
+    public Topic(Member member, Category category, String title, TopicSide side, LocalDateTime deadline) {
+        this.title = title;
+        this.side = side;
+        this.deadline = deadline;
+        associate(member, category, null);
     }
 
     //== 연관관계 매핑 ==//
-    public void associate(Member member, Category category, TopicContent content, Choice choiceA, Choice choiceB) {
+    public void associate(Member member, Category category, TopicContent content) {
         this.publishMember = member;
         member.publishTopic(this);
 
@@ -88,8 +95,6 @@ public class Topic extends BaseEntity {
         category.addTopic(this);
 
         this.content = content;
-        this.choiceA = choiceA;
-        this.choiceB = choiceB;
     }
 
     public void addHide(HiddenTopic hiddenTopic) {
@@ -111,7 +116,11 @@ public class Topic extends BaseEntity {
         this.active = 0;
     }
 
-    public void removeHiddenBy(Member member) {
+    public void addChoice(Choice choice) {
+        this.choices.add(choice);
+    }
+
+  public void removeHiddenBy(Member member) {
         this.hides.removeIf(h -> h.has(member));
         member.cancelHide(this);
         hideCount--;

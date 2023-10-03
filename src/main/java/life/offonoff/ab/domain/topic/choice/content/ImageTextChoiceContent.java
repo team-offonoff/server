@@ -8,13 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@DiscriminatorValue("IMAGE_WITH_TEXT")
-public class ImageWithTextChoiceContent extends ChoiceContent {
-
+@DiscriminatorValue(ChoiceContentType.IMAGE_WITH_TEXT_CHOICE_CONTENT)
+public class ImageTextChoiceContent extends ChoiceContent {
     private String imageUrl;
     private String text;
 
-    public ImageWithTextChoiceContent(String imageUrl, String text) {
+    public ImageTextChoiceContent(String imageUrl, String text) {
         this.imageUrl = imageUrl;
         this.text = text;
     }

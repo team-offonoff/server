@@ -2,6 +2,7 @@ package life.offonoff.ab.domain.topic.choice;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
+import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,21 +16,24 @@ public class Choice extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
+
     @Enumerated(EnumType.STRING)
-    private ChoiceOption type;
+    private ChoiceOption option;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "choice_content_id")
     private ChoiceContent content;
 
     //== Constructor ==//
-    public Choice(ChoiceOption type) {
-        this.type = type;
-    }
+    public Choice(Topic topic, ChoiceOption option, ChoiceContent content) {
+        this.topic = topic;
+        topic.addChoice(this);
 
-    //== 연관관계 매핑 ==//
-    public void associate(ChoiceContent contentA) {
-        this.content = contentA;
+        this.option = option;
+        this.content = content;
     }
 
     //== Method ==//

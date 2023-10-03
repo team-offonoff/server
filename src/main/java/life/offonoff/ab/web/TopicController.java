@@ -1,10 +1,19 @@
 package life.offonoff.ab.web;
 
+import java.time.LocalDateTime;
+
+import static org.springframework.data.domain.Sort.Direction.*;
+
+import jakarta.validation.Valid;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.service.dto.TopicSearchParams;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.service.TopicService;
+import life.offonoff.ab.service.request.TopicCreateRequest;
+import life.offonoff.ab.web.common.AuthenticationId;
+import life.offonoff.ab.web.response.TopicResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -12,18 +21,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
-
-import static org.springframework.data.domain.Sort.Direction.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/topics")
 @RestController
+@RequestMapping("/topics")
 public class TopicController {
-
     private final TopicService topicService;
 
+    // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
+    @PostMapping
+    public ResponseEntity<TopicResponse> createCategory(
+            @AuthenticationId final Long memberId,
+            @Valid @RequestBody final TopicCreateRequest request
+    ) {
+        return ResponseEntity.ok(
+                topicService.createMembersTopic(memberId, request));
+    }
+  
     /**
      * 홈 화면 Topic 리스트
      * @param categoryId
