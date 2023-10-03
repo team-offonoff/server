@@ -2,17 +2,16 @@ package life.offonoff.ab.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.service.TopicService;
 import life.offonoff.ab.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.service.request.TopicCreateRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -22,9 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TopicController.class)
-public class TopicControllerTest {
-    @Autowired
-    MockMvc mvc;
+public class TopicControllerTest extends RestDocsTest {
 
     @MockBean
     TopicService topicService;
@@ -37,7 +34,7 @@ public class TopicControllerTest {
         when(topicService.createMembersTopic(any(), any()))
                 .thenReturn(builder.build().createResponse());
 
-        mvc.perform(post(TopicUri.BASE).with(csrf())
+        mvc.perform(post(TopicUri.BASE).with(csrf().asHeader())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                              .writeValueAsString(request)))
