@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +98,13 @@ public class Topic extends BaseEntity {
         this.content = content;
     }
 
+    //== Getter ==//
+    public Long getDeadlineMillis() {
+        return deadline.atZone(ZoneId.of("Asia/Seoul"))
+                       .toInstant()
+                       .toEpochMilli();
+    }
+
     public void addHide(HiddenTopic hiddenTopic) {
         this.hides.add(hiddenTopic);
         hideCount++;
@@ -112,6 +120,10 @@ public class Topic extends BaseEntity {
         voteCount++;
     }
 
+    public void endVote() {
+        status = TopicStatus.EXPIRED;
+    }
+
     public void remove() {
         this.active = 0;
     }
@@ -120,7 +132,7 @@ public class Topic extends BaseEntity {
         this.choices.add(choice);
     }
 
-  public void removeHiddenBy(Member member) {
+    public void removeHiddenBy(Member member) {
         this.hides.removeIf(h -> h.has(member));
         member.cancelHide(this);
         hideCount--;
