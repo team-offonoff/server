@@ -8,6 +8,7 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.service.request.TopicSearchRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -43,6 +44,10 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
     }
 
     private OrderSpecifier[] getOrderSpecifiers(Sort sort) {
+        if (sort == null) {
+            return null;
+        }
+
         return sort.stream()
                 .map(o -> {
                             Order order = o.isAscending() ? Order.ASC : Order.DESC;
