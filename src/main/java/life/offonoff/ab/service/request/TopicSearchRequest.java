@@ -4,11 +4,9 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-import static life.offonoff.ab.repository.specification.TopicSpecificationFactory.*;
-
 @Getter
 @Setter
-public class TopicSearchRequest implements SpecificationRequest {
+public class TopicSearchRequest {
 
     private TopicStatus topicStatus;
     private Long memberId;

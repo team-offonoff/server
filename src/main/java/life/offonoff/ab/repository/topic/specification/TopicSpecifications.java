@@ -1,4 +1,4 @@
-package life.offonoff.ab.repository.specification;
+package life.offonoff.ab.repository.topic.specification;
 
 import jakarta.persistence.criteria.*;
 import life.offonoff.ab.domain.category.Category;
