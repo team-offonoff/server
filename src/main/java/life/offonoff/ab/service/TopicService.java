@@ -4,16 +4,14 @@ import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.exception.CategoryNotFoundException;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
-import life.offonoff.ab.repository.TopicRepository;
-import life.offonoff.ab.repository.specification.TopicSpecificationFactory;
-import life.offonoff.ab.repository.specification.TopicSpecifications;
+import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.repository.topic.specification.TopicSpecificationFactory;
 import life.offonoff.ab.service.request.ChoiceCreateRequest;
 import life.offonoff.ab.service.request.TopicCreateRequest;
 import life.offonoff.ab.service.request.TopicSearchRequest;
@@ -21,7 +19,6 @@ import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,7 +72,7 @@ public class TopicService {
      * @return
      */
     public Slice<Topic> searchAll(final TopicSearchRequest request, final Pageable pageable) {
-        return topicRepository.findAll(TopicSpecificationFactory.create(request), pageable);
+        return topicRepository.findAll(request, pageable);
     }
 
     @Transactional
