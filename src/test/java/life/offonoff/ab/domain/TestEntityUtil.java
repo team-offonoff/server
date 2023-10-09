@@ -10,10 +10,13 @@ import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.vote.Vote;
+import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +36,28 @@ public class TestEntityUtil {
         String topicTitle = "TITLE_" + seq;
         return new Topic(topicTitle, side);
     }
+
+    @Builder
+    public static class TestTopic {
+
+        private TopicSide side;
+        private String title;
+        private Category category;
+        private Member publishMember;
+        private int voteCount;
+
+        @Builder.Default
+        private LocalDateTime deadline = LocalDateTime.now();
+
+        public Topic buildTopic() {
+            Topic topic = new Topic(title, side, deadline);
+            ReflectionTestUtils.setField(topic, "voteCount", voteCount);
+            ReflectionTestUtils.setField(topic, "category", category);
+            ReflectionTestUtils.setField(topic, "publishMember", publishMember);
+            return topic;
+        }
+    }
+
 
     public static Topic createAssociatedTopic(int seq, TopicSide side) {
         Member member = createMember(seq);

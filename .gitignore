@@ -38,3 +38,6 @@ out/
 
 ### ENV ###
 *.yml
+
+### QueryDSL ###
+/src/main/generated/

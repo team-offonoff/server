@@ -4,17 +4,17 @@ import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.exception.CategoryNotFoundException;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
-import life.offonoff.ab.repository.TopicRepository;
-import life.offonoff.ab.service.dto.TopicSearchParams;
+import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.repository.topic.specification.TopicSpecificationFactory;
 import life.offonoff.ab.service.request.ChoiceCreateRequest;
 import life.offonoff.ab.service.request.TopicCreateRequest;
+import life.offonoff.ab.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -65,15 +65,14 @@ public class TopicService {
                               .orElseThrow();
     }
 
-    public Slice<Topic> searchAllNotHidden(TopicSearchParams params, Pageable pageable) {
-        TopicStatus topicStatus = params.getTopicStatus();
-        Long memberId = params.getMemberId();
-        Long categoryId = params.getCategoryId();
-
-        if (categoryId == null) {
-            return topicRepository.findAllNotHidden(topicStatus, memberId, pageable);
-        }
-        return topicRepository.findAllNotHiddenByCategoryId(topicStatus, memberId, categoryId, pageable);
+    /**
+     * 토픽 검색 서비스
+     * @param request Specification을 이용해 검색 조건 추상화
+     * @param pageable
+     * @return
+     */
+    public Slice<Topic> searchAll(final TopicSearchRequest request, final Pageable pageable) {
+        return topicRepository.findAll(request, pageable);
     }
 
     @Transactional
