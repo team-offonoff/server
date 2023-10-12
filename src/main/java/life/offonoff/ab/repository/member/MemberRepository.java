@@ -1,12 +1,11 @@
-package life.offonoff.ab.repository;
+package life.offonoff.ab.repository.member;
 
-import jakarta.persistence.EntityManager;
 import life.offonoff.ab.domain.member.Member;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+
+    List<Member> findAllVotedTo(Long aLong);
 }

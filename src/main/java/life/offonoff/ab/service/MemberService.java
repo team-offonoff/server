@@ -1,7 +1,7 @@
 package life.offonoff.ab.service;
 
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.repository.MemberRepository;
+import life.offonoff.ab.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
