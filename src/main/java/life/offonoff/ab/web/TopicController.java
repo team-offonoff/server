@@ -26,7 +26,7 @@ public class TopicController {
 
     // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
     @PostMapping
-    public ResponseEntity<TopicResponse> createCategory(
+    public ResponseEntity<TopicResponse> createTopic(
             @AuthenticationId final Long memberId,
             @Valid @RequestBody final TopicCreateRequest request
     ) {
