@@ -121,7 +121,7 @@ public class Topic extends BaseEntity {
     }
 
     public void endVote() {
-        status = TopicStatus.EXPIRED;
+        status = TopicStatus.VOTING_ENDED;
     }
 
     public void remove() {
