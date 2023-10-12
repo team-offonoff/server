@@ -34,8 +34,8 @@ public class VotingTopicContainer {
         log.info("new TopicSchedules({}) added, total schedules : {}", votingTopic, storage.size());
     }
 
-    public void remove(VotingTopic schedule) {
-        storage.removeIf(ts -> ts.topicId().equals(schedule.topicId()));
+    public void remove(VotingTopic votingTopic) {
+        storage.remove(votingTopic);
     }
 
     public int size() {

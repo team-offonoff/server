@@ -7,11 +7,6 @@ public record VotingTopic(
         LocalDateTime deadline
 ) {
 
-    public VotingTopic(Long topicId, LocalDateTime deadline) {
-        this.topicId = topicId;
-        this.deadline = deadline;
-    }
-
     public boolean votingEnded(LocalDateTime time) {
         return !time.isBefore(deadline);
     }
