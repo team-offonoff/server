@@ -18,44 +18,49 @@ import java.util.function.Predicate;
  */
 public class VotingTopicQueue implements VotingTopicStorage {
 
-    private final Queue<VotingTopic> schedules;
+    private final Queue<VotingTopic> storage;
 
     public VotingTopicQueue(Comparator<VotingTopic> comparator) {
-        this.schedules = new PriorityQueue<>(comparator);
+        this.storage = new PriorityQueue<>(comparator);
     }
 
     @Override
     public void loadInVoting(List<VotingTopic> schedules) {
-        this.schedules.addAll(schedules);
+        this.storage.addAll(schedules);
     }
 
     @Override
     public void add(VotingTopic schedule) {
-        schedules.offer(schedule);
+        storage.offer(schedule);
     }
 
     @Override
-    public void removeIf(Predicate<VotingTopic> predicate) {
-        schedules.removeIf(predicate);
+    public void remove(VotingTopic votingTopic) {
+        storage.removeIf(votingTopic::equals);
     }
 
     @Override
     public boolean isEmpty() {
-        return schedules.isEmpty();
+        return storage.isEmpty();
     }
 
     @Override
     public int size() {
-        return schedules.size();
+        return storage.size();
     }
 
     @Override
     public VotingTopic front() {
-        return schedules.peek();
+        return storage.peek();
     }
 
     @Override
     public VotingTopic popFront() {
-        return schedules.poll();
+        return storage.poll();
+    }
+
+    @Override
+    public boolean contains(VotingTopic votingTopic) {
+        return storage.contains(votingTopic);
     }
 }

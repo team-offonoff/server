@@ -10,11 +10,11 @@ import java.util.function.Predicate;
  */
 public interface VotingTopicStorage {
 
-    void loadInVoting(List<VotingTopic> schedules);
+    void loadInVoting(List<VotingTopic> topics);
 
-    void add(VotingTopic schedule);
+    void add(VotingTopic votingTopic);
 
-    void removeIf(Predicate<VotingTopic> predicate);
+    void remove(VotingTopic votingTopic);
 
     boolean isEmpty();
 
@@ -23,4 +23,6 @@ public interface VotingTopicStorage {
     VotingTopic front();
 
     VotingTopic popFront();
+
+    boolean contains(VotingTopic votingTopic);
 }

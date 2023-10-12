@@ -38,6 +38,23 @@ class VotingTopicQueueTest {
     }
 
     @Test
+    @DisplayName("큐에 추가하면 contained")
+    void insert_then_contains() {
+        VotingTopic votingTopic = new VotingTopic(1L, LocalDateTime.now());
+        queue.add(votingTopic);
+
+        assertThat(queue.contains(votingTopic)).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않으면 not contains")
+    void contains_non_match() {
+        VotingTopic votingTopic = new VotingTopic(1L, LocalDateTime.now());
+
+        assertThat(queue.contains(votingTopic)).isFalse();
+    }
+
+    @Test
     @DisplayName("빈 큐는 empty")
     void empty() {
         assertThat(queue.isEmpty()).isTrue();
@@ -52,6 +69,7 @@ class VotingTopicQueueTest {
     }
 
     @Test
+    @DisplayName("불러온 토픽들은 큐에 load")
     void load_VotingTopics() {
         // given
         VotingTopic topic1 = new VotingTopic(1L, LocalDateTime.now());
@@ -89,5 +107,19 @@ class VotingTopicQueueTest {
                 () -> assertThat(front).isNotNull(),
                 () -> assertThat(queue.size()).isEqualTo(topics.size() - 1)
         );
+    }
+
+    @Test
+    @DisplayName("같은 VoticTopic이 저장돼있으면 삭제")
+    void remove() {
+        // given
+        VotingTopic votingTopic = new VotingTopic(1L, LocalDateTime.now());
+        queue.add(votingTopic);
+
+        // when
+        queue.remove(votingTopic);
+
+        // then
+        assertThat(queue.contains(votingTopic)).isFalse();
     }
 }
