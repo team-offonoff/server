@@ -21,7 +21,7 @@ public class Choice extends BaseEntity {
     private Topic topic;
 
     @Enumerated(EnumType.STRING)
-    private ChoiceOption option;
+    private ChoiceOption choiceOption;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "choice_content_id")
@@ -32,7 +32,7 @@ public class Choice extends BaseEntity {
         this.topic = topic;
         topic.addChoice(this);
 
-        this.option = option;
+        this.choiceOption = option;
         this.content = content;
     }
 

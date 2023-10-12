@@ -13,6 +13,6 @@ public record ChoiceResponse(
         return new ChoiceResponse(
                 choice.getId(),
                 ChoiceContentResponseFactory.create(choice.getContent()),
-                choice.getOption());
+                choice.getChoiceOption());
     }
 }
