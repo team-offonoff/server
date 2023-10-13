@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,10 +45,6 @@ public class VotingTopicContainer {
      * 투표가 끝난 토픽 반환
      */
     public List<VotingTopic> getVotingEnded(LocalDateTime time) {
-        List<VotingTopic> ended = new ArrayList<>();
-        while (!storage.isEmpty() && storage.front().votingEnded(time)) {
-            ended.add(storage.popFront());
-        }
-        return ended;
+        return storage.popAllIf(votingTopic -> votingTopic.votingEnded(time));
     }
 }

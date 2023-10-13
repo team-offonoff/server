@@ -22,7 +22,7 @@ public interface VotingTopicStorage {
 
     VotingTopic front();
 
-    VotingTopic popFront();
+    List<VotingTopic> popAllIf(Predicate<VotingTopic> predicate);
 
     boolean contains(VotingTopic votingTopic);
 }

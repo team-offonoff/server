@@ -1,11 +1,9 @@
 package life.offonoff.ab.service.schedule.topic.storage;
 
+import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.service.schedule.topic.VotingTopic;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -54,9 +52,17 @@ public class VotingTopicQueue implements VotingTopicStorage {
         return storage.peek();
     }
 
+    /**
+     * 우선순위 큐로 구현했기에 만족하지 않으면 iteration ends
+     */
     @Override
-    public VotingTopic popFront() {
-        return storage.poll();
+    public List<VotingTopic> popAllIf(Predicate<VotingTopic> predicate) {
+        List<VotingTopic> topics = new ArrayList<>();
+
+        while (!storage.isEmpty() && predicate.test(storage.peek())) {
+            topics.add(storage.poll());
+        }
+        return topics;
     }
 
     @Override
