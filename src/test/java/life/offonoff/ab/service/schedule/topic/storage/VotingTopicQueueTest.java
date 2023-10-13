@@ -85,13 +85,16 @@ class VotingTopicQueueTest {
     }
 
     @Test
-    @DisplayName("빈 큐에서 popFront 시 null 리턴")
+    @DisplayName("빈 큐에서 popAllIf 시 null 리턴")
     void popFront_when_empty() {
-        assertThat(queue.popFront()).isNull();
+        assertThat(queue.popAllIf(
+                        votingTopic -> votingTopic.votingEnded(LocalDateTime.now())
+                )
+        ).isEmpty();
     }
 
     @Test
-    @DisplayName("큐에서 popFront 시 가장 앞 VotingTopic 리턴")
+    @DisplayName("큐에서 popAllIf 시 만족하는 VotingTopic들 리턴")
     void popFront_not_empty() {
         // given
         LocalDateTime now = LocalDateTime.now();
@@ -102,7 +105,7 @@ class VotingTopicQueueTest {
         queue.loadInVoting(topics);
 
         // when
-        VotingTopic front = queue.popFront();
+        List<VotingTopic> front = queue.popAllIf(vt -> vt.votingEnded(now));
         assertAll(
                 () -> assertThat(front).isNotNull(),
                 () -> assertThat(queue.size()).isEqualTo(topics.size() - 1)
