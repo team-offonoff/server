@@ -1,8 +1,8 @@
-package life.offonoff.ab.service;
+package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.repository.CategoryRepository;
-import life.offonoff.ab.service.request.CategoryCreateRequest;
+import life.offonoff.ab.application.service.request.CategoryCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,7 @@
 package life.offonoff.ab.service.schedule.topic.storage;
 
-import life.offonoff.ab.service.schedule.topic.VotingTopic;
+import life.offonoff.ab.application.schedule.topic.VotingTopic;
+import life.offonoff.ab.application.schedule.topic.storage.VotingTopicQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

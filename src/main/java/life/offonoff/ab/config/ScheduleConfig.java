@@ -1,7 +1,7 @@
 package life.offonoff.ab.config;
 
-import life.offonoff.ab.service.schedule.topic.storage.VotingTopicQueue;
-import life.offonoff.ab.service.schedule.topic.storage.VotingTopicStorage;
+import life.offonoff.ab.application.schedule.topic.storage.VotingTopicQueue;
+import life.offonoff.ab.application.schedule.topic.storage.VotingTopicStorage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;

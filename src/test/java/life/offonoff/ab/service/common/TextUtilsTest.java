@@ -1,9 +1,9 @@
 package life.offonoff.ab.service.common;
 
+import life.offonoff.ab.application.service.common.TextUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class TextUtilsTest {
 

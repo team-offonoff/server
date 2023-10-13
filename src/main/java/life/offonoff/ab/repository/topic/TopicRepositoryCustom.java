@@ -2,9 +2,9 @@ package life.offonoff.ab.repository.topic;
 
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.service.event.topic.VotingResult;
-import life.offonoff.ab.service.request.TopicSearchRequest;
-import life.offonoff.ab.service.schedule.topic.VotingTopic;
+import life.offonoff.ab.application.event.topic.VotingResult;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.schedule.topic.VotingTopic;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;

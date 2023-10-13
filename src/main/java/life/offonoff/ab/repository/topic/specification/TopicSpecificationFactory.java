@@ -1,7 +1,7 @@
 package life.offonoff.ab.repository.topic.specification;
 
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import org.springframework.data.jpa.domain.Specification;
 
 public class TopicSpecificationFactory {

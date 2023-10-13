@@ -1,8 +1,8 @@
-package life.offonoff.ab.service.schedule.topic;
+package life.offonoff.ab.application.schedule.topic;
 
 import jakarta.annotation.PostConstruct;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.service.schedule.topic.storage.VotingTopicStorage;
+import life.offonoff.ab.application.schedule.topic.storage.VotingTopicStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -2,8 +2,8 @@ package life.offonoff.ab.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.restdocs.RestDocsTest;
-import life.offonoff.ab.service.CategoryService;
-import life.offonoff.ab.service.request.CategoryCreateRequest;
+import life.offonoff.ab.application.service.CategoryService;
+import life.offonoff.ab.application.service.request.CategoryCreateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

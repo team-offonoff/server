@@ -1,4 +1,4 @@
-package life.offonoff.ab.service.common;
+package life.offonoff.ab.application.service.common;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

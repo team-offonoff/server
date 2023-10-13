@@ -1,9 +1,8 @@
 package life.offonoff.ab.web;
 
 import jakarta.validation.Valid;
-import life.offonoff.ab.service.CategoryService;
-import life.offonoff.ab.service.request.CategoryCreateRequest;
-import life.offonoff.ab.web.common.AuthenticationId;
+import life.offonoff.ab.application.service.CategoryService;
+import life.offonoff.ab.application.service.request.CategoryCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

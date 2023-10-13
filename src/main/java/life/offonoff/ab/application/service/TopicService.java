@@ -1,5 +1,6 @@
-package life.offonoff.ab.service;
+package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.topic.TopicCreateEvent;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -11,10 +12,9 @@ import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.service.event.topic.TopicCreateEvent;
-import life.offonoff.ab.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.service.request.TopicCreateRequest;
-import life.offonoff.ab.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
