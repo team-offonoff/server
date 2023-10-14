@@ -1,5 +1,6 @@
 package life.offonoff.ab.service.schedule.topic;
 
+import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.application.schedule.topic.VotingTopic;
 import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
@@ -27,6 +28,8 @@ class VotingTopicContainerTest {
     VotingTopicStorage storage;
     @Mock
     TopicRepository topicRepository;
+    @Mock
+    VotingEndCriteria criteria;
 
     @Test
     @DisplayName("빈 컨테이너는 사이즈가 0")
@@ -80,7 +83,7 @@ class VotingTopicContainerTest {
         when(storage.popAllIf(any())).thenReturn(topics);
 
         // when
-        List<VotingTopic> votingEnded = container.getVotingEnded(standard);
+        List<VotingTopic> votingEnded = container.getVotingEnded(criteria);
 
         // then
         assertThat(votingEnded).containsExactlyElementsOf(topics);

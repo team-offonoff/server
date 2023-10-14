@@ -100,13 +100,13 @@ class VotingTopicQueueTest {
         // given
         LocalDateTime now = LocalDateTime.now();
         VotingTopic topic1 = new VotingTopic(1L, now);
-        VotingTopic topic2 = new VotingTopic(2L, now.plusHours(1));
+        VotingTopic topic2 = new VotingTopic(2L, now.plusHours(2));
 
         List<VotingTopic> topics = List.of(topic1, topic2);
         queue.loadInVoting(topics);
 
         // when
-        List<VotingTopic> front = queue.popAllIf(vt -> vt.deadlinePassed(now));
+        List<VotingTopic> front = queue.popAllIf(vt -> vt.deadlinePassed(now.plusHours(1)));
         assertAll(
                 () -> assertThat(front).isNotNull(),
                 () -> assertThat(queue.size()).isEqualTo(topics.size() - 1)

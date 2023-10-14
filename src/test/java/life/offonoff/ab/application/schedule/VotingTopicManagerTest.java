@@ -3,6 +3,7 @@ package life.offonoff.ab.application.schedule;
 import life.offonoff.ab.application.event.topic.VotingEndEvent;
 import life.offonoff.ab.application.schedule.topic.VotingTopic;
 import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
+import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,8 @@ class VotingTopicManagerTest {
     TopicRepository topicRepository;
     @MockBean
     ApplicationEventPublisher eventPublisher;
+    @MockBean
+    VotingEndCriteria criteria;
 
     @BeforeEach
     void beforeEach() {
@@ -50,7 +53,7 @@ class VotingTopicManagerTest {
         doNothing().when(topicRepository).updateStatus(any(), any());
 
         // when
-        votingTopicManager.endVoting(standard);
+        votingTopicManager.endVoting(criteria);
 
         // then
         verify(eventPublisher, times(topics.size())).publishEvent(any(VotingEndEvent.class));
@@ -65,7 +68,7 @@ class VotingTopicManagerTest {
 
         try {
             // when
-            votingTopicManager.endVoting(standard);
+            votingTopicManager.endVoting(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, never()).publishEvent(any(VotingEndEvent.class));
@@ -88,7 +91,7 @@ class VotingTopicManagerTest {
 
         try {
             // when
-            votingTopicManager.endVoting(standard);
+            votingTopicManager.endVoting(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, times(topics.size() - 1)).publishEvent(any(VotingEndEvent.class));
