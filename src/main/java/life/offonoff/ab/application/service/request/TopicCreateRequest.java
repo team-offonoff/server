@@ -1,10 +1,10 @@
-package life.offonoff.ab.service.request;
+package life.offonoff.ab.application.service.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.exception.LengthInvalidException;
-import life.offonoff.ab.service.common.TextUtils;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

@@ -4,10 +4,10 @@ import static org.springframework.data.domain.Sort.Direction.*;
 
 import jakarta.validation.Valid;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.common.response.PageResponse;
-import life.offonoff.ab.service.TopicService;
-import life.offonoff.ab.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.TopicService;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.web.common.AuthenticationId;
 import life.offonoff.ab.web.response.TopicDetailResponse;
 import life.offonoff.ab.web.response.TopicResponse;
@@ -26,7 +26,7 @@ public class TopicController {
 
     // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
     @PostMapping
-    public ResponseEntity<TopicResponse> createCategory(
+    public ResponseEntity<TopicResponse> createTopic(
             @AuthenticationId final Long memberId,
             @Valid @RequestBody final TopicCreateRequest request
     ) {

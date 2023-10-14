@@ -6,7 +6,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
-import life.offonoff.ab.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

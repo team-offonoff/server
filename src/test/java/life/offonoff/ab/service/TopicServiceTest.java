@@ -1,39 +1,64 @@
 package life.offonoff.ab.service;
 
+import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.repository.CategoryRepository;
-import life.offonoff.ab.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.service.request.ImageTextChoiceContentCreateRequest;
-import life.offonoff.ab.service.request.TopicCreateRequest;
-import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.repository.ChoiceRepository;
+import life.offonoff.ab.repository.member.MemberRepository;
+import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.application.event.topic.TopicCreateEvent;
+import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
+import life.offonoff.ab.application.service.request.ImageTextChoiceContentCreateRequest;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.web.response.ChoiceResponse;
 import life.offonoff.ab.web.response.ImageTextChoiceContentResponse;
-import life.offonoff.ab.web.response.TopicDetailResponse;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.Builder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.Optional;
+import static life.offonoff.ab.domain.TestEntityUtil.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.*;
 
 @Transactional
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class TopicServiceTest {
-    @Autowired
+
+    @InjectMocks
     TopicService topicService;
 
-    @Autowired
+    @Mock
     CategoryRepository categoryRepository;
+    @Mock
+    ChoiceRepository choiceRepository;
+    @Mock
+    TopicRepository topicRepository;
+    @Mock
+    MemberRepository memberRepository;
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
+    @BeforeEach
+    void before() {
+        setEventPublisher(topicService, eventPublisher);
+    }
 
     @Test
     void TopicCreateRequest_equalOrLessThanMaxLength25_success() {
@@ -52,24 +77,101 @@ public class TopicServiceTest {
     }
 
     @Test
+    @DisplayName("토픽 생성 테스트")
     void createMembersTopic() {
-        Category category = createCategory();
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build()
+                .buildMember();
+
+        Category category = TestCategory.builder()
+                .id(1L)
+                .build()
+                .buildCategory();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+
+        // when
         TopicResponse topicResponse = topicService.createMembersTopic(
-                0L,
+                member.getId(),
                 TopicTestDtoHelper.builder()
                         .category(category)
                         .build().createRequest());
-        System.out.println("topicResponse = " + topicResponse);
+
+        // then
+        assertThat(topicResponse.categoryId()).isEqualTo(category.getId());
     }
 
-    private Category createCategory() {
-        Category category = new Category("category");
-        categoryRepository.save(category);
-        return category;
+    @Test
+    @DisplayName("토픽이 생성되면 이벤트 발행")
+    void event_publish_when_topic_saved() {
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build()
+                .buildMember();
+
+        Category category = TestCategory.builder()
+                .id(1L)
+                .build()
+                .buildCategory();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+
+        TopicCreateRequest request = TopicTestDtoHelper.builder()
+                .category(category)
+                .build()
+                .createRequest();
+
+        // when
+        topicService.createMembersTopic(member.getId(), request);
+
+        // then
+        verify(eventPublisher).publishEvent(any(TopicCreateEvent.class));
+    }
+
+    @Test
+    @DisplayName("토픽이 생성 중 예외 발생하면 이벤트 발행X")
+    void topic_save_exception_test() {
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build()
+                .buildMember();
+
+        Category category = TestCategory.builder()
+                .id(1L)
+                .build()
+                .buildCategory();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(topicRepository.save(any())).thenThrow(RuntimeException.class);
+
+        TopicCreateRequest request = TopicTestDtoHelper.builder()
+                .category(category)
+                .build()
+                .createRequest();
+
+        try {
+            // when
+            topicService.createMembersTopic(member.getId(), request);
+        } catch (RuntimeException e) {
+            // then
+            verify(eventPublisher, never()).publishEvent(any(TopicCreateEvent.class));
+        }
+    }
+
+    private void setEventPublisher(TopicService topicService, ApplicationEventPublisher eventPublisher) {
+        ReflectionTestUtils.setField(topicService, "eventPublisher", eventPublisher);
     }
 
     @Builder
     public static class TopicTestDtoHelper {
+
         private Category category;
 
         @Builder.Default

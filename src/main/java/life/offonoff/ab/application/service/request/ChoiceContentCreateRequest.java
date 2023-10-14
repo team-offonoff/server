@@ -1,4 +1,4 @@
-package life.offonoff.ab.service.request;
+package life.offonoff.ab.application.service.request;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

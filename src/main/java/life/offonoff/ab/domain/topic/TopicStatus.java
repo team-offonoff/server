@@ -1,5 +1,5 @@
 package life.offonoff.ab.domain.topic;
 
 public enum TopicStatus {
-    VOTING, EXPIRED
+    VOTING, VOTING_ENDED, NOTICED
 }

@@ -1,8 +1,8 @@
-package life.offonoff.ab.service;
+package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.topic.TopicCreateEvent;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -10,13 +10,14 @@ import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.exception.CategoryNotFoundException;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
+import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.repository.topic.specification.TopicSpecificationFactory;
-import life.offonoff.ab.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.service.request.TopicCreateRequest;
-import life.offonoff.ab.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,11 @@ public class TopicService {
     private final CategoryRepository categoryRepository;
     private final ChoiceRepository choiceRepository;
     private final TopicRepository topicRepository;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
+    private final ApplicationEventPublisher eventPublisher;
+
+    //== Create ==//
     @Transactional
     public TopicResponse createMembersTopic(final Long memberId, final TopicCreateRequest request) {
         Member member = findMember(memberId);
@@ -41,6 +45,9 @@ public class TopicService {
         request.choices().stream()
                 .map(choiceRequest -> createTopicsChoice(topic, choiceRequest))
                 .forEach(choiceRepository::save);
+
+        // topic 생성 이벤트 발행
+        eventPublisher.publishEvent(TopicCreateEvent.of(topic));
 
         return TopicResponse.from(topic);
     }
@@ -57,9 +64,11 @@ public class TopicService {
 
     // TODO: Find member
     private Member findMember(final Long memberId) {
-        return new Member("name", "nickname", new NotificationEnabled(true, true, true, true));
+        return memberRepository.findById(memberId)
+                               .orElseThrow();
     }
 
+    //== Search ==//
     public Topic searchById(Long topicId) {
         return topicRepository.findById(topicId)
                               .orElseThrow();
@@ -75,9 +84,10 @@ public class TopicService {
         return topicRepository.findAll(request, pageable);
     }
 
+    //== Hide ==//
     @Transactional
     public void hide(Long memberId, Long topicId, Boolean hide) {
-        Member member = memberService.searchById(memberId);
+        Member member = findMember(memberId);
         Topic topic = this.searchById(topicId);
 
         if (hide) {
