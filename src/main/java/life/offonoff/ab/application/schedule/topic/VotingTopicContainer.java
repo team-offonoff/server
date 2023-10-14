@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.schedule.topic;
 
 import jakarta.annotation.PostConstruct;
+import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.application.schedule.topic.storage.VotingTopicStorage;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class VotingTopicContainer {
     /**
      * 투표가 끝난 토픽 반환
      */
-    public List<VotingTopic> getVotingEnded(LocalDateTime time) {
-        return storage.popAllIf(votingTopic -> votingTopic.votingEnded(time));
+    public List<VotingTopic> getVotingEnded(VotingEndCriteria criteria) {
+        return storage.popAllIf(criteria::check);
     }
 }

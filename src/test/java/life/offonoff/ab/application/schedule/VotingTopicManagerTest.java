@@ -19,10 +19,10 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class VotingManagerTest {
+class VotingTopicManagerTest {
 
     @Autowired
-    VotingManager votingManager;
+    VotingTopicManager votingTopicManager;
     @MockBean
     VotingTopicContainer container;
     @MockBean
@@ -32,7 +32,7 @@ class VotingManagerTest {
 
     @BeforeEach
     void beforeEach() {
-        setEventPublisher(votingManager, eventPublisher);
+        setEventPublisher(votingTopicManager, eventPublisher);
     }
 
     @Test
@@ -50,7 +50,7 @@ class VotingManagerTest {
         doNothing().when(topicRepository).updateStatus(any(), any());
 
         // when
-        votingManager.endVoting(standard);
+        votingTopicManager.endVoting(standard);
 
         // then
         verify(eventPublisher, times(topics.size())).publishEvent(any(VotingEndEvent.class));
@@ -65,7 +65,7 @@ class VotingManagerTest {
 
         try {
             // when
-            votingManager.endVoting(standard);
+            votingTopicManager.endVoting(standard);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, never()).publishEvent(any(VotingEndEvent.class));
@@ -88,7 +88,7 @@ class VotingManagerTest {
 
         try {
             // when
-            votingManager.endVoting(standard);
+            votingTopicManager.endVoting(standard);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, times(topics.size() - 1)).publishEvent(any(VotingEndEvent.class));
@@ -96,7 +96,7 @@ class VotingManagerTest {
     }
 
     // 테스트 환경에서 ApplicationEventPublisher MockBean이 DI가 되지 않아서 일단 리플렉션으로 DI했습니다...
-    private void setEventPublisher(VotingManager votingManager, ApplicationEventPublisher eventPublisher) {
-        ReflectionTestUtils.setField(votingManager, "eventPublisher", eventPublisher);
+    private void setEventPublisher(VotingTopicManager votingTopicManager, ApplicationEventPublisher eventPublisher) {
+        ReflectionTestUtils.setField(votingTopicManager, "eventPublisher", eventPublisher);
     }
 }

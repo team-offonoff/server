@@ -89,7 +89,7 @@ class VotingTopicQueueTest {
     @DisplayName("빈 큐에서 popAllIf 시 null 리턴")
     void popFront_when_empty() {
         assertThat(queue.popAllIf(
-                        votingTopic -> votingTopic.votingEnded(LocalDateTime.now())
+                        votingTopic -> votingTopic.deadlinePassed(LocalDateTime.now())
                 )
         ).isEmpty();
     }
@@ -106,7 +106,7 @@ class VotingTopicQueueTest {
         queue.loadInVoting(topics);
 
         // when
-        List<VotingTopic> front = queue.popAllIf(vt -> vt.votingEnded(now));
+        List<VotingTopic> front = queue.popAllIf(vt -> vt.deadlinePassed(now));
         assertAll(
                 () -> assertThat(front).isNotNull(),
                 () -> assertThat(queue.size()).isEqualTo(topics.size() - 1)

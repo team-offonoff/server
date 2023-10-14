@@ -1,5 +1,6 @@
 package life.offonoff.ab.application.schedule;
 
+import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 @Component
 public class GlobalScheduler {
 
-    private final VotingManager votingManager;
+    private final VotingTopicManager votingTopicManager;
+    private final VotingEndCriteria criteria;
 
     /**
      * 매 분마다 스케쥴링
@@ -21,12 +23,7 @@ public class GlobalScheduler {
     public void checkVotingTopic() {
         log.info("[checkVotingTopic] schedule start");
 
-        // 분 단위
-        LocalDateTime timeInMinute = LocalDateTime.now()
-                .withSecond(0)
-                .withNano(0);
-
-        votingManager.endVoting(timeInMinute);
+        votingTopicManager.endVoting(criteria);
 
         log.info("[checkVotingTopic] schedule ended");
     }

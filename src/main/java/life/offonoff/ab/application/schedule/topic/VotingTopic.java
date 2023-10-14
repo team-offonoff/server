@@ -7,7 +7,7 @@ public record VotingTopic(
         LocalDateTime deadline
 ) {
 
-    public boolean votingEnded(LocalDateTime time) {
-        return !time.isBefore(deadline);
+    public boolean deadlinePassed(LocalDateTime time) {
+        return deadline.isBefore(time);
     }
 }
