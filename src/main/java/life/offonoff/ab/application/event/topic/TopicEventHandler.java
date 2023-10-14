@@ -3,6 +3,7 @@ package life.offonoff.ab.application.event.topic;
 import life.offonoff.ab.application.schedule.topic.VotingTopic;
 import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
 import life.offonoff.ab.application.notice.NoticeService;
+import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,5 +38,13 @@ public class TopicEventHandler {
         log.info("# Voting Ended / topic-id : {}", topicId);
 
         noticeService.noticeVotingResult(topicRepository.findVotingResultById(topicId));
+    }
+
+    /**
+     * 투표 결과 전송 -> 투표 공지 status 수정
+     */
+    @TransactionalEventListener
+    public void noticedTopic(NoticedEvent event) {
+        topicRepository.updateStatus(event.topicId(), TopicStatus.NOTICED);
     }
 }

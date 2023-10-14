@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class FcmNoticeService implements NoticeService {
 
@@ -20,6 +22,7 @@ public class FcmNoticeService implements NoticeService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     @Override
     public void noticeVotingResult(VotingResult result) {
         List<Member> members = memberRepository.findAllVotedTo(result.topicId());
