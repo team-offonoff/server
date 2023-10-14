@@ -3,7 +3,7 @@ package life.offonoff.ab.config;
 import life.offonoff.ab.application.schedule.topic.VotingTopic;
 import life.offonoff.ab.application.schedule.topic.criteria.DeadlineVotingEndCriteria;
 import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
-import life.offonoff.ab.application.schedule.topic.storage.VotingTopicQueue;
+import life.offonoff.ab.application.schedule.topic.storage.VotingTopicDeadlineQueue;
 import life.offonoff.ab.application.schedule.topic.storage.VotingTopicStorage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ public class ScheduleConfig {
 
     @Bean
     public VotingTopicStorage topicScheduleStorage(Comparator<VotingTopic> votingTopicComparator) {
-        return new VotingTopicQueue(votingTopicComparator);
+        return new VotingTopicDeadlineQueue(votingTopicComparator);
     }
 
     @Bean

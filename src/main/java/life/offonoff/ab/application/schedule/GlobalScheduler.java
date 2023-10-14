@@ -6,14 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class GlobalScheduler {
 
-    private final VotingTopicManager votingTopicManager;
+    private final VotingManager votingManager;
     private final VotingEndCriteria criteria;
 
     /**
@@ -23,7 +21,7 @@ public class GlobalScheduler {
     public void checkVotingTopic() {
         log.info("[checkVotingTopic] schedule start");
 
-        votingTopicManager.endVoting(criteria);
+        votingManager.endVoting(criteria);
 
         log.info("[checkVotingTopic] schedule ended");
     }

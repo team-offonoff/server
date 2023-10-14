@@ -20,10 +20,10 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class VotingTopicManagerTest {
+class VotingManagerTest {
 
     @Autowired
-    VotingTopicManager votingTopicManager;
+    VotingManager votingManager;
     @MockBean
     VotingTopicContainer container;
     @MockBean
@@ -35,7 +35,7 @@ class VotingTopicManagerTest {
 
     @BeforeEach
     void beforeEach() {
-        setEventPublisher(votingTopicManager, eventPublisher);
+        setEventPublisher(votingManager, eventPublisher);
     }
 
     @Test
@@ -53,7 +53,7 @@ class VotingTopicManagerTest {
         doNothing().when(topicRepository).updateStatus(any(), any());
 
         // when
-        votingTopicManager.endVoting(criteria);
+        votingManager.endVoting(criteria);
 
         // then
         verify(eventPublisher, times(topics.size())).publishEvent(any(VotingEndEvent.class));
@@ -68,7 +68,7 @@ class VotingTopicManagerTest {
 
         try {
             // when
-            votingTopicManager.endVoting(criteria);
+            votingManager.endVoting(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, never()).publishEvent(any(VotingEndEvent.class));
@@ -91,7 +91,7 @@ class VotingTopicManagerTest {
 
         try {
             // when
-            votingTopicManager.endVoting(criteria);
+            votingManager.endVoting(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, times(topics.size() - 1)).publishEvent(any(VotingEndEvent.class));
@@ -99,7 +99,7 @@ class VotingTopicManagerTest {
     }
 
     // 테스트 환경에서 ApplicationEventPublisher MockBean이 DI가 되지 않아서 일단 리플렉션으로 DI했습니다...
-    private void setEventPublisher(VotingTopicManager votingTopicManager, ApplicationEventPublisher eventPublisher) {
-        ReflectionTestUtils.setField(votingTopicManager, "eventPublisher", eventPublisher);
+    private void setEventPublisher(VotingManager votingManager, ApplicationEventPublisher eventPublisher) {
+        ReflectionTestUtils.setField(votingManager, "eventPublisher", eventPublisher);
     }
 }

@@ -13,11 +13,11 @@ import java.util.function.Predicate;
  *
  * {@link life.offonoff.ab.config.ScheduleConfig}에서 Bean 등록
  */
-public class VotingTopicQueue implements VotingTopicStorage {
+public class VotingTopicDeadlineQueue implements VotingTopicStorage {
 
     private final Queue<VotingTopic> storage;
 
-    public VotingTopicQueue(Comparator<VotingTopic> comparator) {
+    public VotingTopicDeadlineQueue(Comparator<VotingTopic> comparator) {
         this.storage = new PriorityQueue<>(comparator);
     }
 

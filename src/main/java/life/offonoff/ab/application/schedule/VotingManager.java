@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class VotingTopicManager {
+public class VotingManager {
 
     private final VotingTopicContainer container;
     private final TopicRepository topicRepository;

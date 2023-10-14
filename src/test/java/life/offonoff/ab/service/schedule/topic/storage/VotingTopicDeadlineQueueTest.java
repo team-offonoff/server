@@ -1,7 +1,7 @@
 package life.offonoff.ab.service.schedule.topic.storage;
 
 import life.offonoff.ab.application.schedule.topic.VotingTopic;
-import life.offonoff.ab.application.schedule.topic.storage.VotingTopicQueue;
+import life.offonoff.ab.application.schedule.topic.storage.VotingTopicDeadlineQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,15 +13,15 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class VotingTopicQueueTest {
+class VotingTopicDeadlineQueueTest {
 
-    private VotingTopicQueue queue;
+    private VotingTopicDeadlineQueue queue;
     private Comparator<VotingTopic> comparator
             = (t1, t2) -> t1.deadline().compareTo(t2.deadline());
 
     @BeforeEach
     void beforeEach() {
-        queue = new VotingTopicQueue(comparator);
+        queue = new VotingTopicDeadlineQueue(comparator);
     }
 
     @Test
