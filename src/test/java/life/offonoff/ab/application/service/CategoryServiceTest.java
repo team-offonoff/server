@@ -1,4 +1,4 @@
-package life.offonoff.ab.service;
+package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.service.CategoryService;
 import life.offonoff.ab.repository.CategoryRepository;

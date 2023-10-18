@@ -3,6 +3,7 @@ package life.offonoff.ab.domain.member;
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
@@ -41,6 +42,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+
     private int active = 1;
 
     //== Constructor ==//
@@ -67,6 +71,10 @@ public class Member extends BaseEntity {
         votes.add(vote);
     }
 
+    public void addNotification(Notification notification) {
+        this.notifications.add(notification);
+    }
+
     //== Method ==//
     public void inactive() {
         this.active = 0;
@@ -79,5 +87,9 @@ public class Member extends BaseEntity {
 
     public void cancelHide(Topic topic) {
         hiddenTopics.removeIf(h -> h.has(topic));
+    }
+
+    public void readNotification(Notification notification) {
+        notification.read();
     }
 }

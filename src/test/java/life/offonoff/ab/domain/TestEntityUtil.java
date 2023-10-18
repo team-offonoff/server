@@ -88,7 +88,8 @@ public class TestEntityUtil {
         private Long id;
         private String name;
         private String nickname;
-        private NotificationEnabled enabled;
+        @Builder.Default
+        private NotificationEnabled enabled = new NotificationEnabled(true, true, true, true);
 
         public Member buildMember() {
             Member member = new Member(name, nickname, enabled);
@@ -111,7 +112,7 @@ public class TestEntityUtil {
 
     @Builder
     public static class TestTopic {
-
+        private Long id;
         private TopicSide side;
         private String title;
         private Category category;
@@ -123,6 +124,7 @@ public class TestEntityUtil {
 
         public Topic buildTopic() {
             Topic topic = new Topic(title, side, deadline);
+            ReflectionTestUtils.setField(topic, "id", id);
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
             ReflectionTestUtils.setField(topic, "category", category);
             ReflectionTestUtils.setField(topic, "publishMember", publishMember);

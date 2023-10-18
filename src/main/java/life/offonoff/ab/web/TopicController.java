@@ -63,4 +63,14 @@ public class TopicController {
         topicService.hide(memberId, topicId, hide);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/test")
+    public String test(
+            @RequestParam("memberId") Long memberId,
+            @Valid @RequestBody final TopicCreateRequest request
+    ) {
+        topicService.createMembersTopic(memberId, request);
+        return "ok";
+    }
+
 }

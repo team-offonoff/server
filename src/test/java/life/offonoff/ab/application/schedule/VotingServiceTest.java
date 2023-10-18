@@ -1,9 +1,10 @@
 package life.offonoff.ab.application.schedule;
 
 import life.offonoff.ab.application.event.topic.VotingEndEvent;
-import life.offonoff.ab.application.schedule.topic.VotingTopic;
-import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
-import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.VotingService;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,10 +21,10 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class VotingManagerTest {
+class VotingServiceTest {
 
     @Autowired
-    VotingManager votingManager;
+    VotingService votingService;
     @MockBean
     VotingTopicContainer container;
     @MockBean
@@ -35,7 +36,7 @@ class VotingManagerTest {
 
     @BeforeEach
     void beforeEach() {
-        setEventPublisher(votingManager, eventPublisher);
+        setEventPublisher(votingService, eventPublisher);
     }
 
     @Test
@@ -53,7 +54,7 @@ class VotingManagerTest {
         doNothing().when(topicRepository).updateStatus(any(), any());
 
         // when
-        votingManager.endVoting(criteria);
+        votingService.endVoting(criteria);
 
         // then
         verify(eventPublisher, times(topics.size())).publishEvent(any(VotingEndEvent.class));
@@ -68,7 +69,7 @@ class VotingManagerTest {
 
         try {
             // when
-            votingManager.endVoting(criteria);
+            votingService.endVoting(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, never()).publishEvent(any(VotingEndEvent.class));
@@ -91,7 +92,7 @@ class VotingManagerTest {
 
         try {
             // when
-            votingManager.endVoting(criteria);
+            votingService.endVoting(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, times(topics.size() - 1)).publishEvent(any(VotingEndEvent.class));
@@ -99,7 +100,7 @@ class VotingManagerTest {
     }
 
     // 테스트 환경에서 ApplicationEventPublisher MockBean이 DI가 되지 않아서 일단 리플렉션으로 DI했습니다...
-    private void setEventPublisher(VotingManager votingManager, ApplicationEventPublisher eventPublisher) {
-        ReflectionTestUtils.setField(votingManager, "eventPublisher", eventPublisher);
+    private void setEventPublisher(VotingService votingService, ApplicationEventPublisher eventPublisher) {
+        ReflectionTestUtils.setField(votingService, "eventPublisher", eventPublisher);
     }
 }

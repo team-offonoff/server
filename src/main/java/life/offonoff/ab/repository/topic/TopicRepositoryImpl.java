@@ -9,7 +9,7 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.application.event.topic.VotingResult;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.application.schedule.topic.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

@@ -1,6 +1,6 @@
-package life.offonoff.ab.application.schedule.topic.criteria;
+package life.offonoff.ab.application.service.vote.criteria;
 
-import life.offonoff.ab.application.schedule.topic.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
 
 import java.time.LocalDateTime;
 

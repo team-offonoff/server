@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.schedule.topic;
+package life.offonoff.ab.application.service.vote.votingtopic;
 
 import java.time.LocalDateTime;
 

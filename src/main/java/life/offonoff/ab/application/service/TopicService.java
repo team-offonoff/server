@@ -17,12 +17,14 @@ import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -48,7 +50,6 @@ public class TopicService {
 
         // topic 생성 이벤트 발행
         eventPublisher.publishEvent(TopicCreateEvent.of(topic));
-
         return TopicResponse.from(topic);
     }
 

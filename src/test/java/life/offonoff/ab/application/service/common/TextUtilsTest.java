@@ -1,4 +1,4 @@
-package life.offonoff.ab.service.common;
+package life.offonoff.ab.application.service.common;
 
 import life.offonoff.ab.application.service.common.TextUtils;
 import org.junit.jupiter.api.Test;

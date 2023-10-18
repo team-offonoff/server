@@ -1,10 +1,9 @@
-package life.offonoff.ab.service.schedule.topic;
+package life.offonoff.ab.application.service.schedule.topic;
 
-import life.offonoff.ab.application.schedule.topic.criteria.VotingEndCriteria;
-import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.application.schedule.topic.VotingTopic;
-import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
-import life.offonoff.ab.application.schedule.topic.storage.VotingTopicStorage;
+import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.storage.VotingTopicStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,14 +26,30 @@ class VotingTopicContainerTest {
     @Mock
     VotingTopicStorage storage;
     @Mock
-    TopicRepository topicRepository;
-    @Mock
     VotingEndCriteria criteria;
 
     @Test
     @DisplayName("빈 컨테이너는 사이즈가 0")
     void empty_size() {
         assertThat(container.size()).isEqualTo(0);
+    }
+
+    @Test
+    void load() {
+        // given
+        LocalDateTime time = LocalDateTime.now();
+        VotingTopic topic1 = new VotingTopic(1L, time);
+        VotingTopic topic2 = new VotingTopic(2L, time);
+
+        List<VotingTopic> topics = List.of(topic1, topic2);
+
+        when(storage.size()).thenReturn(topics.size());
+
+        // when
+        container.load(topics);
+
+        // then
+        assertThat(container.size()).isEqualTo(topics.size());
     }
 
     @Test
@@ -51,23 +66,6 @@ class VotingTopicContainerTest {
         assertThat(container.size()).isEqualTo(1);
     }
 
-    @Test
-    @DisplayName("컨테이너 초기화하면 토픽 load")
-    void init() {
-        // given
-        VotingTopic votingTopic1 = new VotingTopic(1L, LocalDateTime.now());
-        VotingTopic votingTopic2 = new VotingTopic(2L, LocalDateTime.now());
-        List<VotingTopic> topics = List.of(votingTopic1, votingTopic2);
-
-        when(topicRepository.findAllInVoting(any())).thenReturn(topics);
-        when(storage.size()).thenReturn(topics.size());
-
-        // when
-        container.init();
-
-        // then
-        assertThat(container.size()).isEqualTo(topics.size());
-    }
 
     @Test
     @DisplayName("입력 시각 기준으로 투표가 끝난 토픽들 반환")

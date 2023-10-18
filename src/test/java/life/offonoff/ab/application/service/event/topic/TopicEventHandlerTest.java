@@ -1,12 +1,11 @@
-package life.offonoff.ab.service.event.topic;
+package life.offonoff.ab.application.service.event.topic;
 
 import life.offonoff.ab.application.event.topic.*;
 import life.offonoff.ab.application.notice.NoticeService;
-import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

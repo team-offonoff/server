@@ -1,7 +1,7 @@
 package life.offonoff.ab.application.event.topic;
 
-import life.offonoff.ab.application.schedule.topic.VotingTopic;
-import life.offonoff.ab.application.schedule.topic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
 import life.offonoff.ab.application.notice.NoticeService;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -23,7 +23,7 @@ public class TopicEventHandler {
     /**
      * 투표 생성 이벤트 -> VotingTopicContainer에서 관리 추가
      */
-    @TransactionalEventListener
+    @EventListener
     public void addTopic(TopicCreateEvent event) {
         log.info("# Topic created / topic-id : {}, deadline : {}", event.topicId(), event.deadline());
         votingTopicContainer.insert(new VotingTopic(event.topicId(), event.deadline()));
