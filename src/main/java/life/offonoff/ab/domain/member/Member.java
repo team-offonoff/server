@@ -42,7 +42,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
     private int active = 1;
@@ -90,6 +90,6 @@ public class Member extends BaseEntity {
     }
 
     public void readNotification(Notification notification) {
-        notification.read();
+        notification.check();
     }
 }

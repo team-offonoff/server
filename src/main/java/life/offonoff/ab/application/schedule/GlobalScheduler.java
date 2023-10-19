@@ -19,17 +19,17 @@ public class GlobalScheduler {
      * 매 분마다 스케쥴링
      */
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
-    public void checkVotingDeadline() {
+    public void endVotingDeadlinePassed() {
         log.info("[checkVotingTopic] schedule start");
 
         votingService.endVoting(
-                votingTopic -> votingTopic.deadlinePassed(getStandardLocalDateTime())
+                votingTopic -> votingTopic.deadlinePassed(timeToCompare())
         );
 
         log.info("[checkVotingTopic] schedule ended");
     }
 
-    private LocalDateTime getStandardLocalDateTime() {
+    private LocalDateTime timeToCompare() {
         return LocalDateTime.now()
                         .withSecond(0)
                         .withNano(0);

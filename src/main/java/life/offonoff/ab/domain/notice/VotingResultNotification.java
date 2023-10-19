@@ -1,21 +1,19 @@
 package life.offonoff.ab.domain.notice;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import life.offonoff.ab.domain.vote.VotingResult;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import static life.offonoff.ab.domain.notice.NotificationType.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 @DiscriminatorValue(VOTING_RESULT_NOTIFICATION)
 public class VotingResultNotification extends Notification {
-    private Long topicId;
-    private int totalVoteCount;
 
-    public VotingResultNotification(Long topicId, int totalVoteCount) {
-        this.topicId = topicId;
-        this.totalVoteCount = totalVoteCount;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    private VotingResult votingResult;
 }

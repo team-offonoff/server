@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,6 +18,7 @@ public class TopicEventHandler {
 
     private final VotingTopicContainer votingTopicContainer;
     private final TopicRepository topicRepository;
+
     private final NoticeService noticeService;
 
     /**
@@ -25,26 +26,27 @@ public class TopicEventHandler {
      */
     @EventListener
     public void addTopic(TopicCreateEvent event) {
-        log.info("# Topic created / topic-id : {}, deadline : {}", event.topicId(), event.deadline());
+        log.info("# Topic Created / topic-id : {}, deadline : {}", event.topicId(), event.deadline());
         votingTopicContainer.insert(new VotingTopic(event.topicId(), event.deadline()));
     }
 
     /**
-     * 투표 종료 이벤트 -> 투표 종료 status 수정 + 투표 결과 만들어서 NoticeService로 공지
+     * 투표 종료 이벤트 -> 투표 결과 만들어서 NoticeService로 공지
      */
     @EventListener
     public void votingEnded(VotingEndEvent event) {
-        Long topicId = event.topicId();
-        log.info("# Voting Ended / topic-id : {}", topicId);
+        log.info("# Topic Voting Ended / topic-id : {}", event.topicId());
 
-        noticeService.noticeVotingResult(topicRepository.findVotingResultById(topicId));
+        noticeService.noticeVotingResult(event.result());
     }
 
     /**
      * 투표 결과 전송 -> 투표 공지 status 수정
      */
-    @TransactionalEventListener
-    public void noticedTopic(NoticedEvent event) {
+    @Transactional
+    @EventListener
+    public void noticed(NoticedEvent event) {
+        log.info("# Topic Noticed / topic-id : {}", event.topicId());
         topicRepository.updateStatus(event.topicId(), TopicStatus.NOTICED);
     }
 }

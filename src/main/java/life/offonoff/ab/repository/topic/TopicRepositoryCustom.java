@@ -2,7 +2,6 @@ package life.offonoff.ab.repository.topic;
 
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.application.event.topic.VotingResult;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +14,6 @@ import java.util.List;
 public interface TopicRepositoryCustom {
 
     Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable);
-
-    VotingResult findVotingResultById(Long topicId);
 
     List<VotingTopic> findAllInVoting(LocalDateTime time);
 

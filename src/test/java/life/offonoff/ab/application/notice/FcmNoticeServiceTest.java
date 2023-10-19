@@ -1,7 +1,6 @@
 package life.offonoff.ab.application.notice;
 
 import life.offonoff.ab.application.event.topic.NoticedEvent;
-import life.offonoff.ab.application.event.topic.VotingResult;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.repository.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;

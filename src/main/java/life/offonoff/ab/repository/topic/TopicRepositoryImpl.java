@@ -6,7 +6,6 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.application.event.topic.VotingResult;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
@@ -60,21 +59,6 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
                         }
                 ).toList()
                 .toArray(OrderSpecifier[]::new);
-    }
-
-    public VotingResult findVotingResultById(Long topicId) {
-        return queryFactory
-                .select(constructor(VotingResult.class,
-                        topic.id,
-                        topic.title,
-                        topic.category.name,
-                        topic.publishMember.name,
-                        topic.voteCount)
-                ).from(topic)
-                .join(topic.category)
-                .join(topic.publishMember)
-                .where(topic.id.eq(topicId))
-                .fetchOne();
     }
 
     @Override

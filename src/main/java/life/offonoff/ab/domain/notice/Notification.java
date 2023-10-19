@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @DiscriminatorColumn(name = "notification_type")
 public abstract class Notification extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
     private Member member;
 
-    private Boolean read = false;
+    private Boolean checked = false;
 
     //== 연관관계 매핑 ==//
     public void setMember(Member member) {
@@ -28,7 +28,7 @@ public abstract class Notification extends BaseEntity {
     }
 
     //== Method ==//
-    public void read() {
-        this.read = true;
+    public void check() {
+        this.checked = true;
     }
 }

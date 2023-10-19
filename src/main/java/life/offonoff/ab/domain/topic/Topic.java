@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
+import life.offonoff.ab.domain.vote.VotingResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,6 +56,9 @@ public class Topic extends BaseEntity {
     // 운영 측면에서 hide 정보 추적
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hides = new ArrayList<>();
+
+    @OneToOne(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private VotingResult votingResult;
 
     @Enumerated(EnumType.STRING)
     private TopicStatus status = TopicStatus.VOTING;
@@ -120,10 +124,6 @@ public class Topic extends BaseEntity {
         voteCount++;
     }
 
-    public void endVote() {
-        status = TopicStatus.VOTING_ENDED;
-    }
-
     public void remove() {
         this.active = 0;
     }
@@ -136,5 +136,9 @@ public class Topic extends BaseEntity {
         this.hides.removeIf(h -> h.has(member));
         member.cancelHide(this);
         hideCount--;
+    }
+
+    public void setVotingResult(VotingResult votingResult) {
+        this.votingResult = votingResult;
     }
 }

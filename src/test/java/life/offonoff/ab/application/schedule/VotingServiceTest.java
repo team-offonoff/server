@@ -54,7 +54,7 @@ class VotingServiceTest {
         doNothing().when(topicRepository).updateStatus(any(), any());
 
         // when
-        votingService.endVoting(criteria);
+        votingService.close(criteria);
 
         // then
         verify(eventPublisher, times(topics.size())).publishEvent(any(VotingEndEvent.class));
@@ -69,7 +69,7 @@ class VotingServiceTest {
 
         try {
             // when
-            votingService.endVoting(criteria);
+            votingService.close(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, never()).publishEvent(any(VotingEndEvent.class));
@@ -92,7 +92,7 @@ class VotingServiceTest {
 
         try {
             // when
-            votingService.endVoting(criteria);
+            votingService.close(criteria);
         } catch (RuntimeException e) {
             // then
             verify(eventPublisher, times(topics.size() - 1)).publishEvent(any(VotingEndEvent.class));
