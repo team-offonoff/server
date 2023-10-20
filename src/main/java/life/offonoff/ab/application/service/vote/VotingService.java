@@ -7,8 +7,10 @@ import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Component
@@ -39,21 +42,26 @@ public class VotingService {
     @Transactional
     public void endVoting(VotingEndCriteria criteria) {
         List<VotingTopic> ended = container.getVotingEnded(criteria);
-
+        log.info("Voting Ended : {}", ended.size());
         ended.forEach(vt -> {
-            topicRepository.updateStatus(vt.topicId(), TopicStatus.VOTING_ENDED);
-            VotingResult result = aggregateVote(vt.topicId());
+            Topic topic = findTopic(vt.topicId());
+            topic.endVote();
+
+            VotingResult result = aggregateVote(topic);
 
             // 투표 종료 이벤트 발행
-            eventPublisher.publishEvent(new VotingEndEvent(vt.topicId(), result));
+            eventPublisher.publishEvent(new VotingEndEvent(topic.getId(), result));
         });
     }
 
-    private VotingResult aggregateVote(Long topicId) {
-        Topic topic = topicRepository.findById(topicId)
-                                     .orElseThrow();
+    public VotingResult aggregateVote(Topic topic) {
         VotingResult votingResult = new VotingResult();
         votingResult.setTopic(topic);
         return votingResult;
+    }
+
+    private Topic findTopic(Long topicId) {
+        return topicRepository.findById(topicId)
+                .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 }

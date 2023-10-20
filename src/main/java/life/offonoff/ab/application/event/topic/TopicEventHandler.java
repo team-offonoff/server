@@ -11,6 +11,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static life.offonoff.ab.domain.topic.TopicStatus.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -47,6 +49,6 @@ public class TopicEventHandler {
     @EventListener
     public void noticed(NoticedEvent event) {
         log.info("# Topic Noticed / topic-id : {}", event.topicId());
-        topicRepository.updateStatus(event.topicId(), TopicStatus.NOTICED);
+        topicRepository.updateStatus(event.topicId(), NOTICED);
     }
 }

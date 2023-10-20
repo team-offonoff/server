@@ -16,6 +16,8 @@ public class VotingTopicContainer {
 
     public void load(List<VotingTopic> topics) {
         this.storage.loadInVoting(topics);
+
+        log.info("Resume Voting, loaded Topic : {}", topics.size());
     }
 
     public void insert(VotingTopic votingTopic) {

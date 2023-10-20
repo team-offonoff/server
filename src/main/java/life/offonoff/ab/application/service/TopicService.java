@@ -58,7 +58,7 @@ public class TopicService {
         return new Choice(topic, request.choiceOption(), choiceContent);
     }
 
-    private Category findCategory(Long categoryId) {
+    private Category findCategory(final Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
@@ -70,7 +70,7 @@ public class TopicService {
     }
 
     //== Search ==//
-    public Topic searchById(Long topicId) {
+    public Topic searchById(final Long topicId) {
         return topicRepository.findById(topicId)
                               .orElseThrow();
     }
@@ -87,7 +87,7 @@ public class TopicService {
 
     //== Hide ==//
     @Transactional
-    public void hide(Long memberId, Long topicId, Boolean hide) {
+    public void hide(final Long memberId, final Long topicId, final Boolean hide) {
         Member member = findMember(memberId);
         Topic topic = this.searchById(topicId);
 
@@ -98,14 +98,14 @@ public class TopicService {
         cancelHide(member, topic);
     }
 
-    private void doHide(Member member, Topic topic) {
+    private void doHide(final Member member, final Topic topic) {
         if (!member.hideAlready(topic)) {
             HiddenTopic hiddenTopic = new HiddenTopic();
             hiddenTopic.associate(member, topic);
         }
     }
 
-    private void cancelHide(Member member, Topic topic) {
+    private void cancelHide(final Member member, final Topic topic) {
         if (member.hideAlready(topic)) {
             topic.removeHiddenBy(member);
         }
