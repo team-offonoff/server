@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class UnableToVoteException extends UnableToProcessException {
     private static final String MESSAGE = "투표를 할 수 없습니다.";
-    private static final AbCode AB_CODE = AbCode.UNABLT_TO_VOTE;
+    private static final AbCode AB_CODE = AbCode.UNABLE_TO_VOTE;
     private final LocalDateTime deadline;
 
     public UnableToVoteException(final LocalDateTime deadline) {

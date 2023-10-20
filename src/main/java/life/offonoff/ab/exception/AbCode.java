@@ -7,5 +7,5 @@ public enum AbCode {
     // Entity Not Found;
     CATEGORY_NOT_FOUND,
     TOPIC_NOT_FOUND,
-    MEMBER_NOT_FOUND, UNABLT_TO_VOTE;
+    MEMBER_NOT_FOUND, UNABLE_TO_VOTE;
 }
