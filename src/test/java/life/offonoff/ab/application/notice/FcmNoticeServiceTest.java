@@ -2,6 +2,7 @@ package life.offonoff.ab.application.notice;
 
 import life.offonoff.ab.application.event.topic.NoticedEvent;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VotingResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +22,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NoticeServiceTest {
+class FcmNoticeServiceTest {
 
     @InjectMocks
-    NoticeService noticeService;
+    FcmNoticeService noticeService;
     @Mock
     MemberRepository memberRepository;
     @Mock
@@ -36,13 +37,20 @@ class NoticeServiceTest {
     }
 
     @Test
-    @DisplayName("투표 결과 알림 후, VotingResultNotification 생성")
+    @DisplayName("투표 결과 알림 후, Member에 VotingResultNotification 추가")
     void notice_then_create_VotingResultNotification() {
         // given
         Member member = TestMember.builder()
+                .id(1L)
                 .build().buildMember();
 
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .voteCount(1000)
+                .build().buildTopic();
+
         VotingResult result = new VotingResult();
+        result.setTopic(topic);
 
         List<Member> voteMembers = List.of(member);
 
