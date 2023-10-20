@@ -3,7 +3,6 @@ package life.offonoff.ab.application.event.topic;
 import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
 import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
 import life.offonoff.ab.application.notice.NoticeService;
-import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

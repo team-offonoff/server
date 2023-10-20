@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
+import life.offonoff.ab.domain.vote.VotingResult;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
@@ -38,7 +39,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
                         eqCategory(request.getCategoryId()),
                         hideOrNot(request.getMemberId(), request.getHidden())
                 )
-                .orderBy(getOrderSpecifiers(pageable.getSort()))
+                .orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -46,32 +47,17 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
         return PagingUtil.toSlice(result, pageable);
     }
 
-    private OrderSpecifier[] getOrderSpecifiers(Sort sort) {
-        if (sort == null) {
-            return null;
-        }
-
-        return sort.stream()
-                .map(o -> {
-                            Order order = o.isAscending() ? Order.ASC : Order.DESC;
-                            PathBuilder path = new PathBuilder(Topic.class, "topic");
-                            return new OrderSpecifier(order, path.get(o.getProperty()));
-                        }
-                ).toList()
-                .toArray(OrderSpecifier[]::new);
-    }
-
     @Override
-    public List<VotingTopic> findAllInVoting(LocalDateTime time) {
+    public List<VotingTopic> findAll(VotingTopicSearchCond cond) {
         return queryFactory
                 .select(constructor(VotingTopic.class,
-                                topic.id,
-                                topic.deadline
-                        )
-                )
+                        topic.id,
+                        topic.deadline))
                 .from(topic)
-                .where(topic.deadline.after(time))
-                .fetch();
+                .where(
+                        eqTopicStatus(cond.topicStatus()),
+                        gtDeadline(cond.compareTime())
+                ).fetch();
     }
 
     @Override
@@ -83,4 +69,21 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
                 .execute();
     }
 
+    static class TopicOrderBy {
+
+        private static OrderSpecifier[] getOrderSpecifiers(Sort sort) {
+            if (sort == null) {
+                return null;
+            }
+
+            return sort.stream()
+                    .map(o -> {
+                                Order order = o.isAscending() ? Order.ASC : Order.DESC;
+                                PathBuilder path = new PathBuilder(Topic.class, "topic");
+                                return new OrderSpecifier(order, path.get(o.getProperty()));
+                            }
+                    ).toList()
+                    .toArray(OrderSpecifier[]::new);
+        }
+    }
 }

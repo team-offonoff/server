@@ -15,7 +15,7 @@ public interface TopicRepositoryCustom {
 
     Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable);
 
-    List<VotingTopic> findAllInVoting(LocalDateTime time);
+    List<VotingTopic> findAll(VotingTopicSearchCond cond);
 
     @Transactional
     void updateStatus(Long topicId, TopicStatus topicStatus);

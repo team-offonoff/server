@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.vote.VotingResult;
 import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.repository.topic.VotingTopicSearchCond;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -33,7 +34,11 @@ public class VotingService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void resumeVoting() {
-        container.load(topicRepository.findAllInVoting(LocalDateTime.now()));
+        container.load(
+                topicRepository.findAll(
+                        new VotingTopicSearchCond(LocalDateTime.now(), TopicStatus.VOTING)
+                )
+        );
     }
 
     /**
