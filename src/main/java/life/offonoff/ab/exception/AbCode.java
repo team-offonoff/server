@@ -2,7 +2,10 @@ package life.offonoff.ab.exception;
 
 public enum AbCode {
     INVALID_FIELD,
+    INVALID_LENGTH_OF_FIELD,
+
+    // Entity Not Found;
     CATEGORY_NOT_FOUND,
-    INVALID_LENGTH_OF_FIELD
-    ;
+    TOPIC_NOT_FOUND,
+    MEMBER_NOT_FOUND, UNABLT_TO_VOTE;
 }
