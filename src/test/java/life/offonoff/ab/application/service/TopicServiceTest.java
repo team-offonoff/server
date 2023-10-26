@@ -1,10 +1,12 @@
 package life.offonoff.ab.application.service;
 
-import life.offonoff.ab.application.service.TopicService;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
@@ -167,6 +169,68 @@ public class TopicServiceTest {
 
     private void setEventPublisher(TopicService topicService, ApplicationEventPublisher eventPublisher) {
         ReflectionTestUtils.setField(topicService, "eventPublisher", eventPublisher);
+    }
+
+    @Test
+    @DisplayName("투표를 하면 voteAlready = true")
+    void create_vote() {
+        // given
+        Long topicId = 1L;
+        Long memberId = 1L;
+        LocalDateTime deadline = LocalDateTime.now();
+
+        Member member = TestMember.builder()
+                .id(memberId)
+                .build().buildMember();
+
+        Topic topic = TestTopic.builder()
+                .id(topicId)
+                .deadline(deadline)
+                .build().buildTopic();
+
+        VoteRequest request = new VoteRequest(member.getId(), ChoiceOption.CHOICE_A, deadline.minusDays(1), true);
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
+
+        // when
+        topicService.vote(topicId, request);
+
+        // then
+        assertThat(member.votedAlready(topic)).isTrue();
+    }
+
+    @Test
+    @DisplayName("투표 취소")
+    void cancel_vote() {
+        // given
+        Long topicId = 1L;
+        Long memberId = 1L;
+        LocalDateTime deadline = LocalDateTime.now();
+
+        Member member = TestMember.builder()
+                .id(memberId)
+                .build().buildMember();
+
+        Topic topic = TestTopic.builder()
+                .id(topicId)
+                .deadline(deadline)
+                .build().buildTopic();
+
+        // Vote 생성
+        Vote vote = new Vote(ChoiceOption.CHOICE_A);
+        vote.associate(member, topic);
+
+        VoteRequest request = new VoteRequest(member.getId(), ChoiceOption.CHOICE_A, deadline.minusDays(1), false);
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
+
+        // when
+        topicService.vote(topicId, request);
+
+        // then
+        assertThat(member.votedAlready(topic)).isFalse();
     }
 
     @Builder
