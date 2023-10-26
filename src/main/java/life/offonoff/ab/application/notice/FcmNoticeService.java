@@ -38,6 +38,7 @@ public class FcmNoticeService implements NoticeService {
              */
 
             // 공지 저장
+            // TODO 이 부분은 bulk insert로 수정 예정
             Notification notification = new VotingResultNotification(result);
             notification.setMember(member);
         }

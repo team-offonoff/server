@@ -27,27 +27,4 @@ public class MemberService {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFountException(memberId)); // custom exception 추가 후 예외 핸들
     }
-
-    //== Vote ==//
-    @Transactional
-    public void vote(final Long memberId, final VoteRequest request) {
-        Member member = searchById(memberId);
-        Topic topic = findTopic(request.topicId());
-
-        validateVotable(topic, request);
-
-        Vote vote = new Vote(request.choiceOption());
-        vote.associate(member, topic);
-    }
-
-    private static void validateVotable(final Topic topic, final VoteRequest request) {
-        if (!topic.votable(request.requestTime())) {
-            throw new UnableToVoteException(request.requestTime());
-        }
-    }
-
-    private Topic findTopic(final Long topicId) {
-        return topicRepository.findById(topicId)
-                .orElseThrow(() -> new TopicNotFoundException(topicId));
-    }
 }

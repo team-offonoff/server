@@ -1,13 +1,18 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.CategoryNotFoundException;
+import life.offonoff.ab.exception.MemberNotFountException;
+import life.offonoff.ab.exception.TopicNotFoundException;
+import life.offonoff.ab.exception.UnableToVoteException;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
@@ -66,13 +71,13 @@ public class TopicService {
     // TODO: Find member
     private Member findMember(final Long memberId) {
         return memberRepository.findById(memberId)
-                               .orElseThrow();
+                               .orElseThrow(() -> new MemberNotFountException(memberId));
     }
 
     //== Search ==//
     public Topic searchById(final Long topicId) {
         return topicRepository.findById(topicId)
-                              .orElseThrow();
+                              .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
     /**
@@ -107,7 +112,39 @@ public class TopicService {
 
     private void cancelHide(final Member member, final Topic topic) {
         if (member.hideAlready(topic)) {
-            topic.removeHiddenBy(member);
+            member.cancelHide(topic);
+        }
+    }
+
+    //== Vote ==//
+    @Transactional
+    public void vote(final Long topicId, final VoteRequest request) {
+        Member member = findMember(request.memberId());
+        Topic topic = searchById(topicId);
+
+        validateVotable(topic, request);
+
+        if (request.vote()) {
+            doVote(member, topic, request);
+            return;
+        }
+        cancelVote(member, topic);
+    }
+
+    private void doVote(final Member member, final Topic topic, VoteRequest request) {
+        Vote vote = new Vote(request.choiceOption());
+        vote.associate(member, topic);
+    }
+
+    private void cancelVote(final Member member, final Topic topic) {
+        if (member.votedAlready(topic)) {
+            member.cancelVote(topic);
+        }
+    }
+
+    private static void validateVotable(final Topic topic, final VoteRequest request) {
+        if (!topic.votable(request.requestTime())) {
+            throw new UnableToVoteException(request.requestTime());
         }
     }
 }

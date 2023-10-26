@@ -89,6 +89,15 @@ public class Member extends BaseEntity {
         hiddenTopics.removeIf(h -> h.has(topic));
     }
 
+    public boolean votedAlready(Topic topic) {
+        return votes.stream()
+                    .anyMatch(v -> v.has(topic));
+    }
+
+    public void cancelVote(Topic topic) {
+        this.votes.removeIf(v -> v.has(topic));
+    }
+
     public void readNotification(Notification notification) {
         notification.check();
     }
