@@ -100,3 +100,7 @@ task copyMainResources {
     }
 }
 processResources.dependsOn copyMainResources
+
+jar {
+    enabled = false // Do not make plain jar
+}
