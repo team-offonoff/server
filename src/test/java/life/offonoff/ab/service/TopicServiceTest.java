@@ -1,6 +1,10 @@
 package life.offonoff.ab.service;
 
+import life.offonoff.ab.application.event.topic.TopicCreateEvent;
 import life.offonoff.ab.application.service.TopicService;
+import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
+import life.offonoff.ab.application.service.request.ImageTextChoiceContentCreateRequest;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.TopicSide;
@@ -10,10 +14,6 @@ import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.application.event.topic.TopicCreateEvent;
-import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.application.service.request.ImageTextChoiceContentCreateRequest;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.web.response.ChoiceResponse;
 import life.offonoff.ab.web.response.ImageTextChoiceContentResponse;
 import life.offonoff.ab.web.response.TopicResponse;
@@ -28,12 +28,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static org.assertj.core.api.Assertions.*;
+
+import static life.offonoff.ab.domain.TestEntityUtil.TestCategory;
+import static life.offonoff.ab.domain.TestEntityUtil.TestMember;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -191,7 +196,7 @@ public class TopicServiceTest {
         );
 
         @Builder.Default
-        private LocalDateTime deadline = LocalDateTime.now();
+        private Long deadline = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
 
         public TopicCreateRequest createRequest() {
             Long categoryId = 0L;
