@@ -1,9 +1,10 @@
 package life.offonoff.ab.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.application.service.CategoryService;
 import life.offonoff.ab.application.service.request.CategoryCreateRequest;
+import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.restdocs.RestDocsTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,7 +25,7 @@ class CategoryControllerTest extends RestDocsTest {
     @Test
     @WithMockUser
     void categoryCreateRequest_withNonBlankName_ok() throws Exception {
-        CategoryCreateRequest request = new CategoryCreateRequest("ok");
+        CategoryCreateRequest request = new CategoryCreateRequest("ok", TopicSide.TOPIC_A);
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
                                                .contentType(MediaType.APPLICATION_JSON)
@@ -36,7 +37,20 @@ class CategoryControllerTest extends RestDocsTest {
     @Test
     @WithMockUser
     void categoryCreateRequest_withBlankName_badRequest() throws Exception {
-        CategoryCreateRequest request = new CategoryCreateRequest("  ");
+        CategoryCreateRequest request = new CategoryCreateRequest("  ", TopicSide.TOPIC_A);
+
+        MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
+                                               .contentType(MediaType.APPLICATION_JSON)
+                                               .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser
+    void categoryCreateRequest_withBlankTopicSide_badRequest() throws Exception {
+        CategoryCreateRequest request = new CategoryCreateRequest("category", null);
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
                                                .contentType(MediaType.APPLICATION_JSON)

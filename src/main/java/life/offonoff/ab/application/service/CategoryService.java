@@ -15,7 +15,7 @@ public class CategoryService {
 
     @Transactional
     public void createCategory(final CategoryCreateRequest request) {
-        Category category = new Category(request.name());
+        Category category = new Category(request.name(), request.topicSide());
         categoryRepository.save(category);
     }
 

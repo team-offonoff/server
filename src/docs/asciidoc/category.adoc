@@ -1,3 +1,4 @@
 == CategoryControllerTest
 operation::category-controller-test/category-create-request_with-non-blank-name_ok[snippets="http-request,http-response"]
 operation::category-controller-test/category-create-request_with-blank-name_bad-request[snippets="http-request,http-response"]
+operation::category-controller-test/category-create-request_with-blank-topic-side_bad-request[snippets="http-request,http-response"]
