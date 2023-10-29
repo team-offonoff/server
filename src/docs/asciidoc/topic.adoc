@@ -1,2 +1,6 @@
 == TopicControllerTest
-operation::topic-controller-test/create-category[snippets="http-request,http-response"]
+### 토픽 생성 API
+- 회원 가입 기능 개발 후 jwt 헤더에 추가 예정
+- 이미지 업로드 위한 S3 세팅 예정
+
+operation::topic-controller-test/create-topic[snippets="request-fields,http-request,http-response"]
