@@ -21,9 +21,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return queryFactory.selectFrom(member)
                 .join(vote)
                 .on(
-                        member.id.eq(vote.id)
+                        member.id.eq(vote.member.id)
                         .and(vote.topic.id.eq(topicId))
-                ).where(member.notificationEnabled.topicExpiration.isTrue())
+                ).where(member.notificationEnabled.votingResult.isTrue())
                 .fetch();
     }
 }

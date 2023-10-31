@@ -1,2 +1,4 @@
 == TopicControllerTest
-operation::topic-controller-test/create-category[snippets="http-request,http-response"]
+
+operation::topic-controller-test/create-topic[snippets="http-request,http-response"]
+operation::topic-controller-test/get-topic-slice[snippets="http-request,http-response"]
