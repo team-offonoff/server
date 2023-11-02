@@ -1,13 +1,18 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.CategoryNotFoundException;
+import life.offonoff.ab.exception.MemberNotFountException;
+import life.offonoff.ab.exception.TopicNotFoundException;
+import life.offonoff.ab.exception.UnableToVoteException;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
@@ -17,12 +22,14 @@ import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -48,7 +55,6 @@ public class TopicService {
 
         // topic 생성 이벤트 발행
         eventPublisher.publishEvent(TopicCreateEvent.of(topic));
-
         return TopicResponse.from(topic);
     }
 
@@ -57,7 +63,7 @@ public class TopicService {
         return new Choice(topic, request.choiceOption(), choiceContent);
     }
 
-    private Category findCategory(Long categoryId) {
+    private Category findCategory(final Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
@@ -65,13 +71,13 @@ public class TopicService {
     // TODO: Find member
     private Member findMember(final Long memberId) {
         return memberRepository.findById(memberId)
-                               .orElseThrow();
+                               .orElseThrow(() -> new MemberNotFountException(memberId));
     }
 
     //== Search ==//
-    public Topic searchById(Long topicId) {
+    public Topic searchById(final Long topicId) {
         return topicRepository.findById(topicId)
-                              .orElseThrow();
+                              .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
     /**
@@ -86,7 +92,7 @@ public class TopicService {
 
     //== Hide ==//
     @Transactional
-    public void hide(Long memberId, Long topicId, Boolean hide) {
+    public void hide(final Long memberId, final Long topicId, final Boolean hide) {
         Member member = findMember(memberId);
         Topic topic = this.searchById(topicId);
 
@@ -97,16 +103,48 @@ public class TopicService {
         cancelHide(member, topic);
     }
 
-    private void doHide(Member member, Topic topic) {
+    private void doHide(final Member member, final Topic topic) {
         if (!member.hideAlready(topic)) {
             HiddenTopic hiddenTopic = new HiddenTopic();
             hiddenTopic.associate(member, topic);
         }
     }
 
-    private void cancelHide(Member member, Topic topic) {
+    private void cancelHide(final Member member, final Topic topic) {
         if (member.hideAlready(topic)) {
-            topic.removeHiddenBy(member);
+            member.cancelHide(topic);
+        }
+    }
+
+    //== Vote ==//
+    @Transactional
+    public void vote(final Long topicId, final VoteRequest request) {
+        Member member = findMember(request.memberId());
+        Topic topic = searchById(topicId);
+
+        validateVotable(topic, request);
+
+        if (request.vote()) {
+            doVote(member, topic, request);
+            return;
+        }
+        cancelVote(member, topic);
+    }
+
+    private void doVote(final Member member, final Topic topic, VoteRequest request) {
+        Vote vote = new Vote(request.choiceOption());
+        vote.associate(member, topic);
+    }
+
+    private void cancelVote(final Member member, final Topic topic) {
+        if (member.votedAlready(topic)) {
+            member.cancelVote(topic);
+        }
+    }
+
+    private static void validateVotable(final Topic topic, final VoteRequest request) {
+        if (!topic.votable(request.requestTime())) {
+            throw new UnableToVoteException(request.requestTime());
         }
     }
 }

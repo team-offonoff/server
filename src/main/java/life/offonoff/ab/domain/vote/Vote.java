@@ -41,4 +41,8 @@ public class Vote extends BaseEntity {
         this.topic = topic;
         topic.addVote(this);
     }
+
+    public boolean has(Topic topic) {
+        return this.topic == topic;
+    }
 }

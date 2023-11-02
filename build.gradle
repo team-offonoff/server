@@ -83,6 +83,7 @@ task copyDocument(type: Copy) { // (12)
     into file("src/main/resources/static/docs")
 }
 
+// build -> test -> asciidoctor -> copyDocument
 build {
     dependsOn copyDocument
 }

@@ -6,6 +6,8 @@ import com.querydsl.jpa.JPQLQuery;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 
+import java.time.LocalDateTime;
+
 import static life.offonoff.ab.domain.topic.QTopic.topic;
 import static life.offonoff.ab.domain.topic.hide.QHiddenTopic.hiddenTopic;
 
@@ -13,6 +15,10 @@ public class TopicBooleanExpression {
 
     public static BooleanExpression eqTopicStatus(TopicStatus topicStatus) {
         return topicStatus != null ? topic.status.eq(topicStatus) : null;
+    }
+
+    public static BooleanExpression gtDeadline(LocalDateTime compareTime) {
+        return topic.deadline.gt(compareTime);
     }
 
     public static BooleanExpression eqCategory(Long categoryId) {
