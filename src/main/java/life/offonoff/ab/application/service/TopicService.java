@@ -1,13 +1,16 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
+import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.CategoryNotFoundException;
 import life.offonoff.ab.exception.MemberNotFountException;
@@ -17,9 +20,6 @@ import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +28,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,7 +50,8 @@ public class TopicService {
     public TopicResponse createMembersTopic(final Long memberId, final TopicCreateRequest request) {
         Member member = findMember(memberId);
         Category category = findCategory(request.categoryId());
-        Topic topic = new Topic(member, category, request.topicTitle(), request.topicSide(), request.deadline());
+        LocalDateTime deadline = convertTime(request.deadline());
+        Topic topic = new Topic(member, category, request.topicTitle(), request.topicSide(), deadline);
         topicRepository.save(topic);
 
         request.choices().stream()
@@ -56,6 +61,12 @@ public class TopicService {
         // topic 생성 이벤트 발행
         eventPublisher.publishEvent(TopicCreateEvent.of(topic));
         return TopicResponse.from(topic);
+    }
+
+    private LocalDateTime convertTime(Long deadline) {
+        return Instant.ofEpochSecond(deadline)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 
     private Choice createTopicsChoice(final Topic topic, final ChoiceCreateRequest request) {

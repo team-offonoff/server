@@ -103,10 +103,8 @@ public class Topic extends BaseEntity {
     }
 
     //== Getter ==//
-    public Long getDeadlineMillis() {
-        return deadline.atZone(ZoneId.of("Asia/Seoul"))
-                       .toInstant()
-                       .toEpochMilli();
+    public Long getDeadlineSecond() {
+        return deadline.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public void addHide(HiddenTopic hiddenTopic) {

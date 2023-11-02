@@ -3,8 +3,6 @@ package life.offonoff.ab.web.response;
 import life.offonoff.ab.domain.topic.Topic;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 public class TopicDetailResponse {
 
@@ -21,7 +19,7 @@ public class TopicDetailResponse {
         this.title = topic.getTitle();
         this.publishMemberId = topic.getPublishMember().getId();
         this.publishMemberNickname = topic.getPublishMember().getNickname();
-        this.deadline = topic.getDeadlineMillis();
+        this.deadline = topic.getDeadlineSecond();
         this.voteCount = topic.getVoteCount();
         this.commentCount = topic.getCommentCount();
     }

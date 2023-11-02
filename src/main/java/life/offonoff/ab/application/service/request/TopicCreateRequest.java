@@ -7,7 +7,6 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.exception.LengthInvalidException;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -19,7 +18,7 @@ public record TopicCreateRequest(
         @NotBlank(message = "Topic title을 입력해주세요.")
         String topicTitle,
         List<ChoiceCreateRequest> choices,
-        LocalDateTime deadline
+        Long deadline
 ) {
     private static final int TOPIC_TITLE_MAX_LENGTH = 25;
 
