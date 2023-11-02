@@ -58,7 +58,7 @@ public class TestEntityUtil {
 
     public static Category createCategory(int seq) {
         String name = "CATEGORY_" + seq;
-        return new Category(name);
+        return new Category(name, TopicSide.TOPIC_A);
     }
     //== Comment ==//
 
@@ -104,7 +104,7 @@ public class TestEntityUtil {
         private String name;
 
         public Category buildCategory() {
-            Category category = new Category(name);
+            Category category = new Category(name, TopicSide.TOPIC_A);
             ReflectionTestUtils.setField(category, "id", id);
             return category;
         }

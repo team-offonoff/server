@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.service.CategoryService;
+import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.application.service.request.CategoryCreateRequest;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ class CategoryServiceTest {
 
     @Test
     void createCategory_findWithName() {
-        CategoryCreateRequest request = new CategoryCreateRequest("name");
+        CategoryCreateRequest request = new CategoryCreateRequest("name", TopicSide.TOPIC_A);
 
         categoryService.createCategory(request);
 
