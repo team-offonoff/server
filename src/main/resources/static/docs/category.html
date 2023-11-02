@@ -444,15 +444,27 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_categorycontrollertest">CategoryControllerTest</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_categorycontrollertest_curl_request">Curl request</h3>
+<h3 id="_categorycontrollertest_http_request">HTTP request</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/categories' -i -X POST \
-    -H 'Content-Type: application/json;charset=UTF-8' \
-    -H 'X-CSRF-TOKEN: bVBr_T7yuztkWbfbcHOxEDvImFsiBHNLjpZ13nHUAyvudUVYCzRexAzKiF5JaIXuFF6FJg2stWIbMkVmua9M6hfgMEmLTSY9' \
-    -d '{
-  "name" : "  "
-}'</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /categories HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 49
+X-CSRF-TOKEN: rdb75hqXWm_ueBoOSO97E0qXq27f9Ao7j65S6eXx6ohv6Rb2mbTO1CijY1vDQCs9eMJPK371hla8wjoWvp032YPA37hW2SfA
+Host: localhost:8080
+
+{
+  "name" : "ok",
+  "topicSide" : "TOPIC_A"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_categorycontrollertest_http_response">HTTP response</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK</code></pre>
 </div>
 </div>
 </div>
@@ -462,12 +474,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /categories HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 21
-X-CSRF-TOKEN: bVBr_T7yuztkWbfbcHOxEDvImFsiBHNLjpZ13nHUAyvudUVYCzRexAzKiF5JaIXuFF6FJg2stWIbMkVmua9M6hfgMEmLTSY9
+Content-Length: 49
+X-CSRF-TOKEN: Kh58W4UXtRQx06Z8kGYrBIIRpRFHhGvup0QRxsilQVA5wsOME39IarYl0yQc4JJP80sfYucmiHNz4AjDknV18fGdcDRdpPq_
 Host: localhost:8080
 
 {
-  "name" : "  "
+  "name" : "  ",
+  "topicSide" : "TOPIC_A"
 }</code></pre>
 </div>
 </div>
@@ -492,67 +505,18 @@ Content-Length: 201
 </div>
 </div>
 <div class="sect2">
-<h3 id="_categorycontrollertest_httpie_request">HTTPie request</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ echo '{
-  "name" : "  "
-}' | http POST 'http://localhost:8080/categories' \
-    'Content-Type:application/json;charset=UTF-8' \
-    'X-CSRF-TOKEN:bVBr_T7yuztkWbfbcHOxEDvImFsiBHNLjpZ13nHUAyvudUVYCzRexAzKiF5JaIXuFF6FJg2stWIbMkVmua9M6hfgMEmLTSY9'</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_request_body">Request body</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "name" : "  "
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_response_body">Response body</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "abCode" : "INVALID_FIELD",
-  "errorContent" : {
-    "message" : "잘못된 요청 바디입니다.",
-    "hint" : "카테고리의 이름을 입력해주세요.",
-    "httpCode" : 400
-  }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_curl_request">Curl request</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ curl 'http://localhost:8080/categories' -i -X POST \
-    -H 'Content-Type: application/json;charset=UTF-8' \
-    -H 'X-CSRF-TOKEN: CGyXUX-So6A1VfzwoS0l17aEhRPGMoc1gZ2_rFrmvQVkX1W0OQmuMxqhksMYZsSWxQAR7461qCv0CuIYua3cymiHhWRVaWCC' \
-    -d '{
-  "name" : "ok"
-}'</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_categorycontrollertest_http_request">HTTP request</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /categories HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 21
-X-CSRF-TOKEN: CGyXUX-So6A1VfzwoS0l17aEhRPGMoc1gZ2_rFrmvQVkX1W0OQmuMxqhksMYZsSWxQAR7461qCv0CuIYua3cymiHhWRVaWCC
+Content-Length: 50
+X-CSRF-TOKEN: we5W-DFGa5t1r6nx9kxfDzW5ZFcD_WpDvpY1XWYL3n-HQjH6p9czwQZ-DflYmpvDl2FrOQXdSTY6mw9u3aJWOVdpuhu-elOZ
 Host: localhost:8080
 
 {
-  "name" : "ok"
+  "name" : "category",
+  "topicSide" : null
 }</code></pre>
 </div>
 </div>
@@ -561,37 +525,18 @@ Host: localhost:8080
 <h3 id="_categorycontrollertest_http_response">HTTP response</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_httpie_request">HTTPie request</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">$ echo '{
-  "name" : "ok"
-}' | http POST 'http://localhost:8080/categories' \
-    'Content-Type:application/json;charset=UTF-8' \
-    'X-CSRF-TOKEN:CGyXUX-So6A1VfzwoS0l17aEhRPGMoc1gZ2_rFrmvQVkX1W0OQmuMxqhksMYZsSWxQAR7461qCv0CuIYua3cymiHhWRVaWCC'</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_request_body">Request body</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code class="language-json" data-lang="json">{
-  "name" : "ok"
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 222
+
+{
+  "abCode" : "INVALID_FIELD",
+  "errorContent" : {
+    "message" : "잘못된 요청 바디입니다.",
+    "hint" : "카테고리의 TopicSide를 입력해주세요. (TOPIC_A/TOPIC_B)",
+    "httpCode" : 400
+  }
 }</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_response_body">Response body</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight nowrap"><code></code></pre>
 </div>
 </div>
 </div>
@@ -601,7 +546,7 @@ Host: localhost:8080
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-10-18 17:05:41 +0900
+Last updated 2023-11-02 12:42:03 +0900
 </div>
 </div>
 </body>
