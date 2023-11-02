@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
-import life.offonoff.ab.service.TopicServiceTest.TopicTestDtoHelper;
-import life.offonoff.ab.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
+import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
+import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -65,6 +65,7 @@ public class TopicControllerTest extends RestDocsTest {
     @WithMockUser
     void getTopicSlice() throws Exception {
         when(topicService.searchAll(any(), any())).thenReturn(createTopicSlice());
+
         mvc.perform(
                 get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
                 .param("hidden", String.valueOf(true)))
@@ -76,12 +77,24 @@ public class TopicControllerTest extends RestDocsTest {
         PageRequest pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "voteCount");
         Comparator<Topic> voteCountDesc = (t1, t2) -> t2.getVoteCount() - t1.getVoteCount();
 
-        Member publishMember = TestEntityUtil.createMember(1);
-        Category category = TestEntityUtil.createCategory(1);
+        // create Member
+        Member publishMember = TestMember.builder()
+                .id(1L)
+                .name("memberA")
+                .nickname("nicknameA")
+                .build().buildMember();
+
+        // create Category
+        Category category = TestCategory.builder()
+                .id(1L)
+                .name("categoryA")
+                .build().buildCategory();
+
         List<Topic> topics = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            Topic topic = TestEntityUtil.TestTopic
+            Topic topic = TestTopic
                     .builder()
+                    .id((long) (i + 1))
                     .title("title" + i)
                     .publishMember(publishMember)
                     .category(category)
@@ -94,6 +107,7 @@ public class TopicControllerTest extends RestDocsTest {
         topics.sort(voteCountDesc);
         return PagingUtil.toSlice(topics, pageable);
     }
+
     private static class TopicUri {
         private static String BASE = "/topics";
         private static String OPENED = "/open";
