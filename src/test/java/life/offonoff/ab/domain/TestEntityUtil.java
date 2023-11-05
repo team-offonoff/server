@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.member.NotificationEnabled;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
@@ -121,6 +122,8 @@ public class TestEntityUtil {
 
         @Builder.Default
         private LocalDateTime deadline = LocalDateTime.now();
+        @Builder.Default
+        private TopicStatus status = TopicStatus.VOTING;
 
         public Topic buildTopic() {
             Topic topic = new Topic(title, side, deadline);
@@ -128,6 +131,7 @@ public class TestEntityUtil {
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
             ReflectionTestUtils.setField(topic, "category", category);
             ReflectionTestUtils.setField(topic, "publishMember", publishMember);
+            ReflectionTestUtils.setField(topic, "status", status);
             return topic;
         }
     }
