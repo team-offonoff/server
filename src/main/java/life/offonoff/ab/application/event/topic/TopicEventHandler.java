@@ -1,25 +1,29 @@
 package life.offonoff.ab.application.event.topic;
 
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.VotingTopicService;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.application.notice.NoticeService;
-import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.domain.topic.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static life.offonoff.ab.domain.topic.TopicStatus.*;
-
+/**
+ * 토픽 생성 -> 투표 중 -> 투표 끝 -> 결과 집계 -> 결과 공지
+ *
+ * 트랜잭션 분리 필요
+ *
+ * 1. 토픽 생성 -> [투표 중 (이벤트) -> ]
+ * 2. 투표 끝 -> 결과 집계 -> [결과 공지 (이벤트) -> 토픽 noticed]
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class TopicEventHandler {
 
-    private final VotingTopicContainer votingTopicContainer;
-    private final TopicRepository topicRepository;
-
+    private final VotingTopicService votingTopicService;
     private final NoticeService noticeService;
 
     /**
@@ -27,8 +31,9 @@ public class TopicEventHandler {
      */
     @EventListener
     public void addTopic(TopicCreateEvent event) {
-        log.info("# Topic Created / topic-id : {}, deadline : {}", event.topicId(), event.deadline());
-        votingTopicContainer.insert(new VotingTopic(event.topicId(), event.deadline()));
+        log.info("# Topic Created / topic-id : {}, deadline : {}", event.topic(), event.topic().getDeadline());
+
+        votingTopicService.startVote(new VotingTopic(event.topic()));
     }
 
     /**
@@ -36,7 +41,7 @@ public class TopicEventHandler {
      */
     @EventListener
     public void votingEnded(VotingEndEvent event) {
-        log.info("# Topic Voting Ended / topic-id : {}", event.topicId());
+        log.info("# Topic Voting Ended / topic-id : {}", event.topic());
 
         noticeService.noticeVotingResult(event.result());
     }
@@ -47,7 +52,9 @@ public class TopicEventHandler {
     @Transactional
     @EventListener
     public void noticed(NoticedEvent event) {
-        log.info("# Topic Noticed / topic-id : {}", event.topicId());
-        topicRepository.updateStatus(event.topicId(), NOTICED);
+        log.info("# Topic Noticed / topic-id : {}", event.topic());
+
+        Topic topic = event.topic();
+        topic.noticed();
     }
 }

@@ -1,9 +1,11 @@
 package life.offonoff.ab.application.service.schedule.topic;
 
 import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
-import life.offonoff.ab.application.service.vote.votingtopic.storage.VotingTopicStorage;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.container.store.VotingTopicStorage;
+import life.offonoff.ab.domain.TestEntityUtil;
+import life.offonoff.ab.domain.topic.Topic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -38,10 +41,21 @@ class VotingTopicContainerTest {
     void load() {
         // given
         LocalDateTime time = LocalDateTime.now();
-        VotingTopic topic1 = new VotingTopic(1L, time);
-        VotingTopic topic2 = new VotingTopic(2L, time);
 
-        List<VotingTopic> topics = List.of(topic1, topic2);
+        Topic topic1 = TestTopic.builder()
+                .id(1L)
+                .deadline(time)
+                .build().buildTopic();
+
+        Topic topic2 = TestTopic.builder()
+                .id(2L)
+                .deadline(time)
+                .build().buildTopic();
+
+        VotingTopic votingTopic1 = new VotingTopic(topic1);
+        VotingTopic votingTopic2 = new VotingTopic(topic2);
+
+        List<VotingTopic> topics = List.of(votingTopic1, votingTopic2);
 
         when(storage.size()).thenReturn(topics.size());
 
@@ -56,7 +70,11 @@ class VotingTopicContainerTest {
     @DisplayName("VotingTopic을 추가하면 사이즈 증가")
     void insert_토픽() {
         // given
-        VotingTopic votingTopic = new VotingTopic(1L, LocalDateTime.now());
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .build().buildTopic();
+
+        VotingTopic votingTopic = new VotingTopic(topic);
         when(storage.size()).thenReturn(1);
 
         // when
@@ -74,8 +92,18 @@ class VotingTopicContainerTest {
         LocalDateTime standard = LocalDateTime.now();
         LocalDateTime beforeStandard = standard.minusHours(1);
 
-        VotingTopic votingTopic1 = new VotingTopic(1L, beforeStandard);
-        VotingTopic votingTopic2 = new VotingTopic(2L, beforeStandard);
+        Topic topic1 = TestTopic.builder()
+                .id(1L)
+                .deadline(beforeStandard)
+                .build().buildTopic();
+
+        Topic topic2 = TestTopic.builder()
+                .id(2L)
+                .deadline(beforeStandard)
+                .build().buildTopic();
+
+        VotingTopic votingTopic1 = new VotingTopic(topic1);
+        VotingTopic votingTopic2 = new VotingTopic(topic2);
         List<VotingTopic> topics = List.of(votingTopic1, votingTopic2);
 
         when(storage.popAllIf(any())).thenReturn(topics);
