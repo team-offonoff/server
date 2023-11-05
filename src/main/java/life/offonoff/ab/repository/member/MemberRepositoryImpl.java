@@ -18,7 +18,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
     @Override
     public List<Member> findAllVotedTo(Long topicId) {
-        return queryFactory.selectFrom(member)
+        return queryFactory
+                .selectFrom(member)
                 .join(vote)
                 .on(
                         member.id.eq(vote.member.id)
