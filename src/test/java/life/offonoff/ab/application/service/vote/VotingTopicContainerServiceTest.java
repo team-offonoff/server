@@ -1,7 +1,8 @@
 package life.offonoff.ab.application.service.vote;
 
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
 import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainerService;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VotingResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -18,10 +19,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class VotingServiceTest {
+class VotingTopicContainerServiceTest {
 
     @InjectMocks
-    VotingService votingService;
+    VotingTopicContainerService votingTopicContainerService;
     @Mock
     VotingTopicContainer container;
     @Mock
@@ -43,7 +44,7 @@ class VotingServiceTest {
                 .build().buildTopic();
 
         // when
-        VotingResult votingResult = votingService.aggregateVote(topic);
+        VotingResult votingResult = votingTopicContainerService.aggregateVote(topic);
 
         // then
         assertAll(
@@ -115,7 +116,7 @@ class VotingServiceTest {
 //    }
 
     // 테스트 환경에서 ApplicationEventPublisher MockBean이 DI가 되지 않아서 일단 리플렉션으로 DI했습니다...
-    private void setEventPublisher(VotingService votingService, ApplicationEventPublisher eventPublisher) {
-        ReflectionTestUtils.setField(votingService, "eventPublisher", eventPublisher);
+    private void setEventPublisher(VotingTopicContainerService votingTopicContainerService, ApplicationEventPublisher eventPublisher) {
+        ReflectionTestUtils.setField(votingTopicContainerService, "eventPublisher", eventPublisher);
     }
 }

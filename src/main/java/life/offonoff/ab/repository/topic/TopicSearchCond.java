@@ -4,8 +4,9 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 
 import java.time.LocalDateTime;
 
-public record VotingTopicSearchCond(
-        LocalDateTime compareTime,
+public record TopicSearchCond(
+        LocalDateTime startCompareTime,
+        LocalDateTime endCompareTime,
         TopicStatus topicStatus
 ) {
 

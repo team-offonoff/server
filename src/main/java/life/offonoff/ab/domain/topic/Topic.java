@@ -140,11 +140,15 @@ public class Topic extends BaseEntity {
         this.votingResult = votingResult;
     }
 
+    public boolean votable(LocalDateTime requestTime) {
+        return requestTime.isBefore(deadline);
+    }
+
     public void endVote() {
         this.status = TopicStatus.VOTING_ENDED;
     }
 
-    public boolean votable(LocalDateTime requestTime) {
-        return requestTime.isBefore(deadline);
+    public void noticed() {
+        this.status = TopicStatus.NOTICED;
     }
 }

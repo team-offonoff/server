@@ -1,15 +1,13 @@
-package life.offonoff.ab.application.service.vote.votingtopic;
+package life.offonoff.ab.application.service.vote.votingtopic.container;
 
 import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
-import life.offonoff.ab.application.service.vote.votingtopic.storage.VotingTopicStorage;
+import life.offonoff.ab.application.service.vote.votingtopic.container.store.VotingTopicStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class VotingTopicContainer {
 
     private final VotingTopicStorage storage;

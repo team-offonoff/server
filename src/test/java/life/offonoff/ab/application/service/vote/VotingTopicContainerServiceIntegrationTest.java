@@ -1,8 +1,10 @@
 package life.offonoff.ab.application.service.vote;
 
 import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainerService;
+import life.offonoff.ab.config.vote.ContainerVotingTopicConfig;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.member.MemberRepository;
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.springframework.context.annotation.Import;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +26,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class VotingServiceIntegrationTest {
+@Import(ContainerVotingTopicConfig.class)
+public class VotingTopicContainerServiceIntegrationTest {
 
     @Autowired
-    VotingService votingService;
+    VotingTopicContainerService votingTopicContainerService;
 
     @MockBean
     VotingEndCriteria criteria;
@@ -42,25 +45,23 @@ public class VotingServiceIntegrationTest {
     @DisplayName("투표가 끝난 토픽은 status 수정 & Voting Result 매핑")
     void endVote_then_status_voting_result() {
         // given
-        Long topicId = 1L;
         LocalDateTime deadline = LocalDateTime.now();
         Topic topic = TestTopic.builder()
-                .id(topicId)
+                .id(1L)
                 .deadline(deadline)
                 .build().buildTopic();
 
-        VotingTopic votingTopic = new VotingTopic(topicId, deadline);
+        VotingTopic votingTopic = new VotingTopic(topic);
         List<VotingTopic> votingTopics = List.of(votingTopic);
 
         when(container.getVotingEnded(criteria)).thenReturn(votingTopics);
-        when(topicRepository.findById(topicId)).thenReturn(Optional.of(topic));
 
         // when
-        votingService.endVoting(criteria);
+        votingTopicContainerService.endVote(criteria);
 
         // then
         assertAll(
-                () -> assertThat(topic.getStatus()).isEqualTo(VOTING_ENDED),
+                () -> assertThat(topic.getStatus()).isEqualTo(NOTICED),
                 () -> assertThat(topic.getVotingResult()).isNotNull()
         );
     }
@@ -80,7 +81,7 @@ public class VotingServiceIntegrationTest {
         List<Member> voteMembers = List.of(member);
 
         // Voting Topic
-        VotingTopic votingTopic = new VotingTopic(topic.getId(), topic.getDeadline());
+        VotingTopic votingTopic = new VotingTopic(topic);
         List<VotingTopic> votingTopics = List.of(votingTopic);
 
         when(container.getVotingEnded(criteria)).thenReturn(votingTopics);
@@ -88,7 +89,7 @@ public class VotingServiceIntegrationTest {
         when(memberRepository.findAllVotedTo(topic.getId())).thenReturn(voteMembers);
 
         // when
-        votingService.endVoting(criteria);
+        votingTopicContainerService.endVote(criteria);
 
         // then
         assertAll(

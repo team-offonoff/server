@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,5 +106,29 @@ class TopicRepositoryTest {
                 () -> assertThat(topicSlice.getContent()).containsExactlyElementsOf(topics),
                 () -> assertThat(topicSlice.getContent()).isSortedAccordingTo((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
         );
+    }
+
+    @Test
+    @DisplayName("")
+    void findBy_TopicSearchCond() {
+        // given
+
+        // create Topic
+        LocalDateTime deadline = LocalDateTime.now();
+
+        Topic topic = TestTopic.builder()
+                .deadline(deadline)
+                .status(TopicStatus.VOTING)
+                .build().buildTopic();
+
+        em.persist(topic);
+
+        TopicSearchCond searchCond = new TopicSearchCond(null, null, TopicStatus.VOTING);
+
+        // when
+        List<Topic> topics = topicRepository.findAll(searchCond);
+
+        // then
+        assertThat(topics).containsExactly(topic);
     }
 }

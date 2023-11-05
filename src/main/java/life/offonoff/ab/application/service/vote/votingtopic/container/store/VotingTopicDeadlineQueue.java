@@ -1,6 +1,6 @@
-package life.offonoff.ab.application.service.vote.votingtopic.storage;
+package life.offonoff.ab.application.service.vote.votingtopic.container.store;
 
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
+import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 
 import java.util.*;
 import java.util.function.Predicate;

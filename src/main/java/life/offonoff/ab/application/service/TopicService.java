@@ -59,7 +59,7 @@ public class TopicService {
                 .forEach(choiceRepository::save);
 
         // topic 생성 이벤트 발행
-        eventPublisher.publishEvent(TopicCreateEvent.of(topic));
+        eventPublisher.publishEvent(new TopicCreateEvent(topic));
         return TopicResponse.from(topic);
     }
 

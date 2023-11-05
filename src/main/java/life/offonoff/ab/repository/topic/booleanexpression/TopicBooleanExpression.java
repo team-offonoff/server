@@ -18,7 +18,11 @@ public class TopicBooleanExpression {
     }
 
     public static BooleanExpression gtDeadline(LocalDateTime compareTime) {
-        return topic.deadline.gt(compareTime);
+        return compareTime != null ? topic.deadline.gt(compareTime) : null;
+    }
+
+    public static BooleanExpression ltDeadline(LocalDateTime compareTime) {
+        return compareTime != null ? topic.deadline.lt(compareTime) : null;
     }
 
     public static BooleanExpression eqCategory(Long categoryId) {

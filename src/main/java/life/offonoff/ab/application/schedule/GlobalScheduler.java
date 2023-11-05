@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.schedule;
 
-import life.offonoff.ab.application.service.vote.VotingService;
+import life.offonoff.ab.application.service.vote.VotingTopicService;
+import life.offonoff.ab.application.service.vote.criteria.DeadlineVotingEndCriteria;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Component
 public class GlobalScheduler {
 
-    private final VotingService votingService;
+    private final VotingTopicService votingTopicService;
 
     /**
      * 매 분마다 스케쥴링
@@ -22,14 +23,12 @@ public class GlobalScheduler {
     public void endVotingDeadlinePassed() {
         log.info("[checkVotingTopic] schedule start");
 
-        votingService.endVoting(
-                votingTopic -> votingTopic.deadlinePassed(timeToCompare())
-        );
+        votingTopicService.endVote(new DeadlineVotingEndCriteria(compareTime()));
 
         log.info("[checkVotingTopic] schedule ended");
     }
 
-    private LocalDateTime timeToCompare() {
+    private LocalDateTime compareTime() {
         return LocalDateTime.now()
                         .withSecond(0)
                         .withNano(0);

@@ -44,6 +44,6 @@ public class FcmNoticeService implements NoticeService {
         }
 
         // 공지완료 이벤트 발행
-        eventPublisher.publishEvent(new NoticedEvent(result.getTopicId()));
+        eventPublisher.publishEvent(new NoticedEvent(result.getTopic()));
     }
 }

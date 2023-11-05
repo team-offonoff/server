@@ -5,21 +5,16 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.domain.vote.VotingResult;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.application.service.vote.votingtopic.VotingTopic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.querydsl.core.types.Projections.*;
 import static life.offonoff.ab.domain.topic.QTopic.*;
 import static life.offonoff.ab.repository.topic.booleanexpression.TopicBooleanExpression.*;
 
@@ -48,25 +43,15 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
     }
 
     @Override
-    public List<VotingTopic> findAll(VotingTopicSearchCond cond) {
+    public List<Topic> findAll(TopicSearchCond cond) {
         return queryFactory
-                .select(constructor(VotingTopic.class,
-                        topic.id,
-                        topic.deadline))
+                .select(topic)
                 .from(topic)
                 .where(
                         eqTopicStatus(cond.topicStatus()),
-                        gtDeadline(cond.compareTime())
+                        gtDeadline(cond.startCompareTime()),
+                        ltDeadline(cond.endCompareTime())
                 ).fetch();
-    }
-
-    @Override
-    public void updateStatus(Long topicId, TopicStatus topicStatus) {
-        queryFactory
-                .update(topic)
-                .set(topic.status, topicStatus)
-                .where(topic.id.eq(topicId))
-                .execute();
     }
 
     static class TopicOrderBy {
