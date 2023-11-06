@@ -2,6 +2,7 @@ package life.offonoff.ab.application.service.authenticate.oauth;
 
 import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,6 +16,9 @@ import static life.offonoff.ab.util.JwtParser.*;
 public class OAuthRestTemplate {
 
     private final RestTemplate restTemplate;
+
+    @Value("${ab.auth.oauth.kakao.client-id}")
+    private String KAKAO_CLIENT_ID;
 
     public KakaoProfile getKakaoProfile(String authorizeCode, String redirectUri) {
         KakaoTokenResponse response = restTemplate.postForEntity(
