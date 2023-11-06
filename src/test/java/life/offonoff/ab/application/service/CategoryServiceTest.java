@@ -1,6 +1,5 @@
 package life.offonoff.ab.application.service;
 
-import life.offonoff.ab.application.service.CategoryService;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.application.service.request.CategoryCreateRequest;
@@ -12,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CategoryServiceTest {
 
     @Autowired

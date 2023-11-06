@@ -3,8 +3,6 @@ package life.offonoff.ab.application.service.vote;
 import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
-import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainerService;
-import life.offonoff.ab.config.vote.ContainerVotingTopicConfig;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.member.MemberRepository;
@@ -13,9 +11,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-@Import(ContainerVotingTopicConfig.class)
+@Import(TestVoteConfig.TestContainerVotingTopicConfig.class)
 public class VotingTopicContainerServiceIntegrationTest {
 
     @Autowired
-    VotingTopicContainerService votingTopicContainerService;
+    VotingTopicService votingTopicContainerService;
 
     @MockBean
     VotingEndCriteria criteria;

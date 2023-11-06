@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.service;
 
 import jakarta.persistence.EntityManager;
+import life.offonoff.ab.application.service.vote.TestVoteConfig;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.config.vote.ContainerVotingTopicConfig;
@@ -9,6 +10,7 @@ import life.offonoff.ab.domain.member.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,8 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.*;
 
 @Transactional
-@Import(ContainerVotingTopicConfig.class)
 @SpringBootTest
+@Import(TestVoteConfig.TestContainerVotingTopicConfig.class)
 public class VotingTopicContainerIntegrationTest {
 
     @Autowired
