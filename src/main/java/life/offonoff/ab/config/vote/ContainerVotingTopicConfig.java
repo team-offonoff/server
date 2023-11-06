@@ -22,21 +22,22 @@ public class ContainerVotingTopicConfig {
     }
 
     @Bean
-    public VotingTopicStorage topicScheduleStorage() {
-        return new VotingTopicDeadlineQueue(votingTopicComparator());
+    public VotingTopicStorage topicScheduleStorage(Comparator<VotingTopic> votingTopicComparator) {
+        return new VotingTopicDeadlineQueue(votingTopicComparator);
     }
 
     @Bean
-    public VotingTopicContainer votingTopicContainer() {
-        return new VotingTopicContainer(topicScheduleStorage());
+    public VotingTopicContainer votingTopicContainer(VotingTopicStorage votingTopicStorage) {
+        return new VotingTopicContainer(votingTopicStorage);
     }
 
     @Bean
     public VotingTopicService votingTopicContainerService(
             TopicRepository topicRepository,
+            VotingTopicContainer votingTopicContainer,
             ApplicationEventPublisher eventPublisher
     ) {
         log.info("# VotingTopicService, class : {}", VotingTopicContainerService.class);
-        return new VotingTopicContainerService(topicRepository, votingTopicContainer(), eventPublisher);
+        return new VotingTopicContainerService(topicRepository, votingTopicContainer, eventPublisher);
     }
 }

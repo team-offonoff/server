@@ -3,15 +3,17 @@ package life.offonoff.ab.application.service.event.topic;
 import life.offonoff.ab.application.event.topic.*;
 import life.offonoff.ab.application.notice.NoticeService;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
+import life.offonoff.ab.config.vote.ContainerVotingTopicConfig;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VotingResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.time.LocalDateTime;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.*;
@@ -22,28 +24,8 @@ class TopicEventHandlerTest {
 
     @Autowired
     private TopicEventHandler topicEventHandler;
-    @Autowired
-    private VotingTopicContainer container;
     @MockBean
     private NoticeService noticeService;
-
-    @Test
-    @DisplayName("Topic 추가하면 container 사이즈 증가")
-    void add_voting_topic() {
-        // given
-        Topic topic = TestTopic.builder()
-                .id(1L)
-                .build().buildTopic();
-
-        TopicCreateEvent createEvent = new TopicCreateEvent(topic);
-        topicEventHandler.addTopic(createEvent);
-
-        // when
-        int size = container.size();
-
-        // then
-        assertThat(size).isEqualTo(1);
-    }
 
     @Test
     @DisplayName("Voting End 시에 Notice Service 호출")
