@@ -27,6 +27,8 @@ public class Member extends BaseEntity {
     @Column(length = 40)
     private String nickname;
 
+    private String email;
+
     @Embedded
     private NotificationEnabled notificationEnabled;
 
