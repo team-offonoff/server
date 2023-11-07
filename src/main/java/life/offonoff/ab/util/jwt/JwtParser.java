@@ -1,4 +1,4 @@
-package life.offonoff.ab.util;
+package life.offonoff.ab.util.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
