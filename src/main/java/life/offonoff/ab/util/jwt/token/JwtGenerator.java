@@ -19,6 +19,9 @@ public class JwtGenerator {
     @Value("${ab.auth.token.jwt.secret-key}")
     private String secretKey;
 
+    @Value("${ab.auth.token.jwt.expires-in}")
+    private Long expiresIn;
+
     public String generateAccessToken(Long memberId) {
         return Jwts.builder()
                 .setHeader(header())
@@ -31,6 +34,7 @@ public class JwtGenerator {
     private Map<String, Object> header() {
         Map<String, Object> header = new HashMap<>();
         header.put("alg", signAlg.getValue());
+        header.put("typ", "JWT");
 
         return header;
     }
@@ -44,7 +48,7 @@ public class JwtGenerator {
 
     private Date exp(long currentTime) {
         Date date = new Date();
-        date.setTime(currentTime + 1000);
+        date.setTime(currentTime + expiresIn);
 
         return date;
     }

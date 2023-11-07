@@ -1,5 +1,7 @@
 package life.offonoff.ab.application.service.authenticate;
 
+import life.offonoff.ab.application.service.request.SignInRequest;
+import life.offonoff.ab.application.service.request.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.DuplicateException;
 import life.offonoff.ab.exception.EmailInvalidException;
@@ -11,7 +13,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;

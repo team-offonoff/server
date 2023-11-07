@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.service.authenticate;
+package life.offonoff.ab.application.service.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -10,7 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import static life.offonoff.ab.util.JwtParser.*;
+import static life.offonoff.ab.util.jwt.JwtParser.*;
 
 @RequiredArgsConstructor
 public class OAuthRestTemplate {

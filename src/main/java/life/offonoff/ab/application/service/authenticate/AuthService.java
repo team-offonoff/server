@@ -1,5 +1,7 @@
 package life.offonoff.ab.application.service.authenticate;
 
+import life.offonoff.ab.application.service.request.SignInRequest;
+import life.offonoff.ab.application.service.request.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.DuplicateException;
 import life.offonoff.ab.exception.EmailInvalidException;
@@ -9,8 +11,6 @@ import life.offonoff.ab.web.response.SignInResponse;
 import life.offonoff.ab.web.response.SignUpResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import static life.offonoff.ab.domain.member.QMember.member;
 
 @RequiredArgsConstructor
 @Service

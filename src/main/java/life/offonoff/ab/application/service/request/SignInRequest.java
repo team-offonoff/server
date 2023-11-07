@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.service.authenticate;
+package life.offonoff.ab.application.service.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
