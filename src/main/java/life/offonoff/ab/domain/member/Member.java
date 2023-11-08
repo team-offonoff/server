@@ -7,15 +7,15 @@ import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 @Entity
 public class Member extends BaseEntity {
 
@@ -26,6 +26,10 @@ public class Member extends BaseEntity {
 
     @Column(length = 40)
     private String nickname;
+
+    private String email;
+
+    private String password;
 
     @Embedded
     private NotificationEnabled notificationEnabled;
@@ -82,7 +86,7 @@ public class Member extends BaseEntity {
 
     public boolean hideAlready(Topic topic) {
         return hiddenTopics.stream()
-                           .anyMatch(h -> h.has(topic));
+                .anyMatch(h -> h.has(topic));
     }
 
     public void cancelHide(Topic topic) {
@@ -91,7 +95,7 @@ public class Member extends BaseEntity {
 
     public boolean votedAlready(Topic topic) {
         return votes.stream()
-                    .anyMatch(v -> v.has(topic));
+                .anyMatch(v -> v.has(topic));
     }
 
     public void cancelVote(Topic topic) {
@@ -102,3 +106,5 @@ public class Member extends BaseEntity {
         notification.check();
     }
 }
+
+

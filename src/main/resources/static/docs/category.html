@@ -444,14 +444,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_categorycontrollertest">CategoryControllerTest</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_categorycontrollertest_http_request">HTTP request</h3>
+<h3 id="_카테고리_생성_api">카테고리 생성 API</h3>
+<div class="sect3">
+<h4 id="_카테고리_생성_api_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /categories HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 49
-X-CSRF-TOKEN: rdb75hqXWm_ueBoOSO97E0qXq27f9Ao7j65S6eXx6ohv6Rb2mbTO1CijY1vDQCs9eMJPK371hla8wjoWvp032YPA37hW2SfA
-Host: localhost:8080
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 
 {
   "name" : "ok",
@@ -460,23 +461,24 @@ Host: localhost:8080
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_http_response">HTTP response</h3>
+<div class="sect3">
+<h4 id="_카테고리_생성_api_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_http_request">HTTP request</h3>
+<div class="sect3">
+<h4 id="_bad_request_이름_비어있을_때">Bad Request: 이름 비어있을 때</h4>
+<div class="sect4">
+<h5 id="_bad_request_이름_비어있을_때_http_request">HTTP request</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /categories HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 49
-X-CSRF-TOKEN: Kh58W4UXtRQx06Z8kGYrBIIRpRFHhGvup0QRxsilQVA5wsOME39IarYl0yQc4JJP80sfYucmiHNz4AjDknV18fGdcDRdpPq_
-Host: localhost:8080
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 
 {
   "name" : "  ",
@@ -485,8 +487,8 @@ Host: localhost:8080
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_http_response">HTTP response</h3>
+<div class="sect4">
+<h5 id="_bad_request_이름_비어있을_때_http_response">HTTP response</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
@@ -504,15 +506,17 @@ Content-Length: 201
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_http_request">HTTP request</h3>
+</div>
+<div class="sect3">
+<h4 id="_bad_request_topicside_ab_지정_안했을_때">Bad Request: TopicSide A/B 지정 안했을 때</h4>
+<div class="sect4">
+<h5 id="_bad_request_topicside_ab_지정_안했을_때_http_request">HTTP request</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /categories HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 50
-X-CSRF-TOKEN: we5W-DFGa5t1r6nx9kxfDzW5ZFcD_WpDvpY1XWYL3n-HQjH6p9czwQZ-DflYmpvDl2FrOQXdSTY6mw9u3aJWOVdpuhu-elOZ
-Host: localhost:8080
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 
 {
   "name" : "category",
@@ -521,8 +525,8 @@ Host: localhost:8080
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_categorycontrollertest_http_response">HTTP response</h3>
+<div class="sect4">
+<h5 id="_bad_request_topicside_ab_지정_안했을_때_http_response">HTTP response</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
@@ -543,10 +547,12 @@ Content-Length: 222
 </div>
 </div>
 </div>
+</div>
+</div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-02 12:42:03 +0900
+Last updated 2023-11-06 09:16:29 +0900
 </div>
 </div>
 </body>

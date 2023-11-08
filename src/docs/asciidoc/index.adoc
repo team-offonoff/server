@@ -7,3 +7,4 @@
 
 include::topic.adoc[]
 include::category.adoc[]
+include::oauth.adoc[]

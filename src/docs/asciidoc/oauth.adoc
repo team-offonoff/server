@@ -1,0 +1,5 @@
+== OAuthControllerTest
+### 카카오 로그인 API
+- json body에 `카카오 로그인 서버`로 부터 받은 authorize code + 프론트엔드 단 redirect uri
+
+operation::o-auth-controller-test/oauth_kakao_new_member[snippets="request-fields,http-request,http-response"]

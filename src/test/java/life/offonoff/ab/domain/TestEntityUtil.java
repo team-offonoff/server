@@ -89,12 +89,17 @@ public class TestEntityUtil {
         private Long id;
         private String name;
         private String nickname;
+        private String email;
+        private String password;
+
         @Builder.Default
         private NotificationEnabled enabled = new NotificationEnabled(true, true, true, true);
 
         public Member buildMember() {
             Member member = new Member(name, nickname, enabled);
             ReflectionTestUtils.setField(member, "id", id);
+            ReflectionTestUtils.setField(member, "email", email);
+            ReflectionTestUtils.setField(member, "password", email);
             return member;
         }
     }
