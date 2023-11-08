@@ -1,17 +1,14 @@
 package life.offonoff.ab.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.authenticate.OAuthService;
 import life.offonoff.ab.application.service.request.auth.KakaoAuthRequest;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.web.response.OAuthSignUpResponse;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
