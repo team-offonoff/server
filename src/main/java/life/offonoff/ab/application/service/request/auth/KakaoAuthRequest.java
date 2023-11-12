@@ -1,14 +1,20 @@
 package life.offonoff.ab.application.service.request.auth;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
-public class KakaoTokenRequest extends OAuthRequest {
-    private final String authorizeCode;
-    private final String redirectUri;
+public class KakaoAuthRequest extends OAuthRequest {
+    private AuthorizeType type;
 
-    public KakaoTokenRequest(String authorizeCode, String redirectUri) {
-        this.authorizeCode = authorizeCode;
-        this.redirectUri = redirectUri;
-    }
+    // token 조회 -> auth
+    private String authorizeCode;
+    private String redirectUri;
+
+    // auth
+    private String idToken;
 }

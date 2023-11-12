@@ -18,6 +18,7 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final JwtGenerator jwtGenerator;
+
     //== Sign In ==//
     public SignInResponse signIn(SignInRequest request) {
 
@@ -48,11 +49,8 @@ public class AuthService {
         validateSignUp(request);
 
         Member saveMember = memberRepository.save(
-                Member.builder()
-                        .email(request.getEmail())
-                        .password(request.getPassword())
-                        .build()
-        );
+                new Member(request.getEmail(), request.getPassword(), request.getProvider()));
+
         return new SignUpResponse(jwtGenerator.generateAccessToken(saveMember.getId()));
     }
 

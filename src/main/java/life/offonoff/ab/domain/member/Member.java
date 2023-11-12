@@ -31,6 +31,8 @@ public class Member extends BaseEntity {
 
     private String password;
 
+    private String provider;
+
     @Embedded
     private NotificationEnabled notificationEnabled;
 
@@ -56,6 +58,13 @@ public class Member extends BaseEntity {
         this.name = name;
         this.nickname = nickname;
         this.notificationEnabled = notificationEnabled;
+    }
+
+    public Member(String email, String password, String provider) {
+        this.email = email;
+        this.password = password;
+        this.provider = provider;
+        this.notificationEnabled = NotificationEnabled.allEnabled();
     }
 
     //== 연관관계 매핑 ==//

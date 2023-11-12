@@ -18,4 +18,8 @@ public class NotificationEnabled {
         this.voteOnTopic = voteOnTopic;
         this.commentOnTopic = commentOnTopic;
     }
+
+    public static NotificationEnabled allEnabled() {
+        return new NotificationEnabled(true, true, true, true);
+    }
 }
