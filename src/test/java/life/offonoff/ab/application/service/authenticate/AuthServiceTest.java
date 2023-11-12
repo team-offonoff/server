@@ -88,7 +88,7 @@ class AuthServiceTest {
         Member member = TestMember.builder()
                 .id(id)
                 .build().buildMember();
-        SignUpRequest request = new SignUpRequest(email, password);
+        SignUpRequest request = new SignUpRequest(email, password, "AB");
 
         when(generator.generateAccessToken(id)).thenReturn(mockJwt);
         when(memberRepository.save(any(Member.class))).thenReturn(member);
@@ -112,7 +112,7 @@ class AuthServiceTest {
         Member member = TestMember.builder()
                 .build().buildMember();
 
-        SignUpRequest request = new SignUpRequest(email, password);
+        SignUpRequest request = new SignUpRequest(email, password, "AB");
 
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
 
