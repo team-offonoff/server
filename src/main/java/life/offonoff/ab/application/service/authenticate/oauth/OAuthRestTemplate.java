@@ -1,16 +1,17 @@
 package life.offonoff.ab.application.service.authenticate.oauth;
 
-import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
+import life.offonoff.ab.application.service.request.auth.KakaoAuthRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import static life.offonoff.ab.util.jwt.JwtParser.*;
+import static life.offonoff.ab.application.service.authenticate.oauth.OAuthRequestConst.POST_KAKAO_TOKEN_URL;
 
 @RequiredArgsConstructor
 public class OAuthRestTemplate {
@@ -18,16 +19,17 @@ public class OAuthRestTemplate {
     private final RestTemplate restTemplate;
 
     @Value("${ab.auth.oauth.kakao.client-id}")
-    private String KAKAO_CLIENT_ID;
+    private static String KAKAO_CLIENT_ID;
 
-    public KakaoProfile getKakaoProfile(String authorizeCode, String redirectUri) {
-        KakaoTokenResponse response = restTemplate.postForEntity(
-                                                        OAuthRequestConst.POST_KAKAO_TOKEN_URL,
-                                                        createRequest(authorizeCode, redirectUri),
-                                                        KakaoTokenResponse.class)
-                                                  .getBody();
-        String payload = getPayload(response.getIdToken());
-        return (KakaoProfile) extractOAuthProfile(payload);
+    //== KAKAO ==//
+    public ResponseEntity<KakaoTokenResponse> postKakaoToken(final KakaoAuthRequest request) {
+
+        final String authorizeCode = request.getAuthorizeCode();
+        final String redirectUri = request.getRedirectUri();
+
+        return restTemplate.postForEntity(POST_KAKAO_TOKEN_URL,
+                                          createRequest(authorizeCode, redirectUri),
+                                          KakaoTokenResponse.class);
     }
 
     private HttpEntity<MultiValueMap<String, Object>> createRequest(String authorizeCode, String redirectUri) {
@@ -55,7 +57,4 @@ public class OAuthRestTemplate {
         return map;
     }
 
-    private String getPayload(String idToken) {
-        return idToken.split("\\.")[1];
-    }
 }
