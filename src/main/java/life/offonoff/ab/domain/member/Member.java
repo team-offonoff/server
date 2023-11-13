@@ -31,7 +31,8 @@ public class Member extends BaseEntity {
 
     private String password;
 
-    private String provider;
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
     @Embedded
     private NotificationEnabled notificationEnabled;
@@ -60,7 +61,7 @@ public class Member extends BaseEntity {
         this.notificationEnabled = notificationEnabled;
     }
 
-    public Member(String email, String password, String provider) {
+    public Member(String email, String password, Provider provider) {
         this.email = email;
         this.password = password;
         this.provider = provider;
