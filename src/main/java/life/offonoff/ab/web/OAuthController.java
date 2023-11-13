@@ -16,17 +16,6 @@ public class OAuthController {
 
     private final OAuthService oAuthService;
 
-    // Test Redirect Uri
-    @GetMapping("/kakao/authorize")
-    public String kakaoAuthorizeCode(String code) {
-        return code;
-    }
-
-    @GetMapping("/google/authorize")
-    public String googleAuthorizeCode(String code) {
-        return code;
-    }
-
     //== OAUTH ==//
     @PostMapping( "/kakao/authorize")
     public ResponseEntity<OAuthResponse> authorizeKakao(@RequestBody final OAuthRequest request) {
@@ -38,5 +27,16 @@ public class OAuthController {
     public ResponseEntity<OAuthResponse> authorizeGoogle(@RequestBody final OAuthRequest request) {
         request.setProvider(GOOGLE);
         return ResponseEntity.ok(oAuthService.authorize(request));
+    }
+
+    // Test Redirect Uri
+    @GetMapping("/kakao/authorize")
+    public String kakaoAuthorizeCode(String code) {
+        return code;
+    }
+
+    @GetMapping("/google/authorize")
+    public String googleAuthorizeCode(String code) {
+        return code;
     }
 }

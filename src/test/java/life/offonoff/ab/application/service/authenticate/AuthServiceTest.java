@@ -3,6 +3,7 @@ package life.offonoff.ab.application.service.authenticate;
 import life.offonoff.ab.application.service.request.SignInRequest;
 import life.offonoff.ab.application.service.request.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.DuplicateException;
 import life.offonoff.ab.exception.EmailInvalidException;
 import life.offonoff.ab.repository.member.MemberRepository;
@@ -88,7 +89,7 @@ class AuthServiceTest {
         Member member = TestMember.builder()
                 .id(id)
                 .build().buildMember();
-        SignUpRequest request = new SignUpRequest(email, password, "AB");
+        SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
 
         when(generator.generateAccessToken(id)).thenReturn(mockJwt);
         when(memberRepository.save(any(Member.class))).thenReturn(member);
@@ -112,7 +113,7 @@ class AuthServiceTest {
         Member member = TestMember.builder()
                 .build().buildMember();
 
-        SignUpRequest request = new SignUpRequest(email, password, "AB");
+        SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
 
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
 

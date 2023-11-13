@@ -2,7 +2,7 @@ package life.offonoff.ab.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.authenticate.OAuthService;
-import life.offonoff.ab.application.service.request.auth.KakaoAuthRequest;
+import life.offonoff.ab.application.service.request.auth.OAuthRequest;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.web.response.OAuthSignInResponse;
 import life.offonoff.ab.web.response.OAuthSignUpResponse;
@@ -26,9 +26,9 @@ class OAuthControllerTest extends RestDocsTest {
     @Test
     void oauth_kakao_new_member_by_code() throws Exception {
         // given
-        KakaoAuthRequest request = new KakaoAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
+        OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
 
-        when(oAuthService.authenticate(any()))
+        when(oAuthService.authorize(any()))
                 .thenReturn(new OAuthSignUpResponse(true, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
@@ -42,9 +42,9 @@ class OAuthControllerTest extends RestDocsTest {
     @Test
     void oauth_kakao_existing_member_by_code() throws Exception {
         // given
-        KakaoAuthRequest request = new KakaoAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
+        OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
 
-        when(oAuthService.authenticate(any()))
+        when(oAuthService.authorize(any()))
                 .thenReturn(new OAuthSignInResponse(false, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
@@ -58,9 +58,9 @@ class OAuthControllerTest extends RestDocsTest {
     @Test
     void oauth_kakao_new_member_by_idToken() throws Exception {
         // given
-        KakaoAuthRequest request = new KakaoAuthRequest(BY_IDTOKEN, null, null, "id_token");
+        OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
-        when(oAuthService.authenticate(any()))
+        when(oAuthService.authorize(any()))
                 .thenReturn(new OAuthSignUpResponse(true, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
@@ -74,9 +74,9 @@ class OAuthControllerTest extends RestDocsTest {
     @Test
     void oauth_kakao_existing_member_by_idToken() throws Exception {
         // given
-        KakaoAuthRequest request = new KakaoAuthRequest(BY_IDTOKEN, null, null, "id_token");
+        OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
-        when(oAuthService.authenticate(any()))
+        when(oAuthService.authorize(any()))
                 .thenReturn(new OAuthSignInResponse(false, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
