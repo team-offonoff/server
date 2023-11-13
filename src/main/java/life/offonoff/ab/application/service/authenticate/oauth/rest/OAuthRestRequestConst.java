@@ -1,11 +1,11 @@
-package life.offonoff.ab.application.service.authenticate.oauth;
+package life.offonoff.ab.application.service.authenticate.oauth.rest;
 
 import life.offonoff.ab.domain.member.Provider;
 
-public class OAuthRequestConst {
+public class OAuthRestRequestConst {
 
     // GOOGLE
-    public final static String POST_GOOGLE_TOKEN_URL = "https://accounts.google.com/o/oauth2/v2/auth";
+    public final static String POST_GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
     // KAKAO
     public final static String POST_KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
