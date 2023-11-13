@@ -1,5 +1,6 @@
 package life.offonoff.ab.application.service.request;
 
+import life.offonoff.ab.domain.member.Provider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,6 +10,6 @@ public class SignUpRequest {
 
     private String email;
     private String password;
-    private String provider;
+    private Provider provider;
 }
 

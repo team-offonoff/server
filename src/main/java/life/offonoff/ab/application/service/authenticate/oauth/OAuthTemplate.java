@@ -1,40 +1,44 @@
 package life.offonoff.ab.application.service.authenticate.oauth;
 
-import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
+import life.offonoff.ab.application.service.authenticate.oauth.profile.OAuthProfile;
+import life.offonoff.ab.application.service.authenticate.oauth.rest.OAuthRestRequestBuilder;
+import life.offonoff.ab.application.service.authenticate.oauth.rest.OAuthRestTemplate;
 import life.offonoff.ab.application.service.request.auth.AuthorizeType;
-import life.offonoff.ab.application.service.request.auth.KakaoAuthRequest;
+import life.offonoff.ab.application.service.request.auth.OAuthRequest;
+import life.offonoff.ab.util.jwt.JwtParser;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import static life.offonoff.ab.application.service.request.auth.AuthorizeType.*;
-import static life.offonoff.ab.util.jwt.JwtParser.*;
 
 @Component
 public class OAuthTemplate {
 
+    private final JwtParser jwtParser;
     private final OAuthRestTemplate oAuthRestTemplate;
 
-    public OAuthTemplate(RestTemplate restTemplate) {
-        this.oAuthRestTemplate = new OAuthRestTemplate(restTemplate);
+    public OAuthTemplate(JwtParser jwtParser, RestTemplate restTemplate, OAuthRestRequestBuilder oAuthRestRequestBuilder) {
+        this.jwtParser = jwtParser;
+        this.oAuthRestTemplate = new OAuthRestTemplate(restTemplate, oAuthRestRequestBuilder);
     }
 
-    public KakaoProfile getKakaoProfile(KakaoAuthRequest authRequest) {
-        String idToken = getIdToken(authRequest);
+    public OAuthProfile getOAuthProfile(OAuthRequest request) {
+        String idToken = getIdToken(request);
         String payload = getPayload(idToken);
 
-        return (KakaoProfile) extractOAuthProfile(payload);
+        return jwtParser.extractOAuthProfile(payload, request.getProvider());
     }
 
-    private String getIdToken(KakaoAuthRequest authRequest) {
-        AuthorizeType type = authRequest.getType();
+    private String getIdToken(OAuthRequest request) {
+        AuthorizeType type = request.getType();
 
         if (type == BY_CODE) {
-            return oAuthRestTemplate.postKakaoToken(authRequest)
-                               .getBody()
-                               .getIdToken();
+            return oAuthRestTemplate.postOAuthToken(request)
+                                    .getBody()
+                                    .getIdToken();
         }
         if (type == BY_IDTOKEN) {
-            return authRequest.getIdToken();
+            return request.getIdToken();
         }
 
         return null;

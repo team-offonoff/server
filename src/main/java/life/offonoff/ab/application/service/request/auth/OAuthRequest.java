@@ -1,14 +1,12 @@
 package life.offonoff.ab.application.service.request.auth;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Null;
+import life.offonoff.ab.domain.member.Provider;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
-public class KakaoAuthRequest extends OAuthRequest {
+public class OAuthRequest {
+
     private AuthorizeType type;
 
     // token 조회 -> auth
@@ -17,4 +15,12 @@ public class KakaoAuthRequest extends OAuthRequest {
 
     // auth
     private String idToken;
+
+    // controller에서 바인딩
+    @Null
+    private Provider provider;
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+    }
 }

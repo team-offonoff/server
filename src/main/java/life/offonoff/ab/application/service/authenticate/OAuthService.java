@@ -1,10 +1,10 @@
 package life.offonoff.ab.application.service.authenticate;
 
 import life.offonoff.ab.application.service.authenticate.oauth.OAuthTemplate;
-import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
+import life.offonoff.ab.application.service.authenticate.oauth.profile.OAuthProfile;
 import life.offonoff.ab.application.service.request.SignInRequest;
 import life.offonoff.ab.application.service.request.SignUpRequest;
-import life.offonoff.ab.application.service.request.auth.KakaoAuthRequest;
+import life.offonoff.ab.application.service.request.auth.OAuthRequest;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.web.response.*;
 import lombok.RequiredArgsConstructor;
@@ -21,36 +21,34 @@ public class OAuthService {
     private final OAuthTemplate oAuthTemplate;
 
     @Transactional
-    public OAuthResponse authenticate(KakaoAuthRequest request) {
+    public OAuthResponse authorize(OAuthRequest request) {
 
-        KakaoProfile kakaoProfile = oAuthTemplate.getKakaoProfile(request);
+        OAuthProfile oAuthProfile = oAuthTemplate.getOAuthProfile(request);
 
-        if (isNewMember(kakaoProfile)) {
-            return joinOAuthProfile(kakaoProfile);
+        if (isNewMember(oAuthProfile)) {
+            return joinOAuthProfile(oAuthProfile);
         }
-        return loginOAuthProfile(kakaoProfile);
+        return loginOAuthProfile(oAuthProfile);
     }
 
-    private boolean isNewMember(KakaoProfile profile) {
+    private boolean isNewMember(OAuthProfile profile) {
         return memberRepository.findByEmail(profile.getEmail())
                                .isEmpty();
     }
 
-    private OAuthSignUpResponse joinOAuthProfile(KakaoProfile kakaoProfile) {
-        SignUpRequest request = new SignUpRequest(kakaoProfile.getEmail(), createRandomOAuthPassword(), "kakao");
+    private OAuthSignUpResponse joinOAuthProfile(OAuthProfile oAuthProfile) {
+
+        SignUpRequest request = oAuthProfile.toSignUpRequest();
 
         SignUpResponse response = authService.signUp(request);
         return new OAuthSignUpResponse(true, response.getAccessToken());
     }
 
-    private OAuthSignInResponse loginOAuthProfile(KakaoProfile kakaoProfile) {
-        SignInRequest request = new SignInRequest(kakaoProfile.getEmail(), createRandomOAuthPassword());
+    private OAuthSignInResponse loginOAuthProfile(OAuthProfile oAuthProfile) {
+
+        SignInRequest request = oAuthProfile.toSignInRequest();
 
         SignInResponse response = authService.signIn(request);
         return new OAuthSignInResponse(false, response.getAccessToken());
-    }
-
-    private String createRandomOAuthPassword() {
-        return "oauth-password";
     }
 }
