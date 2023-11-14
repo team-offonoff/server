@@ -8,6 +8,7 @@ import life.offonoff.ab.exception.DuplicateException;
 import life.offonoff.ab.exception.EmailNotFoundException;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.util.jwt.token.JwtGenerator;
+import life.offonoff.ab.util.password.PasswordEncoder;
 import life.offonoff.ab.web.response.SignInResponse;
 import life.offonoff.ab.web.response.SignUpResponse;
 import org.junit.jupiter.api.*;
@@ -31,6 +32,8 @@ class AuthServiceTest {
     MemberRepository memberRepository;
     @Mock
     JwtGenerator generator;
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("정상 로그인")
@@ -44,7 +47,7 @@ class AuthServiceTest {
         SignInRequest request = new SignInRequest(email, password);
 
         when(generator.generateAccessToken(id)).thenReturn(mockJwt);
-
+        when(passwordEncoder.isMatch(anyString(), anyString())).thenReturn(true);
         // Member
         Member member = TestMember.builder()
                 .id(1L)
@@ -94,7 +97,7 @@ class AuthServiceTest {
         when(generator.generateAccessToken(id)).thenReturn(mockJwt);
         when(memberRepository.save(any(Member.class))).thenReturn(member);
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-
+        when(passwordEncoder.encode(password)).thenReturn(password);
         // when
         SignUpResponse response = authService.signUp(request);
 
@@ -116,6 +119,7 @@ class AuthServiceTest {
         SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
 
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
+        when(passwordEncoder.encode(password)).thenReturn(password);
 
         // when
         assertThatThrownBy(() -> authService.signUp(request)).isInstanceOf(DuplicateException.class);
