@@ -1,11 +1,11 @@
-package life.offonoff.ab.application.service.authenticate;
+package life.offonoff.ab.application.service.auth;
 
-import life.offonoff.ab.application.service.request.SignInRequest;
-import life.offonoff.ab.application.service.request.SignUpRequest;
+import life.offonoff.ab.application.service.request.auth.SignInRequest;
+import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.DuplicateException;
-import life.offonoff.ab.exception.EmailInvalidException;
+import life.offonoff.ab.exception.EmailNotFoundException;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.util.jwt.token.JwtGenerator;
 import life.offonoff.ab.web.response.SignInResponse;
@@ -73,7 +73,7 @@ class AuthServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         // when
-        assertThatThrownBy(() -> authService.signIn(request)).isInstanceOf(EmailInvalidException.class);
+        assertThatThrownBy(() -> authService.signIn(request)).isInstanceOf(EmailNotFoundException.class);
     }
 
     @Test

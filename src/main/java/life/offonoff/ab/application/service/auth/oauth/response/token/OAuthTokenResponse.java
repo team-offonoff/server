@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.service.authenticate.oauth.response.token;
+package life.offonoff.ab.application.service.auth.oauth.response.token;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

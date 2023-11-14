@@ -1,9 +1,9 @@
 package life.offonoff.ab.util.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import life.offonoff.ab.application.service.authenticate.oauth.profile.GoogleProfile;
-import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
-import life.offonoff.ab.application.service.authenticate.oauth.profile.OAuthProfile;
+import life.offonoff.ab.application.service.auth.oauth.profile.GoogleProfile;
+import life.offonoff.ab.application.service.auth.oauth.profile.KakaoProfile;
+import life.offonoff.ab.application.service.auth.oauth.profile.OAuthProfile;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.OAuthMappingException;
 import org.springframework.stereotype.Component;

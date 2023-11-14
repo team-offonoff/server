@@ -1,8 +1,8 @@
-package life.offonoff.ab.application.service.authenticate.oauth.profile;
+package life.offonoff.ab.application.service.auth.oauth.profile;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import life.offonoff.ab.application.service.request.SignInRequest;
-import life.offonoff.ab.application.service.request.SignUpRequest;
+import life.offonoff.ab.application.service.request.auth.SignInRequest;
+import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public abstract class OAuthProfile {
 
     private String email;
+    private String sub;
 
     public abstract SignUpRequest toSignUpRequest();
 

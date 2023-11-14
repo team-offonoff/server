@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.service.request.auth;
+package life.offonoff.ab.application.service.request.oauth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Null;

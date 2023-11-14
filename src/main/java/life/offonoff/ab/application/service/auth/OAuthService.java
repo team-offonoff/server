@@ -1,10 +1,10 @@
-package life.offonoff.ab.application.service.authenticate;
+package life.offonoff.ab.application.service.auth;
 
-import life.offonoff.ab.application.service.authenticate.oauth.OAuthTemplate;
-import life.offonoff.ab.application.service.authenticate.oauth.profile.OAuthProfile;
-import life.offonoff.ab.application.service.request.SignInRequest;
-import life.offonoff.ab.application.service.request.SignUpRequest;
-import life.offonoff.ab.application.service.request.auth.OAuthRequest;
+import life.offonoff.ab.application.service.auth.oauth.OAuthTemplate;
+import life.offonoff.ab.application.service.auth.oauth.profile.OAuthProfile;
+import life.offonoff.ab.application.service.request.auth.SignInRequest;
+import life.offonoff.ab.application.service.request.auth.SignUpRequest;
+import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.web.response.*;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package life.offonoff.ab.web;
 
-import life.offonoff.ab.application.service.authenticate.OAuthService;
-import life.offonoff.ab.application.service.request.auth.OAuthRequest;
+import life.offonoff.ab.application.service.auth.OAuthService;
+import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.web.response.OAuthResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

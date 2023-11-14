@@ -1,13 +1,13 @@
-package life.offonoff.ab.application.service.authenticate.oauth.rest;
+package life.offonoff.ab.application.service.auth.oauth.rest;
 
-import life.offonoff.ab.application.service.authenticate.oauth.response.token.OAuthTokenResponse;
-import life.offonoff.ab.application.service.request.auth.OAuthRequest;
+import life.offonoff.ab.application.service.auth.oauth.response.token.OAuthTokenResponse;
+import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.domain.member.Provider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import static life.offonoff.ab.application.service.authenticate.oauth.rest.OAuthRestRequestConst.*;
+import static life.offonoff.ab.application.service.auth.oauth.rest.OAuthRestRequestConst.*;
 
 @RequiredArgsConstructor
 public class OAuthRestTemplate {

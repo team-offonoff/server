@@ -1,15 +1,15 @@
-package life.offonoff.ab.application.service.authenticate.oauth;
+package life.offonoff.ab.application.service.auth.oauth;
 
-import life.offonoff.ab.application.service.authenticate.oauth.profile.OAuthProfile;
-import life.offonoff.ab.application.service.authenticate.oauth.rest.OAuthRestRequestBuilder;
-import life.offonoff.ab.application.service.authenticate.oauth.rest.OAuthRestTemplate;
-import life.offonoff.ab.application.service.request.auth.AuthorizeType;
-import life.offonoff.ab.application.service.request.auth.OAuthRequest;
+import life.offonoff.ab.application.service.auth.oauth.profile.OAuthProfile;
+import life.offonoff.ab.application.service.auth.oauth.rest.OAuthRestRequestBuilder;
+import life.offonoff.ab.application.service.auth.oauth.rest.OAuthRestTemplate;
+import life.offonoff.ab.application.service.request.oauth.AuthorizeType;
+import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.util.jwt.JwtParser;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import static life.offonoff.ab.application.service.request.auth.AuthorizeType.*;
+import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.*;
 
 @Component
 public class OAuthTemplate {

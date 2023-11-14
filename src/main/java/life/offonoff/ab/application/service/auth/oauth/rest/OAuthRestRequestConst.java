@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.service.authenticate.oauth.rest;
+package life.offonoff.ab.application.service.auth.oauth.rest;
 
 import life.offonoff.ab.domain.member.Provider;
 
