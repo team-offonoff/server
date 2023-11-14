@@ -1,4 +1,4 @@
-package life.offonoff.ab.application.service;
+package life.offonoff.ab.application.service.member;
 
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.member.Member;

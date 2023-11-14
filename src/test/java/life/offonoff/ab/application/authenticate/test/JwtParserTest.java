@@ -1,12 +1,15 @@
 package life.offonoff.ab.application.authenticate.test;
 
+import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.util.jwt.JwtParser;
-import life.offonoff.ab.application.service.authenticate.oauth.profile.KakaoProfile;
+import life.offonoff.ab.application.service.auth.oauth.profile.KakaoProfile;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 public class JwtParserTest {
+
+    JwtParser parser = new JwtParser();
 
     @Test
     void parse_payload() throws IOException {
@@ -18,7 +21,7 @@ public class JwtParserTest {
                 "sImVtYWlsIjoicnVkd2hkNTE1QGdtYWlsLmNvbSJ9";
 
         // when
-        KakaoProfile profile = (KakaoProfile) JwtParser.extractOAuthProfile(payload);
+        KakaoProfile profile = (KakaoProfile) parser.extractOAuthProfile(payload, Provider.KAKAO);
 
         // then
         System.out.println(profile.getEmail());
