@@ -3,6 +3,7 @@ package life.offonoff.ab.application.service.auth;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.exception.DuplicateEmailException;
 import life.offonoff.ab.exception.DuplicateException;
 import life.offonoff.ab.exception.EmailNotFoundException;
 import life.offonoff.ab.exception.IllegalPasswordException;
@@ -13,6 +14,8 @@ import life.offonoff.ab.web.response.SignInResponse;
 import life.offonoff.ab.web.response.SignUpResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static life.offonoff.ab.domain.member.JoinStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -31,7 +34,9 @@ public class AuthService {
         Member saveMember = memberRepository.save(
                 new Member(request.getEmail(), request.getPassword(), request.getProvider()));
 
-        return new SignUpResponse(jwtGenerator.generateAccessToken(saveMember.getId()));
+        return new SignUpResponse(saveMember.getId(),
+                                  AUTH_REGISTERED,
+                                  jwtGenerator.generateAccessToken(saveMember.getId()));
     }
 
     private void validateSignUp(SignUpRequest request) {
@@ -44,7 +49,7 @@ public class AuthService {
 
         // unique email
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new DuplicateException("duplicate email");
+            throw new DuplicateEmailException();
         }
     }
 
@@ -55,7 +60,9 @@ public class AuthService {
 
         Member member = findMember(request.getEmail());
 
-        return new SignInResponse(jwtGenerator.generateAccessToken(member.getId()));
+        return new SignInResponse(member.getId(),
+                                  member.getJoinStatus(),
+                                  jwtGenerator.generateAccessToken(member.getId()));
     }
 
     private void validateSignIn(SignInRequest request) {
