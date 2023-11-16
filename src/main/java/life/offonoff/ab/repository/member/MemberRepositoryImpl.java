@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static life.offonoff.ab.domain.member.QMember.*;
 import static life.offonoff.ab.domain.vote.QVote.*;
@@ -26,5 +27,15 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         .and(vote.topic.id.eq(topicId))
                 ).where(member.notificationEnabled.votingResult.isTrue())
                 .fetch();
+    }
+
+    @Override
+    public Optional<Member> findByEmail(String email) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(member)
+                        .from(member)
+                        .where(member.authInfo.email.eq(email))
+                        .fetchOne());
     }
 }

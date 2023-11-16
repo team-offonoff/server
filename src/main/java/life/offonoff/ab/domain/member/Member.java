@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,20 +23,17 @@ public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    @Column(length = 40)
-    private String nickname;
-
-    private String email;
-
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    private Provider provider;
-
+    // 인증 정보
+    @Embedded
+    private AuthenticationInfo authInfo;
+    // 개인 정보
+    @Embedded
+    private PersonalInfo personalInfo;
+    // 알람 여부 정보
     @Embedded
     private NotificationEnabled notificationEnabled;
+    // 마케팅 수신 동의
+    private Boolean listenMarketing;
 
     @OneToMany(mappedBy = "publishMember")
     private List<Topic> publishedTopics = new ArrayList<>();
@@ -55,17 +53,22 @@ public class Member extends BaseEntity {
     private int active = 1;
 
     //== Constructor ==//
-    public Member(String name, String nickname, NotificationEnabled notificationEnabled) {
-        this.name = name;
-        this.nickname = nickname;
+    public Member(String name, String nickname, LocalDate birth, Gender gender, String job, NotificationEnabled notificationEnabled) {
+        this.personalInfo = new PersonalInfo(name, nickname, birth, gender, job);
         this.notificationEnabled = notificationEnabled;
     }
 
     public Member(String email, String password, Provider provider) {
-        this.email = email;
-        this.password = password;
-        this.provider = provider;
+        this.authInfo = new AuthenticationInfo(email, password, provider);
         this.notificationEnabled = NotificationEnabled.allEnabled();
+    }
+
+    public void registerAuthInfo(AuthenticationInfo authInfo) {
+        this.authInfo = authInfo;
+    }
+
+    public void registerPersonalInfo(PersonalInfo personalInfo) {
+        this.personalInfo = personalInfo;
     }
 
     //== 연관관계 매핑 ==//
@@ -90,6 +93,22 @@ public class Member extends BaseEntity {
     }
 
     //== Method ==//
+    public JoinStatus getJoinStatus() {
+        if (authInfo == null) {
+            return JoinStatus.EMPTY;
+        }
+
+        if (personalInfo == null) {
+            return JoinStatus.AUTH_REGISTERED;
+        }
+
+        if (listenMarketing == null) {
+            return JoinStatus.PERSONAL_REGISTERED;
+        }
+
+        return JoinStatus.COMPLETE;
+    }
+
     public void inactive() {
         this.active = 0;
     }
@@ -114,6 +133,14 @@ public class Member extends BaseEntity {
 
     public void readNotification(Notification notification) {
         notification.check();
+    }
+
+    public String getPassword() {
+        return authInfo.getPassword();
+    }
+
+    public String getNickname() {
+        return personalInfo.getNickname();
     }
 }
 
