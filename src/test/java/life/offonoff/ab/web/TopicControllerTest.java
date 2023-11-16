@@ -56,8 +56,8 @@ public class TopicControllerTest extends RestDocsTest {
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         relaxedRequestFields(
-                                fieldWithPath("choices[].choiceContentRequest.type").description("현재는 항상 IMAGE_TEXT; 이미지와 텍스트가 아닌 다른 선택지 종류가 추가될 수 있어서 만들어 놓은 필드기 때문임."),
-                                fieldWithPath("deadline").type(Long.TYPE).description("Unix timestamps in seconds")
+                                        fieldWithPath("choices[].choiceContentRequest.type").description("현재는 항상 IMAGE_TEXT; 이미지와 텍스트가 아닌 다른 선택지 종류가 추가될 수 있어서 만들어 놓은 필드기 때문임."),
+                                        fieldWithPath("deadline").type(Long.TYPE).description("Unix timestamps in seconds")
                         )));
     }
 
