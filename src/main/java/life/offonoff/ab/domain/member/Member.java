@@ -135,6 +135,11 @@ public class Member extends BaseEntity {
         notification.check();
     }
 
+    //== GETTER ==//
+    public Role getRole() {
+        return authInfo.getRole();
+    }
+
     public String getPassword() {
         return authInfo.getPassword();
     }

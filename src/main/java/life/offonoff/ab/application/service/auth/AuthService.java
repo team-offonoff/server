@@ -3,13 +3,11 @@ package life.offonoff.ab.application.service.auth;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.exception.DuplicateEmailException;
-import life.offonoff.ab.exception.DuplicateException;
-import life.offonoff.ab.exception.EmailNotFoundException;
-import life.offonoff.ab.exception.IllegalPasswordException;
+import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.util.jwt.token.JwtGenerator;
 import life.offonoff.ab.util.password.PasswordEncoder;
+import life.offonoff.ab.web.response.JoinStatusResponse;
 import life.offonoff.ab.web.response.SignInResponse;
 import life.offonoff.ab.web.response.SignUpResponse;
 import lombok.RequiredArgsConstructor;
@@ -75,8 +73,16 @@ public class AuthService {
         }
     }
 
+    public JoinStatusResponse getJoinStatus(Long memberId) {
+        return new JoinStatusResponse(memberId, findMember(memberId).getJoinStatus());
+    }
+
     private Member findMember(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new EmailNotFoundException(email));
+    }
+    private Member findMember(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFountException(id));
     }
 }
