@@ -6,6 +6,7 @@ import life.offonoff.ab.application.service.auth.oauth.profile.KakaoProfile;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Base64;
 
 public class JwtParserTest {
 

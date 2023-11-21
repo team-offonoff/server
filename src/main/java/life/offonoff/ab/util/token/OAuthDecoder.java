@@ -1,11 +1,13 @@
 package life.offonoff.ab.util.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
 import life.offonoff.ab.application.service.auth.oauth.profile.GoogleProfile;
 import life.offonoff.ab.application.service.auth.oauth.profile.KakaoProfile;
 import life.offonoff.ab.application.service.auth.oauth.profile.OAuthProfile;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.OAuthMappingException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,6 +20,9 @@ public class JwtParser {
 
     private static final ObjectMapper om = new ObjectMapper();
     private static final Base64.Decoder decoder = Base64.getUrlDecoder();
+
+    @Value("${ab.auth.token.jwt.secret-key}")
+    private String secretKey;
 
     public OAuthProfile extractOAuthProfile(String payload, Provider provider) {
 
@@ -35,6 +40,14 @@ public class JwtParser {
             return om.readValue(decoder.decode(payload), extractClass);
         } catch (IOException e) {
             throw new OAuthMappingException("OAuth(" + provider.name() + ") 인가 정보를 매핑하는 데에 실패하였습니다.", e);
+        }
+    }
+
+    public Long extractMemberId(String accessToken) {
+        try {
+            return om.readValue(decoder.decode(accessToken), Long.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
