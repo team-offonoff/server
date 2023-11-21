@@ -12,10 +12,7 @@ import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
-import life.offonoff.ab.exception.CategoryNotFoundException;
-import life.offonoff.ab.exception.MemberNotFountException;
-import life.offonoff.ab.exception.TopicNotFoundException;
-import life.offonoff.ab.exception.UnableToVoteException;
+import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.CategoryRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
@@ -82,7 +79,7 @@ public class TopicService {
     // TODO: Find member
     private Member findMember(final Long memberId) {
         return memberRepository.findById(memberId)
-                               .orElseThrow(() -> new MemberNotFountException(memberId));
+                               .orElseThrow(() -> new MemberByIdNotFountException(memberId));
     }
 
     //== Search ==//

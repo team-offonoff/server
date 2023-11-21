@@ -1,88 +1,90 @@
 package life.offonoff.ab.application.service.auth;
 
+import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.QMember;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.member.MemberRepository;
-import life.offonoff.ab.util.jwt.token.JwtGenerator;
+import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
 import life.offonoff.ab.web.response.JoinStatusResponse;
 import life.offonoff.ab.web.response.SignInResponse;
 import life.offonoff.ab.web.response.SignUpResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static life.offonoff.ab.domain.member.JoinStatus.*;
+import static life.offonoff.ab.domain.member.QMember.member;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class AuthService {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
-    private final JwtGenerator jwtGenerator;
+    private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
     //== Sign Up ==//
+    @Transactional
     public SignUpResponse signUp(SignUpRequest request) {
 
-        validateSignUp(request);
+        beforeSignUp(request);
 
-        Member saveMember = memberRepository.save(
-                new Member(request.getEmail(), request.getPassword(), request.getProvider()));
+        Member saveMember = memberService.join(request);
 
         return new SignUpResponse(saveMember.getId(),
                                   AUTH_REGISTERED,
-                                  jwtGenerator.generateAccessToken(saveMember.getId()));
+                                  jwtProvider.generateAccessToken(saveMember.getId()));
     }
 
-    private void validateSignUp(SignUpRequest request) {
+    private void beforeSignUp(SignUpRequest request) {
 
         String email = request.getEmail();
-        String rawPassword = request.getPassword();
 
+        if (memberService.exists(email)) {
+            throw new DuplicateEmailException(email);
+        }
+
+        String rawPassword = request.getPassword();
         // encode password
         request.setEncodedPassword(passwordEncoder.encode(rawPassword));
-
-        // unique email
-        if (memberRepository.findByEmail(email).isPresent()) {
-            throw new DuplicateEmailException();
-        }
     }
 
     //== Sign In ==//
     public SignInResponse signIn(SignInRequest request) {
 
-        validateSignIn(request);
+        beforeSignIn(request);
 
-        Member member = findMember(request.getEmail());
+        Member member = memberService.find(request.getEmail());
 
         return new SignInResponse(member.getId(),
                                   member.getJoinStatus(),
-                                  jwtGenerator.generateAccessToken(member.getId()));
+                                  jwtProvider.generateAccessToken(member.getId()));
     }
 
-    private void validateSignIn(SignInRequest request) {
-        // email existence (non -> exception)
-        Member member = findMember(request.getEmail());
+    private void beforeSignIn(SignInRequest request) {
+
+        String email = request.getEmail();
+        // email existence
+        if (!memberService.exists(email)) {
+            throw new MemberByEmailNotFountException(email);
+        }
 
         // match password
+        Member member = memberService.find(email);
         if (!passwordEncoder.isMatch(request.getPassword(), member.getPassword())) {
             throw new IllegalPasswordException();
         }
     }
 
+    //== JoinStatus ==//
     public JoinStatusResponse getJoinStatus(Long memberId) {
-        return new JoinStatusResponse(memberId, findMember(memberId).getJoinStatus());
-    }
-
-    private Member findMember(String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new EmailNotFoundException(email));
-    }
-    private Member findMember(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFountException(id));
+        Member member = memberService.find(memberId);
+        return new JoinStatusResponse(member.getId(), member.getJoinStatus());
     }
 }
