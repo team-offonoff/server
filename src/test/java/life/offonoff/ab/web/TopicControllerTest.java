@@ -11,6 +11,7 @@ import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
+import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,12 +43,16 @@ public class TopicControllerTest extends RestDocsTest {
 
     @MockBean
     TopicService topicService;
+    @MockBean
+    AuthorizedArgumentResolver argumentResolver;
 
     @Test
     @WithMockUser
     void createTopic() throws Exception {
         TopicTestDtoHelperBuilder builder = TopicTestDtoHelper.builder();
         TopicCreateRequest request = builder.build().createRequest();
+
+        when(argumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(1L);
         when(topicService.createMembersTopic(any(), any()))
                 .thenReturn(builder.build().createResponse());
 
@@ -67,6 +72,7 @@ public class TopicControllerTest extends RestDocsTest {
     @WithMockUser
     void getTopicSlice() throws Exception {
         when(topicService.searchAll(any(), any())).thenReturn(createTopicSlice());
+        when(argumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(1L);
 
         mvc.perform(
                         get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
