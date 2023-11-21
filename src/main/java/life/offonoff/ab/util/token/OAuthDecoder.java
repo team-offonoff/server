@@ -1,4 +1,4 @@
-package life.offonoff.ab.util.jwt;
+package life.offonoff.ab.util.token;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.auth.oauth.profile.GoogleProfile;
@@ -6,6 +6,7 @@ import life.offonoff.ab.application.service.auth.oauth.profile.KakaoProfile;
 import life.offonoff.ab.application.service.auth.oauth.profile.OAuthProfile;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.OAuthMappingException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.Base64;
 import static life.offonoff.ab.domain.member.Provider.*;
 
 @Component
-public class JwtParser {
+public class OAuthDecoder {
 
     private static final ObjectMapper om = new ObjectMapper();
     private static final Base64.Decoder decoder = Base64.getUrlDecoder();

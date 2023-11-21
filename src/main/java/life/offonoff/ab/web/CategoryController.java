@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/categories")
 public class CategoryController {
     private final CategoryService categoryService;
-
+    
     /*
      * 현재는 유저가 카테고리를 만들 순 없음. 개발자가 생성해놓은 카테고리만 사용 가능.
      * 후에 유저가 카테고리를 생성하는 기능이 추가될 때

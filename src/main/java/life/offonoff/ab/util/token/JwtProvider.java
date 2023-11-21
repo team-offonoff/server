@@ -1,9 +1,10 @@
-package life.offonoff.ab.util.jwt.token;
+package life.offonoff.ab.util.token;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import life.offonoff.ab.exception.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
@@ -12,16 +13,28 @@ import java.util.Map;
 
 import static java.lang.System.*;
 
-public class JwtGenerator {
+@Service
+public class JwtProvider {
 
     private static final SignatureAlgorithm signAlg = SignatureAlgorithm.HS256;
 
-    @Value("${ab.auth.token.jwt.secret-key}")
-    private String secretKey;
+    private final String secretKey;
+    private final Long expiresIn;
+    private final JwtParser parser;
 
-    @Value("${ab.auth.token.jwt.expires-in}")
-    private Long expiresIn;
 
+    public JwtProvider(
+            @Value("${ab.auth.token.jwt.secret-key}") String secretKey,
+            @Value("${ab.auth.token.jwt.expires-in}") Long expiresIn
+    ) {
+        this.secretKey = secretKey;
+        this.expiresIn = expiresIn;
+        this.parser = Jwts.parserBuilder()
+                          .setSigningKey(key())
+                          .build();
+    }
+
+    //== Generate ==//
     public String generateAccessToken(Long memberId) {
         return Jwts.builder()
                 .setHeader(header())
@@ -51,6 +64,24 @@ public class JwtGenerator {
         date.setTime(currentTime + expiresIn);
 
         return date;
+    }
+
+    //== Parse ==//
+    public Long parseMemberId(String accessToken) {
+        Claims claims = parser.parseClaimsJws(accessToken)
+                             .getBody();
+        verity(claims);
+
+        return claims.get("member-id", Long.class);
+    }
+
+    private void verity(Claims claims) {
+        boolean expired = claims.getExpiration()
+                                .before(new Date());
+
+        if (expired) {
+            throw new ExpiredJwtException();
+        }
     }
 
     private Key key() {

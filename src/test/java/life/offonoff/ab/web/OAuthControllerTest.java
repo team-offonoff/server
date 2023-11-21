@@ -4,23 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.auth.OAuthService;
 import life.offonoff.ab.application.service.request.oauth.AuthorizeType;
 import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
+import life.offonoff.ab.domain.member.JoinStatus;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.web.response.OAuthSignInResponse;
 import life.offonoff.ab.web.response.OAuthSignUpResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.*;
+import static life.offonoff.ab.domain.member.JoinStatus.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(OAuthController.class)
+//@WebMvcTest(OAuthController.class)
+@SpringBootTest
 class OAuthControllerTest extends RestDocsTest {
 
     @MockBean
@@ -32,7 +35,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignUpResponse(true, "Access Token"));
+                .thenReturn(new OAuthSignUpResponse(true, 1L, AUTH_REGISTERED, "access token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +54,15 @@ class OAuthControllerTest extends RestDocsTest {
                                         .type(String.class)
                                         .description("카카오 서버로 부터 받은 id_token").optional(),
                                 fieldWithPath("provider").description("서버 내 작업 용. 입력 X").optional()
-                        )));
+                        )))
+                .andDo(restDocs.document(
+                        relaxedResponseFields(
+                                fieldWithPath("joinStatus").type(JoinStatus.class)
+                                        .description("AUTH와 동일"),
+                                fieldWithPath("accessToken")
+                                        .description("AUTH와 동일")
+                        )
+                ));
     }
 
     @Test
@@ -60,7 +71,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignInResponse(false, "Access Token"));
+                .thenReturn(new OAuthSignInResponse(false, 1L, AUTH_REGISTERED, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +87,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignUpResponse(true, "Access Token"));
+                .thenReturn(new OAuthSignUpResponse(true, 1L, AUTH_REGISTERED, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +103,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignInResponse(false, "Access Token"));
+                .thenReturn(new OAuthSignInResponse(false, 1L, AUTH_REGISTERED, "Access Token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -105,6 +116,7 @@ class OAuthControllerTest extends RestDocsTest {
     private static class OAuthUri {
         private static final String BASE = "/oauth";
         private static final String KAKAO = "/kakao";
+        private static final String GOOGLE = "google";
         private static final String AUTHORIZE = "/authorize";
     }
 }

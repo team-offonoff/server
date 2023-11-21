@@ -1,19 +1,21 @@
 package life.offonoff.ab.application.service.request.auth;
 
+import life.offonoff.ab.application.service.request.MemberRequest;
 import life.offonoff.ab.domain.member.Provider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-public class SignUpRequest {
+@NoArgsConstructor
+public class SignUpRequest extends MemberRequest {
 
-    private String email;
-    private String password;
-    private Provider provider;
+    public SignUpRequest(final String email, final String password, final Provider provider) {
+        super(email, password, provider);
+    }
 
-    public void setEncodedPassword(String encoded) {
-        this.password = password;
+    public void setEncodedPassword(final String encoded) {
+        super.setPassword(encoded);
     }
 }
 

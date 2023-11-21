@@ -13,7 +13,7 @@
 ### authorize_code & redirect_uri로 인가
 
 #### new MEMBER
-operation::o-auth-controller-test/oauth_kakao_new_member_by_code[snippets="request-fields,http-request,http-response"]
+operation::o-auth-controller-test/oauth_kakao_new_member_by_code[snippets="request-fields,response-fields,http-request,http-response"]
 #### 존재하는 MEMBER
 operation::o-auth-controller-test/oauth_kakao_existing_member_by_code[snippets="http-request,http-response"]
 

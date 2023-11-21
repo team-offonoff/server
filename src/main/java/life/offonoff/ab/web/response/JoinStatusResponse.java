@@ -4,11 +4,10 @@ import life.offonoff.ab.domain.member.JoinStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
-public class SignInResponse {
+@Getter
+public class JoinStatusResponse {
 
     private Long memberId;
-    private JoinStatus joinStatus;
-    private String accessToken;
+    private JoinStatus status;
 }

@@ -39,16 +39,22 @@ public class OAuthService {
     private OAuthSignUpResponse joinOAuthProfile(OAuthProfile oAuthProfile) {
 
         SignUpRequest request = oAuthProfile.toSignUpRequest();
-
         SignUpResponse response = authService.signUp(request);
-        return new OAuthSignUpResponse(true, response.getAccessToken());
+
+        return new OAuthSignUpResponse(true,
+                                        response.getMemberId(),
+                                        response.getJoinStatus(),
+                                        response.getAccessToken());
     }
 
     private OAuthSignInResponse loginOAuthProfile(OAuthProfile oAuthProfile) {
 
         SignInRequest request = oAuthProfile.toSignInRequest();
-
         SignInResponse response = authService.signIn(request);
-        return new OAuthSignInResponse(false, response.getAccessToken());
+
+        return new OAuthSignInResponse(false,
+                                        response.getMemberId(),
+                                        response.getJoinStatus(),
+                                        response.getAccessToken());
     }
 }

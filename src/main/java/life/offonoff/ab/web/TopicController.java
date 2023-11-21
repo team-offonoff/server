@@ -5,10 +5,10 @@ import static org.springframework.data.domain.Sort.Direction.*;
 import jakarta.validation.Valid;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.web.common.AuthenticationId;
 import life.offonoff.ab.web.response.TopicDetailResponse;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class TopicController {
     // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
     @PostMapping
     public ResponseEntity<TopicResponse> createTopic(
-            @AuthenticationId final Long memberId,
+            @Authorized Long memberId,
             @Valid @RequestBody final TopicCreateRequest request
     ) {
         return ResponseEntity.ok(
@@ -42,7 +42,7 @@ public class TopicController {
      */
     @GetMapping("/open/now")
     public ResponseEntity<PageResponse<TopicDetailResponse>> getTopicInfos(
-            @AuthenticationId Long memberId,
+            @Authorized Long memberId,
             TopicSearchRequest request,
             @PageableDefault(page = 0, size = 10, sort = "voteCount", direction = DESC) Pageable pageable
     ) {
@@ -56,7 +56,7 @@ public class TopicController {
 
     @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
-            @AuthenticationId Long memberId,
+            Long memberId,
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {

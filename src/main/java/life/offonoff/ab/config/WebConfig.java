@@ -1,11 +1,19 @@
 package life.offonoff.ab.config;
 
+import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    private final AuthorizedArgumentResolver authorizedArgumentResolver;
 
     //== OAUTH CORS ==//
     @Override
@@ -15,4 +23,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .allowedMethods("GET", "POST");
     }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(authorizedArgumentResolver);
+    }
+
 }

@@ -10,5 +10,4 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     List<Member> findAllVotedTo(Long aLong);
 
-    Optional<Member> findByEmail(String email);
 }

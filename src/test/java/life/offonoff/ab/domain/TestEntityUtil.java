@@ -2,8 +2,7 @@ package life.offonoff.ab.domain;
 
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.member.NotificationEnabled;
-import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,12 @@ public class TestEntityUtil {
     public static Member createMember(int seq) {
         String name = "MEMBER_" + seq;
         String nickname = "NICKNAME_" + seq;
+        LocalDate birth = LocalDate.now();
+        Gender gender = Gender.MALE;
+        String job = "student";
+
         NotificationEnabled notificationEnabled = new NotificationEnabled(true, true, true, true);
-        return new Member(name, nickname, notificationEnabled);
+        return new Member(name, nickname, birth, gender, job, notificationEnabled);
     }
 
     //== Topic ==//
@@ -89,6 +93,9 @@ public class TestEntityUtil {
         private Long id;
         private String name;
         private String nickname;
+        private LocalDate birth;
+        private Gender gender;
+        private String job;
         private String email;
         private String password;
 
@@ -96,10 +103,10 @@ public class TestEntityUtil {
         private NotificationEnabled enabled = new NotificationEnabled(true, true, true, true);
 
         public Member buildMember() {
-            Member member = new Member(name, nickname, enabled);
+            Member member = new Member(email, password, Provider.NONE);
+            member.registerPersonalInfo(new PersonalInfo(name, nickname, birth, gender, job));
+
             ReflectionTestUtils.setField(member, "id", id);
-            ReflectionTestUtils.setField(member, "email", email);
-            ReflectionTestUtils.setField(member, "password", email);
             return member;
         }
     }
