@@ -1,16 +1,15 @@
 package life.offonoff.ab.application.authenticate.test;
 
 import life.offonoff.ab.domain.member.Provider;
-import life.offonoff.ab.util.jwt.JwtParser;
+import life.offonoff.ab.util.token.OAuthDecoder;
 import life.offonoff.ab.application.service.auth.oauth.profile.KakaoProfile;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Base64;
 
-public class JwtParserTest {
+public class OAuthDecoderTest {
 
-    JwtParser parser = new JwtParser();
+    OAuthDecoder parser = new OAuthDecoder();
 
     @Test
     void parse_payload() throws IOException {

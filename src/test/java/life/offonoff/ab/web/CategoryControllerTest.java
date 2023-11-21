@@ -7,6 +7,7 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -17,7 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CategoryController.class)
+//@WebMvcTest(CategoryController.class)
+@SpringBootTest
 class CategoryControllerTest extends RestDocsTest {
     @MockBean
     private CategoryService categoryService;
@@ -28,8 +30,8 @@ class CategoryControllerTest extends RestDocsTest {
         CategoryCreateRequest request = new CategoryCreateRequest("ok", TopicSide.TOPIC_A);
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
-                                               .contentType(MediaType.APPLICATION_JSON)
-                                               .content(new ObjectMapper().writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andReturn();
     }
@@ -40,8 +42,8 @@ class CategoryControllerTest extends RestDocsTest {
         CategoryCreateRequest request = new CategoryCreateRequest("  ", TopicSide.TOPIC_A);
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
-                                               .contentType(MediaType.APPLICATION_JSON)
-                                               .content(new ObjectMapper().writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andDo(print())
                 .andReturn();
@@ -53,14 +55,14 @@ class CategoryControllerTest extends RestDocsTest {
         CategoryCreateRequest request = new CategoryCreateRequest("category", null);
 
         MvcResult result = mvc.perform(post(CategoryUri.BASE).with(csrf().asHeader())
-                                               .contentType(MediaType.APPLICATION_JSON)
-                                               .content(new ObjectMapper().writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andDo(print())
                 .andReturn();
     }
 
     static class CategoryUri {
-        public static  String BASE = "/categories";
+        public static String BASE = "/categories";
     }
 }

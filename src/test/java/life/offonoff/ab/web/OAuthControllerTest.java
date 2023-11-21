@@ -10,6 +10,7 @@ import life.offonoff.ab.web.response.OAuthSignInResponse;
 import life.offonoff.ab.web.response.OAuthSignUpResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
@@ -21,7 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(OAuthController.class)
+//@WebMvcTest(OAuthController.class)
+@SpringBootTest
 class OAuthControllerTest extends RestDocsTest {
 
     @MockBean

@@ -1,6 +1,5 @@
 package life.offonoff.ab.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.auth.AuthService;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
@@ -14,24 +13,18 @@ import life.offonoff.ab.web.response.SignUpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.PayloadDocumentation;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static life.offonoff.ab.web.AuthControllerTest.AuthUri.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+@SpringBootTest
 class AuthControllerTest extends RestDocsTest {
 
     @MockBean
@@ -154,7 +147,6 @@ class AuthControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("abCode").value(AbCode.ILLEGAL_PASSWORD.name()))
                 .andDo(print());
     }
-
 
     static class AuthUri {
         public static final String BASE = "/auth";

@@ -13,6 +13,7 @@ import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -35,7 +36,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TopicController.class)
+//@WebMvcTest(TopicController.class)
+@SpringBootTest
 public class TopicControllerTest extends RestDocsTest {
 
     @MockBean
@@ -50,14 +52,14 @@ public class TopicControllerTest extends RestDocsTest {
                 .thenReturn(builder.build().createResponse());
 
         mvc.perform(post(TopicUri.BASE).with(csrf().asHeader())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
-                                             .writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                .writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         relaxedRequestFields(
-                                        fieldWithPath("choices[].choiceContentRequest.type").description("현재는 항상 IMAGE_TEXT; 이미지와 텍스트가 아닌 다른 선택지 종류가 추가될 수 있어서 만들어 놓은 필드기 때문임."),
-                                        fieldWithPath("deadline").type(Long.TYPE).description("Unix timestamps in seconds")
+                                fieldWithPath("choices[].choiceContentRequest.type").description("현재는 항상 IMAGE_TEXT; 이미지와 텍스트가 아닌 다른 선택지 종류가 추가될 수 있어서 만들어 놓은 필드기 때문임."),
+                                fieldWithPath("deadline").type(Long.TYPE).description("Unix timestamps in seconds")
                         )));
     }
 
@@ -67,8 +69,8 @@ public class TopicControllerTest extends RestDocsTest {
         when(topicService.searchAll(any(), any())).thenReturn(createTopicSlice());
 
         mvc.perform(
-                get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
-                .param("hidden", String.valueOf(true)))
+                        get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
+                                .param("hidden", String.valueOf(true)))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
