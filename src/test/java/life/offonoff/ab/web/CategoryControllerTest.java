@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest(CategoryController.class)
 @SpringBootTest
 class CategoryControllerTest extends RestDocsTest {
+
     @MockBean
     private CategoryService categoryService;
 

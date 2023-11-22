@@ -1,9 +1,18 @@
 == AuthControllerTest
 
 === 일반 회원가입
+==== 정상 회원가입
 operation::auth-controller-test/sign-up[snippets="response-fields,http-request,http-response"]
+==== 중복 이메일
 operation::auth-controller-test/sign-up_exception_duplicate_email[snippets="http-request,http-response"]
+
 === 일반 로그인
+
+==== 정상 로그인
 operation::auth-controller-test/sign-in[snippets="http-request,http-response"]
+
+==== 비밀번호 오류
 operation::auth-controller-test/sign-in_exception_wrong_password[snippets="http-request,http-response"]
+
+==== 이메일 오류
 operation::auth-controller-test/sign-in_exception_email_not_found[snippets="http-request,http-response"]

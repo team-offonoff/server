@@ -8,13 +8,19 @@ import life.offonoff.ab.domain.member.JoinStatus;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
+import life.offonoff.ab.web.common.auth.AuthenticationHolder;
 import life.offonoff.ab.web.response.SignInResponse;
 import life.offonoff.ab.web.response.SignUpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 
 import static life.offonoff.ab.web.AuthControllerTest.AuthUri.*;
@@ -29,12 +35,8 @@ class AuthControllerTest extends RestDocsTest {
 
     @MockBean
     AuthService authService;
-    ObjectMapper om;
-
-    @BeforeEach
-    void beforeEach() {
-        om = new ObjectMapper();
-    }
+    @MockBean
+    AuthenticationHolder authenticationHolder;
 
     @Test
     @DisplayName("정상 회원가입")
@@ -75,9 +77,8 @@ class AuthControllerTest extends RestDocsTest {
         String password = "password";
 
         SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
-        SignUpResponse response = new SignUpResponse(1L, JoinStatus.AUTH_REGISTERED, "jwt");
 
-        when(authService.signUp(any(SignUpRequest.class))).thenThrow(DuplicateEmailException.class);
+        when(authService.signUp(any(SignUpRequest.class))).thenThrow(new DuplicateEmailException(email));
 
         // then
         mvc.perform(post(BASE + SIGN_UP)
@@ -117,7 +118,7 @@ class AuthControllerTest extends RestDocsTest {
 
         SignInRequest request = new SignInRequest(email, password);
 
-        when(authService.signIn(any(SignInRequest.class))).thenThrow(EmailNotFoundException.class);
+        when(authService.signIn(any(SignInRequest.class))).thenThrow(new EmailNotFoundException(email));
 
         // then
         mvc.perform(post(BASE + SIGN_IN)
@@ -137,7 +138,7 @@ class AuthControllerTest extends RestDocsTest {
 
         SignInRequest request = new SignInRequest(email, password);
 
-        when(authService.signIn(any(SignInRequest.class))).thenThrow(IllegalPasswordException.class);
+        when(authService.signIn(any(SignInRequest.class))).thenThrow(new IllegalPasswordException());
 
         // then
         mvc.perform(post(BASE + SIGN_IN)

@@ -1,7 +1,5 @@
-package life.offonoff.ab.web.filter;
+package life.offonoff.ab.web.interceptor;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import life.offonoff.ab.application.service.member.MemberService;
@@ -12,22 +10,22 @@ import life.offonoff.ab.web.common.auth.AuthenticationHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class AuthenticationFilter extends OncePerRequestFilter {
+public class AuthenticationInterceptor implements HandlerInterceptor {
 
-    private static final String BEARER_PREFIX = "bearer ";
     private final AuthenticationHolder authenticationHolder;
     private final JwtProvider jwtProvider;
     private final MemberService memberService;
 
+    private static final String BEARER_PREFIX = "bearer ";
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("authentication filter");
         if (needAuthentication(request)) {
             String accessToken = getAccessToken(request);
             log.info("accecc_token : {}", accessToken);
@@ -37,7 +35,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             authenticationHolder.setAuthentication(authentication);
         }
 
-        filterChain.doFilter(request, response);
+        return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
     private Authentication getAuthentication(String accessToken) {
