@@ -32,7 +32,7 @@ public class TestEntityUtil {
         String job = "student";
 
         NotificationEnabled notificationEnabled = new NotificationEnabled(true, true, true, true);
-        return new Member(name, nickname, birth, gender, job, notificationEnabled);
+        return new Member(nickname, birth, gender, job, notificationEnabled);
     }
 
     //== Topic ==//
@@ -91,7 +91,6 @@ public class TestEntityUtil {
     @Builder
     public static class TestMember {
         private Long id;
-        private String name;
         private String nickname;
         private LocalDate birth;
         private Gender gender;
@@ -104,7 +103,7 @@ public class TestEntityUtil {
 
         public Member buildMember() {
             Member member = new Member(email, password, Provider.NONE);
-            member.registerPersonalInfo(new PersonalInfo(name, nickname, birth, gender, job));
+            member.registerPersonalInfo(new PersonalInfo(nickname, birth, gender, job));
 
             ReflectionTestUtils.setField(member, "id", id);
             return member;

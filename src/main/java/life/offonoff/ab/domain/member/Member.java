@@ -7,6 +7,7 @@ import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
+import life.offonoff.ab.exception.IllegalJoinStatusException;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,8 +33,9 @@ public class Member extends BaseEntity {
     // 알람 여부 정보
     @Embedded
     private NotificationEnabled notificationEnabled;
-    // 마케팅 수신 동의
-    private Boolean listenMarketing;
+    // 역관 동의
+    @Embedded
+    private TermsEnabled termsEnabled;
 
     @OneToMany(mappedBy = "publishMember")
     private List<Topic> publishedTopics = new ArrayList<>();
@@ -53,8 +55,8 @@ public class Member extends BaseEntity {
     private int active = 1;
 
     //== Constructor ==//
-    public Member(String name, String nickname, LocalDate birth, Gender gender, String job, NotificationEnabled notificationEnabled) {
-        this.personalInfo = new PersonalInfo(name, nickname, birth, gender, job);
+    public Member(String nickname, LocalDate birth, Gender gender, String job, NotificationEnabled notificationEnabled) {
+        this.personalInfo = new PersonalInfo(nickname, birth, gender, job);
         this.notificationEnabled = notificationEnabled;
     }
 
@@ -64,14 +66,31 @@ public class Member extends BaseEntity {
     }
 
     public void registerAuthInfo(AuthenticationInfo authInfo) {
+        if (this.authInfo != null) {
+            throw new IllegalJoinStatusException(getJoinStatus());
+        }
+
         this.authInfo = authInfo;
     }
 
     public void registerPersonalInfo(PersonalInfo personalInfo) {
+        if (this.personalInfo != null) {
+            throw new IllegalJoinStatusException(getJoinStatus());
+        }
+
         this.personalInfo = personalInfo;
     }
 
+    public void agreeTerms(TermsEnabled termsEnabled) {
+        if (this.termsEnabled != null) {
+            throw new IllegalJoinStatusException(getJoinStatus());
+        }
+
+        this.termsEnabled = termsEnabled;
+    }
+
     //== 연관관계 매핑 ==//
+
     public void publishTopic(Topic topic) {
         publishedTopics.add(topic);
     }
@@ -92,7 +111,19 @@ public class Member extends BaseEntity {
         this.notifications.add(notification);
     }
 
-    //== Method ==//
+    //== GETTER ==//
+    public Role getRole() {
+        return authInfo.getRole();
+    }
+
+    public String getPassword() {
+        return authInfo.getPassword();
+    }
+
+    public String getNickname() {
+        return personalInfo.getNickname();
+    }
+
     public JoinStatus getJoinStatus() {
         if (authInfo == null) {
             return JoinStatus.EMPTY;
@@ -102,13 +133,14 @@ public class Member extends BaseEntity {
             return JoinStatus.AUTH_REGISTERED;
         }
 
-        if (listenMarketing == null) {
+        if (termsEnabled == null) {
             return JoinStatus.PERSONAL_REGISTERED;
         }
 
         return JoinStatus.COMPLETE;
     }
 
+    //== Method ==//
     public void inactive() {
         this.active = 0;
     }
@@ -135,17 +167,8 @@ public class Member extends BaseEntity {
         notification.check();
     }
 
-    //== GETTER ==//
-    public Role getRole() {
-        return authInfo.getRole();
-    }
-
-    public String getPassword() {
-        return authInfo.getPassword();
-    }
-
-    public String getNickname() {
-        return personalInfo.getNickname();
+    public boolean joinCompleted() {
+        return this.getJoinStatus() == JoinStatus.COMPLETE;
     }
 }
 

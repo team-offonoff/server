@@ -19,5 +19,8 @@ public enum AbCode {
     DUPLICATE_EMAIL,
 
     // Expired
-    EXPIRED_JWT;
+    EXPIRED_JWT,
+
+    // ILLEGAL STATUS
+    ILLEGAL_JOIN_STATUS;
 }
