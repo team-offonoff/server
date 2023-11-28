@@ -2,7 +2,6 @@ package life.offonoff.ab.web.common.auth;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class AuthenticationHolder {
 
     private final ThreadLocal<Authentication> threadAuthentication = new ThreadLocal<>();

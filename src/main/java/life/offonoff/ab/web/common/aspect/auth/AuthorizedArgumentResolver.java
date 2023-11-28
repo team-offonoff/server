@@ -1,7 +1,7 @@
 package life.offonoff.ab.web.common.aspect.auth;
 
-import life.offonoff.ab.web.common.auth.Authentication;
-import life.offonoff.ab.web.common.auth.AuthenticationHolder;
+import jakarta.servlet.http.HttpServletRequest;
+import life.offonoff.ab.web.common.auth.AuthorizationTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class AuthorizedArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final AuthenticationHolder authenticationHolder;
+    private final AuthorizationTokenResolver tokenResolver;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -27,9 +27,7 @@ public class AuthorizedArgumentResolver implements HandlerMethodArgumentResolver
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-
-        Authentication authentication = authenticationHolder.getAuthentication();
-
-        return authentication.getMemberId();
+        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        return tokenResolver.resolveToken(request);
     }
 }
