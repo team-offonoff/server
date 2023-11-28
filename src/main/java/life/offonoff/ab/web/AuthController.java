@@ -1,12 +1,14 @@
 package life.offonoff.ab.web;
 
+import life.offonoff.ab.application.service.request.TermsRequest;
+import life.offonoff.ab.application.service.request.auth.ProfileRegisterRequest;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.application.service.auth.AuthService;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
-import life.offonoff.ab.web.response.JoinStatusResponse;
-import life.offonoff.ab.web.response.SignInResponse;
-import life.offonoff.ab.web.response.SignUpResponse;
+import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
+import life.offonoff.ab.web.response.auth.join.SignUpResponse;
+import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,22 @@ public class AuthController {
      * @return
      */
     @GetMapping("/signup/status")
-    public ResponseEntity<JoinStatusResponse> getJoinStatus(@Authorized Long memberId) {
+    public ResponseEntity<JoinStatusResponse> getJoinStatus(@Authorized final Long memberId) {
         return ResponseEntity.ok(authService.getJoinStatus(memberId));
+    }
+
+    @PostMapping("/signup/profile")
+    public ResponseEntity<JoinStatusResponse> registerProfile(
+            @RequestBody ProfileRegisterRequest request
+    ) {
+        return ResponseEntity.ok(authService.registerProfile(request));
+    }
+
+    @PostMapping("/signup/terms")
+    public ResponseEntity<JoinStatusResponse> enableTerms(
+            @RequestBody TermsRequest request
+    ) {
+        return ResponseEntity.ok(authService.registerTerms(request));
     }
 
     @PostMapping("/signin")

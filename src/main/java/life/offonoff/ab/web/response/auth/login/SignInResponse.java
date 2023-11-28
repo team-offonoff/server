@@ -1,6 +1,7 @@
-package life.offonoff.ab.web.response;
+package life.offonoff.ab.web.response.auth.login;
 
 import life.offonoff.ab.domain.member.JoinStatus;
+import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

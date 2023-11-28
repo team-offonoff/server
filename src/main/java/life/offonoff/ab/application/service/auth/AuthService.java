@@ -1,23 +1,24 @@
 package life.offonoff.ab.application.service.auth;
 
 import life.offonoff.ab.application.service.member.MemberService;
+import life.offonoff.ab.application.service.request.TermsRequest;
+import life.offonoff.ab.application.service.request.auth.ProfileRegisterRequest;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.member.QMember;
 import life.offonoff.ab.exception.*;
-import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
-import life.offonoff.ab.web.response.JoinStatusResponse;
-import life.offonoff.ab.web.response.SignInResponse;
-import life.offonoff.ab.web.response.SignUpResponse;
+import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
+import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
+import life.offonoff.ab.web.response.auth.join.SignUpResponse;
+import life.offonoff.ab.web.response.auth.join.TermsResponse;
+import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static life.offonoff.ab.domain.member.JoinStatus.*;
-import static life.offonoff.ab.domain.member.QMember.member;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -38,8 +39,7 @@ public class AuthService {
         Member saveMember = memberService.join(request);
 
         return new SignUpResponse(saveMember.getId(),
-                                  AUTH_REGISTERED,
-                                  jwtProvider.generateAccessToken(saveMember.getId()));
+                                  AUTH_REGISTERED);
     }
 
     private void beforeSignUp(SignUpRequest request) {
@@ -55,6 +55,33 @@ public class AuthService {
         request.setEncodedPassword(passwordEncoder.encode(rawPassword));
     }
 
+    //== JoinStatus ==//
+    public JoinStatusResponse getJoinStatus(Long memberId) {
+        Member member = memberService.find(memberId);
+        return new JoinStatusResponse(member.getId(), member.getJoinStatus());
+    }
+
+    @Transactional
+    public JoinStatusResponse registerProfile(ProfileRegisterRequest request) {
+
+        Member member = memberService.find(request.getMemberId());
+        member.registerPersonalInfo(request.toPersonalInfo());
+
+        return new ProfileRegisterResponse(member.getId(), member.getJoinStatus());
+    }
+
+    @Transactional
+    public JoinStatusResponse registerTerms(TermsRequest request) {
+
+        Member member = memberService.find(request.getMemberId());
+        member.agreeTerms(request.toTermsEnabled());
+
+        Long memberId = member.getId();
+        return new TermsResponse(memberId,
+                                 member.getJoinStatus(),
+                                 jwtProvider.generateAccessToken(memberId));
+    }
+
     //== Sign In ==//
     public SignInResponse signIn(SignInRequest request) {
 
@@ -68,23 +95,23 @@ public class AuthService {
     }
 
     private void beforeSignIn(SignInRequest request) {
-
         String email = request.getEmail();
+        Member member = memberService.find(email);
+
         // email existence
         if (!memberService.exists(email)) {
             throw new MemberByEmailNotFountException(email);
         }
 
         // match password
-        Member member = memberService.find(email);
         if (!passwordEncoder.isMatch(request.getPassword(), member.getPassword())) {
             throw new IllegalPasswordException();
         }
+
+        // join status
+        if (!member.joinCompleted()) {
+            throw new IllegalJoinStatusException(member.getJoinStatus());
+        }
     }
 
-    //== JoinStatus ==//
-    public JoinStatusResponse getJoinStatus(Long memberId) {
-        Member member = memberService.find(memberId);
-        return new JoinStatusResponse(member.getId(), member.getJoinStatus());
-    }
 }

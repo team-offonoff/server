@@ -1,4 +1,4 @@
-package life.offonoff.ab.web.response;
+package life.offonoff.ab.web.response.oauth;
 
 import life.offonoff.ab.domain.member.JoinStatus;
 import lombok.Getter;
