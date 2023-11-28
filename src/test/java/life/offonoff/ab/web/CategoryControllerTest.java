@@ -3,12 +3,17 @@ package life.offonoff.ab.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.CategoryService;
 import life.offonoff.ab.application.service.request.CategoryCreateRequest;
+import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.restdocs.RestDocsTest;
+import life.offonoff.ab.util.token.JwtProvider;
+import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
@@ -18,8 +23,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@WebMvcTest(CategoryController.class)
-@SpringBootTest
+@WebMvcTest(value = CategoryController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtProvider.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthorizedArgumentResolver.class)
+        })
 class CategoryControllerTest extends RestDocsTest {
 
     @MockBean

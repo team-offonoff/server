@@ -44,7 +44,6 @@ public class VotingTopicContainerIntegrationTest {
 
         // publish member 생성
         Member member = TestMember.builder()
-                .name("member")
                 .build().buildMember();
         em.persist(member);
 

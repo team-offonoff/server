@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.category.Category;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -11,11 +12,14 @@ import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
+import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -37,14 +41,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@WebMvcTest(TopicController.class)
-@SpringBootTest
+@WebMvcTest(value = TopicController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtProvider.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthorizedArgumentResolver.class)
+        })
 public class TopicControllerTest extends RestDocsTest {
 
     @MockBean
     TopicService topicService;
-    @MockBean
-    AuthorizedArgumentResolver argumentResolver;
 
     @Test
     @WithMockUser
@@ -52,7 +58,6 @@ public class TopicControllerTest extends RestDocsTest {
         TopicTestDtoHelperBuilder builder = TopicTestDtoHelper.builder();
         TopicCreateRequest request = builder.build().createRequest();
 
-        when(argumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(1L);
         when(topicService.createMembersTopic(any(), any()))
                 .thenReturn(builder.build().createResponse());
 
@@ -72,7 +77,6 @@ public class TopicControllerTest extends RestDocsTest {
     @WithMockUser
     void getTopicSlice() throws Exception {
         when(topicService.searchAll(any(), any())).thenReturn(createTopicSlice());
-        when(argumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(1L);
 
         mvc.perform(
                         get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
@@ -88,7 +92,6 @@ public class TopicControllerTest extends RestDocsTest {
         // create Member
         Member publishMember = TestMember.builder()
                 .id(1L)
-                .name("memberA")
                 .nickname("nicknameA")
                 .build().buildMember();
 
