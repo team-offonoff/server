@@ -15,6 +15,4 @@ public abstract class OAuthResponse {
         this.memberId = memberId;
         this.joinStatus = joinStatus;
     }
-
-    public abstract String getAccessToken();
 }
