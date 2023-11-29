@@ -30,17 +30,17 @@ public class Member extends BaseEntity {
     // 개인 정보
     @Embedded
     private PersonalInfo personalInfo;
-    // 알람 여부 정보
-    @Embedded
-    private NotificationEnabled notificationEnabled;
     // 역관 동의
     @Embedded
     private TermsEnabled termsEnabled;
+    // 알람 여부 정보
+    @Embedded
+    private NotificationEnabled notificationEnabled;
 
     @OneToMany(mappedBy = "publishMember")
     private List<Topic> publishedTopics = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "writer")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
@@ -55,11 +55,6 @@ public class Member extends BaseEntity {
     private int active = 1;
 
     //== Constructor ==//
-    public Member(String nickname, LocalDate birth, Gender gender, String job, NotificationEnabled notificationEnabled) {
-        this.personalInfo = new PersonalInfo(nickname, birth, gender, job);
-        this.notificationEnabled = notificationEnabled;
-    }
-
     public Member(String email, String password, Provider provider) {
         this.authInfo = new AuthenticationInfo(email, password, provider);
         this.notificationEnabled = NotificationEnabled.allEnabled();

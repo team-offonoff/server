@@ -19,7 +19,8 @@ class VoteTest {
     void vote_count() {
         // given
         int seq = 0;
-        Member member = createMember(seq);
+        Member member = createMember("email", "password");
+
         Topic topic = createTopic(seq, TopicSide.TOPIC_A);
 
         // when

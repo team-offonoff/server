@@ -2,6 +2,7 @@ package life.offonoff.ab.domain.topic.hide;
 
 import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import org.assertj.core.api.Assertions;
@@ -19,8 +20,8 @@ class HiddenTopicTest {
     void block_count_increase() {
         // given
         int seq = 0;
-        Topic topic = createTopic(seq, TopicSide.TOPIC_A);
-        Member member = createMember(seq);
+        Topic topic = new Topic("title", TopicSide.TOPIC_A);
+        Member member = new Member("email", "password", Provider.NONE);
 
         // when
         HiddenTopic block = new HiddenTopic();
@@ -37,9 +38,8 @@ class HiddenTopicTest {
     @DisplayName("토픽 hide 후 hide 여부 테스트")
     void 중복_hide테스트() {
         // given
-        int seq = 0;
-        Member member = createMember(seq);
-        Topic topic = createTopic(seq, TopicSide.TOPIC_A);
+        Member member = new Member("email", "password", Provider.NONE);
+        Topic topic = new Topic("title", TopicSide.TOPIC_A);
 
         // when
         HiddenTopic hiddenTopic = new HiddenTopic();

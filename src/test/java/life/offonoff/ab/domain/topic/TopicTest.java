@@ -26,7 +26,7 @@ class TopicTest {
 
         Topic topic = TestEntityUtil.createTopic(seq, side);
         Category category = TestEntityUtil.createCategory(seq);
-        Member member = TestEntityUtil.createMember(seq);
+        Member member = TestEntityUtil.createMember("email", "password");
 
         // when
         topic.associate(member, category, null);

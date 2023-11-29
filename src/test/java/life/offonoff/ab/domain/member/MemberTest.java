@@ -81,7 +81,10 @@ class MemberTest {
     @DisplayName("TermsEnabled 중복 등록시 예외")
     void register_termsEnabled_exception() {
         // given
-        Member member = new Member("nickname", LocalDate.now(), Gender.ETC, "job", NotificationEnabled.allEnabled());
+        Member member = new Member("email", "password", Provider.NONE);
+        PersonalInfo personalInfo = new PersonalInfo("nickname", LocalDate.now(), Gender.ETC, "job");
+        member.registerPersonalInfo(personalInfo);
+
         TermsEnabled termsEnabled = new TermsEnabled(true);
 
         // when
