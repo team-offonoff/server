@@ -6,7 +6,11 @@ import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.repository.member.MemberRepository;
-import life.offonoff.ab.web.response.*;
+import life.offonoff.ab.web.response.auth.login.SignInResponse;
+import life.offonoff.ab.web.response.auth.join.SignUpResponse;
+import life.offonoff.ab.web.response.oauth.OAuthResponse;
+import life.offonoff.ab.web.response.oauth.OAuthSignInResponse;
+import life.offonoff.ab.web.response.oauth.OAuthSignUpResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,8 +47,7 @@ public class OAuthService {
 
         return new OAuthSignUpResponse(true,
                                         response.getMemberId(),
-                                        response.getJoinStatus(),
-                                        response.getAccessToken());
+                                        response.getJoinStatus());
     }
 
     private OAuthSignInResponse loginOAuthProfile(OAuthProfile oAuthProfile) {
@@ -54,7 +57,6 @@ public class OAuthService {
 
         return new OAuthSignInResponse(false,
                                         response.getMemberId(),
-                                        response.getJoinStatus(),
-                                        response.getAccessToken());
+                                        response.getJoinStatus());
     }
 }

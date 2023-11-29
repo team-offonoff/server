@@ -3,24 +3,20 @@ package life.offonoff.ab.application.service.auth;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
-import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.member.Provider;
+import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.exception.DuplicateException;
-import life.offonoff.ab.exception.EmailNotFoundException;
-import life.offonoff.ab.exception.MemberByEmailNotFountException;
 import life.offonoff.ab.exception.MemberNotFountException;
-import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
-import life.offonoff.ab.web.response.SignInResponse;
-import life.offonoff.ab.web.response.SignUpResponse;
+import life.offonoff.ab.web.response.auth.login.SignInResponse;
+import life.offonoff.ab.web.response.auth.join.SignUpResponse;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import java.time.LocalDate;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.*;
@@ -34,39 +30,30 @@ class AuthServiceTest {
     @Mock
     MemberService memberService;
     @Mock
-    JwtProvider generator;
-    @Mock
     PasswordEncoder passwordEncoder;
+    @Mock
+    JwtProvider jwtProvider;
 
     @Test
     @DisplayName("정상 로그인")
     void sign_in_test() {
         // given
-        Long id = 1L;
         String email = "email";
         String password = "password";
-        String mockJwt = "jwt";
+        Member member = createCompletelyJoinedMember(email, password, "nickname");
 
         SignInRequest request = new SignInRequest(email, password);
 
-        when(generator.generateAccessToken(id)).thenReturn(mockJwt);
         when(memberService.exists(anyString())).thenReturn(true);
         when(passwordEncoder.isMatch(anyString(), anyString())).thenReturn(true);
-
-        // Member
-        Member member = TestMember.builder()
-                .id(1L)
-                .email(email)
-                .password(password)
-                .build().buildMember();
-
         when(memberService.find(anyString())).thenReturn(member);
+        when(jwtProvider.generateAccessToken(nullable(Long.class))).thenReturn("access_token");
 
         // when
         SignInResponse response = authService.signIn(request);
 
         // then
-        assertThat(response.getAccessToken()).isEqualTo(mockJwt);
+        assertThat(response.getJoinStatus()).isEqualTo(JoinStatus.COMPLETE);
     }
 
     @Test
@@ -91,7 +78,6 @@ class AuthServiceTest {
         Long id = 1L;
         String email = "email";
         String password = "password";
-        String mockJwt = "jwt";
 
         // Member
         Member member = TestMember.builder()
@@ -99,7 +85,6 @@ class AuthServiceTest {
                 .build().buildMember();
         SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
 
-        when(generator.generateAccessToken(id)).thenReturn(mockJwt);
         when(memberService.join(any())).thenReturn(member);
         when(memberService.exists(anyString())).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(password);
@@ -108,7 +93,7 @@ class AuthServiceTest {
         SignUpResponse response = authService.signUp(request);
 
         // then
-        assertThat(response.getAccessToken()).isEqualTo(mockJwt);
+        assertThat(response.getJoinStatus()).isEqualTo(JoinStatus.AUTH_REGISTERED);
     }
 
     @Test

@@ -545,7 +545,7 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
       "text" : "choiceB"
     }
   } ],
-  "deadline" : 1700630071
+  "deadline" : 1701225379
 }</code></pre>
 </div>
 </div>
@@ -555,9 +555,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 404
 
@@ -613,10 +610,7 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <h4 id="_카테고리_생성_api_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
 </div>
 </div>
 </div>
@@ -643,9 +637,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 201
 
@@ -684,9 +675,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 222
 
@@ -809,11 +797,6 @@ Content-Length: 222
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>class life.offonoff.ab.domain.member.JoinStatus</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AUTH와 동일</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accessToken</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AUTH와 동일</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -841,17 +824,13 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 117
+Content-Length: 82
 
 {
   "newMember" : true,
   "memberId" : 1,
-  "joinStatus" : "AUTH_REGISTERED",
-  "accessToken" : "access token"
+  "joinStatus" : "AUTH_REGISTERED"
 }</code></pre>
 </div>
 </div>
@@ -883,17 +862,13 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 118
+Content-Length: 83
 
 {
   "newMember" : false,
   "memberId" : 1,
-  "joinStatus" : "AUTH_REGISTERED",
-  "accessToken" : "Access Token"
+  "joinStatus" : "AUTH_REGISTERED"
 }</code></pre>
 </div>
 </div>
@@ -928,17 +903,13 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 117
+Content-Length: 82
 
 {
   "newMember" : true,
   "memberId" : 1,
-  "joinStatus" : "AUTH_REGISTERED",
-  "accessToken" : "Access Token"
+  "joinStatus" : "AUTH_REGISTERED"
 }</code></pre>
 </div>
 </div>
@@ -970,17 +941,13 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 118
+Content-Length: 83
 
 {
   "newMember" : false,
   "memberId" : 1,
-  "joinStatus" : "AUTH_REGISTERED",
-  "accessToken" : "Access Token"
+  "joinStatus" : "AUTH_REGISTERED"
 }</code></pre>
 </div>
 </div>
@@ -992,6 +959,15 @@ Content-Length: 118
 <div class="sect1">
 <h2 id="_authcontrollertest">AuthControllerTest</h2>
 <div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">회원가입 절차
+
+[email/pwd 등록] -&gt; [개인정보 등록] -&gt; [약관 동의] -&gt; [회원가입 완료]
+
+약관 동의 요청에 대한 응답으로 access_token 발급됩니다.</code></pre>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_일반_회원가입">일반 회원가입</h3>
 <div class="sect3">
@@ -1020,11 +996,6 @@ Content-Length: 118
  <code>PERSONAL_REGISTERED</code> : 개인 정보가 등록된 상태, 약관 동의 필요
  <code>COMPLETE</code> : 회원 가입에 필요한 모든 정보가 등록된 상태</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accessToken</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">90일의 생명주기</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1050,16 +1021,12 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 85
+Content-Length: 59
 
 {
   "memberId" : 1,
-  "joinStatus" : "AUTH_REGISTERED",
-  "accessToken" : "jwt"
+  "joinStatus" : "AUTH_REGISTERED"
 }</code></pre>
 </div>
 </div>
@@ -1089,9 +1056,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 195
 
@@ -1100,6 +1064,157 @@ Content-Length: 195
   "errorContent" : {
     "message" : "중복된 이메일입니다.",
     "hint" : "이메일 [email]은 사용 중입니다.",
+    "httpCode" : 400
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_개인_정보_등록">개인 정보 등록</h4>
+<div class="sect4">
+<h5 id="_개인_정보_등록_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth/signup/profile HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 117
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
+
+{
+  "memberId" : 1,
+  "nickname" : "nickname",
+  "birth" : "2023-11-28",
+  "gender" : "MALE",
+  "job" : "job"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_개인_정보_등록_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 63
+
+{
+  "memberId" : 1,
+  "joinStatus" : "PERSONAL_REGISTERED"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_개인_정보_중복_예외">개인 정보 중복 예외</h4>
+<div class="sect4">
+<h5 id="_개인_정보_중복_예외_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth/signup/profile HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 117
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
+
+{
+  "memberId" : 1,
+  "nickname" : "nickname",
+  "birth" : "2023-11-28",
+  "gender" : "MALE",
+  "job" : "job"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_개인_정보_중복_예외_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 275
+
+{
+  "abCode" : "ILLEGAL_JOIN_STATUS",
+  "errorContent" : {
+    "message" : "올바른 회원 등록 단계가 아닙니다.",
+    "hint" : "현재 회원의 가입 진행 상태는 [COMPLETE] 입니다. 다음 단계를 등록해주세요.",
+    "httpCode" : 400
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_약관_동의">약관 동의</h4>
+<div class="sect4">
+<h5 id="_약관_동의_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth/signup/terms HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 52
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
+
+{
+  "memberId" : 1,
+  "listen_marketing" : true
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_약관_동의_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 87
+
+{
+  "memberId" : 1,
+  "joinStatus" : "COMPLETE",
+  "accessToken" : "access_token"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_약관_동의_중복_예외">약관 동의 중복 예외</h4>
+<div class="sect4">
+<h5 id="_약관_동의_중복_예외_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth/signup/terms HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 52
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
+
+{
+  "memberId" : 1,
+  "listen_marketing" : true
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_약관_동의_중복_예외_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 286
+
+{
+  "abCode" : "ILLEGAL_JOIN_STATUS",
+  "errorContent" : {
+    "message" : "올바른 회원 등록 단계가 아닙니다.",
+    "hint" : "현재 회원의 가입 진행 상태는 [PERSONAL_REGISTERED] 입니다. 다음 단계를 등록해주세요.",
     "httpCode" : 400
   }
 }</code></pre>
@@ -1133,9 +1248,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 85
 
@@ -1171,9 +1283,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 213
 
@@ -1212,9 +1321,6 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
 Content-Length: 212
 
@@ -1230,6 +1336,44 @@ Content-Length: 212
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_회원가입_완료_전_로그인_요청">회원가입 완료 전 로그인 요청</h4>
+<div class="sect4">
+<h5 id="_회원가입_완료_전_로그인_요청_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth/signin HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 53
+Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
+
+{
+  "email" : "email",
+  "password" : "password"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_회원가입_완료_전_로그인_요청_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+Content-Length: 282
+
+{
+  "abCode" : "ILLEGAL_JOIN_STATUS",
+  "errorContent" : {
+    "message" : "올바른 회원 등록 단계가 아닙니다.",
+    "hint" : "현재 회원의 가입 진행 상태는 [AUTH_REGISTERED] 입니다. 다음 단계를 등록해주세요.",
+    "httpCode" : 400
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1237,7 +1381,7 @@ Content-Length: 212
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-22 14:08:56 +0900
+Last updated 2023-11-28 19:57:47 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

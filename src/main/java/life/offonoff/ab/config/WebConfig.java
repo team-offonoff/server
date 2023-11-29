@@ -1,14 +1,13 @@
 package life.offonoff.ab.config;
 
+import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
-import life.offonoff.ab.web.interceptor.AuthenticationInterceptor;
+import life.offonoff.ab.web.common.auth.AuthorizationTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.List;
 public class WebConfig implements WebMvcConfigurer {
 
     private final AuthorizedArgumentResolver authorizedArgumentResolver;
-    private final AuthenticationInterceptor authenticationInterceptor;
 
     //== OAUTH CORS ==//
     @Override
@@ -33,14 +31,5 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authorizedArgumentResolver);
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor)
-                // 적용 URI
-                .addPathPatterns("/**")
-                // 배제 URI
-                .excludePathPatterns("/oauth/**", "/auth/**");
     }
 }

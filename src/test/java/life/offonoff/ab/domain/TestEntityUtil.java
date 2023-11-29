@@ -24,39 +24,25 @@ import java.util.List;
 public class TestEntityUtil {
 
     //== Member ==//
-    public static Member createMember(int seq) {
-        String name = "MEMBER_" + seq;
-        String nickname = "NICKNAME_" + seq;
-        LocalDate birth = LocalDate.now();
-        Gender gender = Gender.MALE;
-        String job = "student";
+    public static Member createMember(String email, String password) {
+        return new Member(email, password, Provider.NONE);
+    }
 
-        NotificationEnabled notificationEnabled = new NotificationEnabled(true, true, true, true);
-        return new Member(name, nickname, birth, gender, job, notificationEnabled);
+    public static Member createCompletelyJoinedMember(String email, String password, String nickname) {
+        Member member = new Member(email, password, Provider.NONE);
+
+        PersonalInfo personalInfo = new PersonalInfo(nickname, LocalDate.now(), Gender.MALE, "job");
+        TermsEnabled termsEnabled = new TermsEnabled(true);
+
+        member.registerPersonalInfo(personalInfo);
+        member.agreeTerms(termsEnabled);
+        return member;
     }
 
     //== Topic ==//
     public static Topic createTopic(int seq, TopicSide side) {
         String topicTitle = "TITLE_" + seq;
         return new Topic(topicTitle, side);
-    }
-
-
-    public static Topic createAssociatedTopic(int seq, TopicSide side) {
-        Member member = createMember(seq);
-        Category category = createCategory(seq);
-        Topic topic = createTopic(seq, side);
-        topic.associate(member, category, null);
-        return topic;
-    }
-
-    public static List<Topic> creatAssociatedTopicList(int length, TopicSide side) {
-        List<Topic> topics = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            topics.add(createAssociatedTopic(i, side));
-        }
-
-        return topics;
     }
 
     //== Category ==//
@@ -91,7 +77,6 @@ public class TestEntityUtil {
     @Builder
     public static class TestMember {
         private Long id;
-        private String name;
         private String nickname;
         private LocalDate birth;
         private Gender gender;
@@ -104,7 +89,7 @@ public class TestEntityUtil {
 
         public Member buildMember() {
             Member member = new Member(email, password, Provider.NONE);
-            member.registerPersonalInfo(new PersonalInfo(name, nickname, birth, gender, job));
+            member.registerPersonalInfo(new PersonalInfo(nickname, birth, gender, job));
 
             ReflectionTestUtils.setField(member, "id", id);
             return member;

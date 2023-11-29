@@ -21,7 +21,7 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_id")
@@ -34,8 +34,9 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
+    //== 연관관계 매핑 ==//
     public void associate(Member member, Topic topic) {
-        this.member = member;
+        this.writer = member;
         member.addComment(this);
 
         this.topic = topic;

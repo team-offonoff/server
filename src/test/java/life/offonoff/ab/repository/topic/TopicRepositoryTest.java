@@ -40,7 +40,7 @@ class TopicRepositoryTest {
         // given
         int size = 5;
 
-        Member member = createMember(1);
+        Member member = createMember("email", "password");
 
         List<Topic> topics = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -76,7 +76,8 @@ class TopicRepositoryTest {
         // given
         int size = 5;
 
-        Member member = createMember(1);
+        Member member = createMember("email", "password");
+
         Category category = createCategory(1);
 
         List<Topic> topics = new ArrayList<>();
