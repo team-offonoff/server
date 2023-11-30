@@ -1,8 +1,7 @@
 package life.offonoff.ab.repository.topic.specification;
 
 import jakarta.persistence.criteria.*;
-import life.offonoff.ab.domain.category.Category;
-import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
@@ -10,9 +9,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class TopicSpecifications {
 
-    public static Specification<Topic> category(Long categoryId) {
-        return (t, query, cb) -> cb.equal(t.<Category>get("category")
-                                           .<Long>get("id"), categoryId);
+    public static Specification<Topic> keyword(Long keywordId) {
+        return (t, query, cb) -> cb.equal(t.<Keyword>get("keyword")
+                                           .<Long>get("id"), keywordId);
     }
 
     public static Specification<Topic> status(TopicStatus status) {

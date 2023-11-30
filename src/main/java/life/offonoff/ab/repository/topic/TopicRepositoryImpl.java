@@ -31,7 +31,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
                 .join(topic.publishMember).fetchJoin()
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
-                        eqCategory(request.getCategoryId()),
+                        eqKeyword(request.getKeywordId()),
                         hideOrNot(request.getMemberId(), request.getHidden())
                 )
                 .orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))

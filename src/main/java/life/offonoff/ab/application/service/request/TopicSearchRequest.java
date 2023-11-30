@@ -12,13 +12,13 @@ public class TopicSearchRequest {
     private TopicStatus topicStatus;
     private Long memberId;
     private Boolean hidden;
-    private Long categoryId;
+    private Long keywordId;
 
     @Builder
-    public TopicSearchRequest(TopicStatus topicStatus, Long memberId, Boolean hidden, Long categoryId) {
+    public TopicSearchRequest(TopicStatus topicStatus, Long memberId, Boolean hidden, Long keywordId) {
         this.topicStatus = topicStatus;
         this.memberId = memberId;
         this.hidden = hidden;
-        this.categoryId = categoryId;
+        this.keywordId = keywordId;
     }
 }

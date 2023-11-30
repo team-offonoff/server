@@ -11,19 +11,19 @@ import java.util.List;
 
 @Builder
 public record TopicCreateRequest(
-        @NotNull(message = "Topic Side를 선택해주세요. (A/B)")
-        TopicSide topicSide,
-        // TODO: 분야를 선택안한 토픽도 가능한가?
-        Long categoryId,
-        @NotBlank(message = "Topic title을 입력해주세요.")
-        String topicTitle,
+        @NotNull(message = "토픽의 Side를 선택해주세요. (A/B)")
+        TopicSide side,
+        @NotBlank(message = "토픽의 키워드를 입력해주세요.")
+        String keywordName,
+        @NotBlank(message = "토픽의 title을 입력해주세요.")
+        String title,
         List<ChoiceCreateRequest> choices,
         Long deadline
 ) {
     private static final int TOPIC_TITLE_MAX_LENGTH = 25;
 
     public TopicCreateRequest {
-        if (TextUtils.getLengthOfEmojiContainableText(topicTitle) > TOPIC_TITLE_MAX_LENGTH) {
+        if (TextUtils.getLengthOfEmojiContainableText(title) > TOPIC_TITLE_MAX_LENGTH) {
             throw new LengthInvalidException("토픽 제목", 1, TOPIC_TITLE_MAX_LENGTH);
         }
     }

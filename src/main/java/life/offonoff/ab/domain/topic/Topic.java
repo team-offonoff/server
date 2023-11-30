@@ -2,7 +2,7 @@ package life.offonoff.ab.domain.topic;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -30,8 +30,8 @@ public class Topic extends BaseEntity {
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @JoinColumn(name = "keyword_id")
+    private Keyword keyword;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_content_id")
@@ -80,24 +80,24 @@ public class Topic extends BaseEntity {
         this(title, side, LocalDateTime.now().plusHours(24));
     }
 
-    public Topic(Member member, Category category, String title, TopicSide side) {
-        this(member, category, title, side, LocalDateTime.now().plusHours(24));
+    public Topic(Member member, Keyword keyword, String title, TopicSide side) {
+        this(member, keyword, title, side, LocalDateTime.now().plusHours(24));
     }
 
-    public Topic(Member member, Category category, String title, TopicSide side, LocalDateTime deadline) {
+    public Topic(Member member, Keyword keyword, String title, TopicSide side, LocalDateTime deadline) {
         this.title = title;
         this.side = side;
         this.deadline = deadline;
-        associate(member, category, null);
+        associate(member, keyword, null);
     }
 
     //== 연관관계 매핑 ==//
-    public void associate(Member member, Category category, TopicContent content) {
+    public void associate(Member member, Keyword keyword, TopicContent content) {
         this.publishMember = member;
         member.publishTopic(this);
 
-        this.category = category;
-        category.addTopic(this);
+        this.keyword = keyword;
+        keyword.addTopic(this);
 
         this.content = content;
     }

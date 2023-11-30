@@ -5,7 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.config.WebConfig;
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.pagination.PagingUtil;
@@ -16,7 +16,6 @@ import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -95,11 +94,11 @@ public class TopicControllerTest extends RestDocsTest {
                 .nickname("nicknameA")
                 .build().buildMember();
 
-        // create Category
-        Category category = TestCategory.builder()
+        // create Keyword
+        Keyword keyword = TestKeyword.builder()
                 .id(1L)
-                .name("categoryA")
-                .build().buildCategory();
+                .name("keywordA")
+                .build().buildKeyword();
 
         List<Topic> topics = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -108,7 +107,7 @@ public class TopicControllerTest extends RestDocsTest {
                     .id((long) (i + 1))
                     .title("title" + i)
                     .publishMember(publishMember)
-                    .category(category)
+                    .keyword(keyword)
                     .voteCount(i)
                     .build()
                     .buildTopic();
