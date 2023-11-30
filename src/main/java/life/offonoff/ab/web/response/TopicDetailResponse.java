@@ -8,8 +8,8 @@ public class TopicDetailResponse {
 
     private Long topicId;
     private String title;
-    private Long publishMemberId;
-    private String publishMemberNickname;
+    private Long authorId;
+    private String authorNickname;
     private Long deadline;
     private int voteCount;
     private int commentCount;
@@ -17,8 +17,8 @@ public class TopicDetailResponse {
     public TopicDetailResponse(Topic topic) {
         this.topicId = topic.getId();
         this.title = topic.getTitle();
-        this.publishMemberId = topic.getPublishMember().getId();
-        this.publishMemberNickname = topic.getPublishMember().getNickname();
+        this.authorId = topic.getAuthor().getId();
+        this.authorNickname = topic.getAuthor().getNickname();
         this.deadline = topic.getDeadlineSecond();
         this.voteCount = topic.getVoteCount();
         this.commentCount = topic.getCommentCount();

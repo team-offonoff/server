@@ -37,7 +37,7 @@ public class Member extends BaseEntity {
     @Embedded
     private NotificationEnabled notificationEnabled;
 
-    @OneToMany(mappedBy = "publishMember")
+    @OneToMany(mappedBy = "author")
     private List<Topic> publishedTopics = new ArrayList<>();
 
     @OneToMany(mappedBy = "writer")

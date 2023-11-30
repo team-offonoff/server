@@ -112,7 +112,7 @@ public class TestEntityUtil {
         private TopicSide side;
         private String title;
         private Keyword keyword;
-        private Member publishMember;
+        private Member author;
         private int voteCount;
 
         @Builder.Default
@@ -125,7 +125,7 @@ public class TestEntityUtil {
             ReflectionTestUtils.setField(topic, "id", id);
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
             ReflectionTestUtils.setField(topic, "keyword", keyword);
-            ReflectionTestUtils.setField(topic, "publishMember", publishMember);
+            ReflectionTestUtils.setField(topic, "author", author);
             ReflectionTestUtils.setField(topic, "status", status);
             return topic;
         }

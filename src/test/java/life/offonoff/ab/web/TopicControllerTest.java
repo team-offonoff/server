@@ -89,7 +89,7 @@ public class TopicControllerTest extends RestDocsTest {
         Comparator<Topic> voteCountDesc = (t1, t2) -> t2.getVoteCount() - t1.getVoteCount();
 
         // create Member
-        Member publishMember = TestMember.builder()
+        Member author = TestMember.builder()
                 .id(1L)
                 .nickname("nicknameA")
                 .build().buildMember();
@@ -106,7 +106,7 @@ public class TopicControllerTest extends RestDocsTest {
                     .builder()
                     .id((long) (i + 1))
                     .title("title" + i)
-                    .publishMember(publishMember)
+                    .author(author)
                     .keyword(keyword)
                     .voteCount(i)
                     .build()

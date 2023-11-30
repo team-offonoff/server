@@ -44,8 +44,8 @@ public class Topic extends BaseEntity {
     private TopicSide side;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "publish_member_id")
-    private Member publishMember;
+    @JoinColumn(name = "author_id")
+    private Member author;
 
     @OneToMany(mappedBy = "topic")
     private List<Comment> comments = new ArrayList<>();
@@ -93,7 +93,7 @@ public class Topic extends BaseEntity {
 
     //== 연관관계 매핑 ==//
     public void associate(Member member, Keyword keyword, TopicContent content) {
-        this.publishMember = member;
+        this.author = member;
         member.publishTopic(this);
 
         this.keyword = keyword;
