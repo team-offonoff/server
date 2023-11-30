@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    List<Member> findAllVotedTo(Long aLong);
-
+    List<Member> findAllVotedTo(Long memberId);
+    Optional<Member> findByIdAndActiveTrue(Long memberId);
 }

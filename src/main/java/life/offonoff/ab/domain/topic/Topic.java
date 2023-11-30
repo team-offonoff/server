@@ -67,7 +67,7 @@ public class Topic extends BaseEntity {
     private int voteCount = 0;
     private int hideCount = 0;
     private LocalDateTime deadline;
-    private int active = 1;
+    private boolean active = true;
 
     // Constructor
     public Topic(String title, TopicSide side, LocalDateTime deadline) {
@@ -122,8 +122,8 @@ public class Topic extends BaseEntity {
         voteCount++;
     }
 
-    public void remove() {
-        this.active = 0;
+    public void activate(boolean active) {
+        this.active = active;
     }
 
     public void addChoice(Choice choice) {

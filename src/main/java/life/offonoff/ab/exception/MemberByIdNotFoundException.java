@@ -1,9 +1,9 @@
 package life.offonoff.ab.exception;
 
-public class MemberByIdNotFountException extends MemberNotFountException {
+public class MemberByIdNotFoundException extends MemberNotFoundException {
     private final Long memberId;
 
-    public MemberByIdNotFountException(final Long memberId) {
+    public MemberByIdNotFoundException(final Long memberId) {
         super();
         this.memberId = memberId;
     }

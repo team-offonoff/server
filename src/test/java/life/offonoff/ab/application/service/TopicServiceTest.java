@@ -98,7 +98,7 @@ public class TopicServiceTest {
                 .build()
                 .buildKeyword();
 
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
         when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(keyword));
 
         // when
@@ -121,7 +121,7 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
                 .build()
@@ -143,7 +143,7 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
         when(topicRepository.save(any())).thenThrow(RuntimeException.class);
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
@@ -182,8 +182,8 @@ public class TopicServiceTest {
 
         VoteRequest request = new VoteRequest(member.getId(), ChoiceOption.CHOICE_A, deadline.minusDays(1), true);
 
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
+        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
 
         // when
         topicService.vote(topicId, request);
@@ -215,8 +215,8 @@ public class TopicServiceTest {
 
         VoteRequest request = new VoteRequest(member.getId(), ChoiceOption.CHOICE_A, deadline.minusDays(1), false);
 
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
+        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
 
         // when
         topicService.vote(topicId, request);

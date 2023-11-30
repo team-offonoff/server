@@ -61,6 +61,11 @@ public class TopicService {
         return TopicResponse.from(topic);
     }
 
+    private Member findMember(final Long memberId) {
+        return memberRepository.findByIdAndActiveTrue(memberId)
+                               .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
     private Keyword findOrCreateKeyword(String keyword, TopicSide side) {
         return keywordRepository.findByNameAndSide(keyword, side)
                 .orElseGet(() -> new Keyword(keyword, side));
@@ -77,15 +82,9 @@ public class TopicService {
         return new Choice(topic, request.choiceOption(), choiceContent);
     }
 
-    // TODO: Find member
-    private Member findMember(final Long memberId) {
-        return memberRepository.findById(memberId)
-                               .orElseThrow(() -> new MemberByIdNotFountException(memberId));
-    }
-
     //== Search ==//
-    public Topic searchById(final Long topicId) {
-        return topicRepository.findById(topicId)
+    public Topic findTopic(final Long topicId) {
+        return topicRepository.findByIdAndActiveTrue(topicId)
                               .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
@@ -101,9 +100,9 @@ public class TopicService {
 
     //== Hide ==//
     @Transactional
-    public void hide(final Long memberId, final Long topicId, final Boolean hide) {
+    public void hideTopicForMember(final Long memberId, final Long topicId, final Boolean hide) {
         Member member = findMember(memberId);
-        Topic topic = this.searchById(topicId);
+        Topic topic = this.findTopic(topicId);
 
         if (hide) {
             doHide(member, topic);
@@ -129,7 +128,7 @@ public class TopicService {
     @Transactional
     public void vote(final Long topicId, final VoteRequest request) {
         Member member = findMember(request.memberId());
-        Topic topic = searchById(topicId);
+        Topic topic = findTopic(topicId);
 
         validateVotable(topic, request);
 
