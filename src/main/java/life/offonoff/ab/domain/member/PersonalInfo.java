@@ -2,6 +2,8 @@ package life.offonoff.ab.domain.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ public class PersonalInfo {
     @Column(length = 40)
     private String nickname;
     private LocalDate birthDate;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     private String job;
 

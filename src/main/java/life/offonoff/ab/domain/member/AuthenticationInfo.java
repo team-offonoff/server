@@ -17,7 +17,7 @@ public class AuthenticationInfo {
     private String password;
     @Enumerated(EnumType.STRING)
     private Provider provider;
-
+    @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
     public AuthenticationInfo(String email, String password, Provider provider) {
