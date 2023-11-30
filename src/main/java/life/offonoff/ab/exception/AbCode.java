@@ -7,7 +7,8 @@ public enum AbCode {
     // Not Found,
     KEYWORD_NOT_FOUND,
     TOPIC_NOT_FOUND,
-      // Member
+
+    // Member
     MEMBER_NOT_FOUND,
     EMAIL_NOT_FOUND,
 
@@ -22,5 +23,7 @@ public enum AbCode {
     EXPIRED_JWT,
 
     // ILLEGAL STATUS
-    ILLEGAL_JOIN_STATUS;
+    ILLEGAL_JOIN_STATUS,
+    DUPLICATE_TOPIC_REPORT,
+    ;
 }

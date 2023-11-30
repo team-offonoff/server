@@ -57,6 +57,9 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hides = new ArrayList<>();
 
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TopicReport> reports = new ArrayList<>();
+
     @OneToOne(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private VotingResult votingResult;
 
@@ -150,5 +153,14 @@ public class Topic extends BaseEntity {
 
     public void noticed() {
         this.status = TopicStatus.NOTICED;
+    }
+
+    public boolean isReportedBy(Member member) {
+        return reports.stream()
+                .anyMatch(report -> report.getMember().getId().equals(member.getId()));
+    }
+
+    public void reportBy(Member member) {
+        reports.add(new TopicReport(member, this));
     }
 }

@@ -12,7 +12,7 @@ public class TopicNotFoundException extends NotFoundException {
 
     @Override
     public String getHint() {
-        return "토픽 id [" + topicId + "]는 존재하지 않습니다.";
+        return "토픽[id=" + topicId + "]";
     }
 
     @Override

@@ -14,8 +14,8 @@ import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
-import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
+import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.TopicResponse;
@@ -154,5 +154,18 @@ public class TopicService {
         if (!topic.votable(request.requestTime())) {
             throw new UnableToVoteException(request.requestTime());
         }
+    }
+
+    @Transactional
+    public void reportTopicByMember(final Long topicId, final Long memberId) {
+        final Member member = findMember(memberId);
+        final Topic topic = findTopic(topicId);
+
+        if (topic.isReportedBy(member)) {
+            throw new TopicReportDuplicateException(topicId, memberId);
+        }
+        topic.reportBy(member);
+
+        // TODO: report 많을 때 알림
     }
 }

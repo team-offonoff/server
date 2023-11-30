@@ -56,11 +56,20 @@ public class TopicController {
 
     @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
-            Long memberId,
+            @Authorized Long memberId,
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {
         topicService.hideTopicForMember(memberId, topicId, hide);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{topicId}/report")
+    public ResponseEntity<Void> reportTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId
+    ) {
+       topicService.reportTopicByMember(topicId, memberId);
         return ResponseEntity.ok().build();
     }
 }

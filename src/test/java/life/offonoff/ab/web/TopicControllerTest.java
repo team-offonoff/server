@@ -3,15 +3,17 @@ package life.offonoff.ab.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.TopicService;
+import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
+import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.exception.TopicNotFoundException;
+import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
-import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
-import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ import java.util.List;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
@@ -38,6 +41,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = TopicController.class,
@@ -81,6 +85,38 @@ public class TopicControllerTest extends RestDocsTest {
                         get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
                                 .param("hidden", String.valueOf(true)))
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void createTopicReport() throws Exception {
+        mvc.perform(post(TopicUri.BASE + "/1/report").with(csrf().asHeader()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void createTopicReport_withNonExistentTopic_TopicNotFoundException() throws Exception {
+        doThrow(new TopicNotFoundException(1L))
+                .when(topicService).reportTopicByMember(any(), any());
+
+        mvc.perform(post(TopicUri.BASE + "/1/report").with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(""))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("abCode").value("TOPIC_NOT_FOUND"))
+                .andDo(print());
+    }
+
+    @Test
+    void createTopicReport_alreadyReported_TopicReportDuplicateException() throws Exception {
+        doThrow(new TopicReportDuplicateException(1L, 2L))
+                .when(topicService).reportTopicByMember(any(), any());
+
+        mvc.perform(post(TopicUri.BASE + "/1/report").with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("DUPLICATE_TOPIC_REPORT"))
                 .andDo(print());
     }
 

@@ -1,6 +1,25 @@
-== TopicControllerTest
-### 토픽 생성 API
+== 토픽 API
+### 1. 토픽 생성
 - 회원 가입 기능 개발 후 jwt 헤더에 추가 예정
 - 이미지 업로드 위한 S3 세팅 예정
 
+#### OK
+
 operation::topic-controller-test/create-topic[snippets="request-fields,http-request,http-response"]
+
+### 2. 토픽 신고
+
+*POST* /topics/{topicId}/report
+
+#### OK
+
+operation::topic-controller-test/create-topic-report[snippets="http-request,http-response"]
+
+#### E1. 존재하지 않는 토픽일때
+#존재하지 않는 토픽일때, 토픽 사용하는 모든 API에서 응답 형식은 동일#
+
+operation::topic-controller-test/create-topic-report_with-non-existent-topic_-topic-not-found-exception[snippets="http-request,http-response"]
+
+#### E2. 이미 신고한 토픽일때
+
+operation::topic-controller-test/create-topic-report_already-reported_-topic-report-duplicate-exception[snippets="http-request,http-response"]
