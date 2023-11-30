@@ -121,15 +121,9 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        Keyword keyword = TestKeyword.builder()
-                .id(1L)
-                .build()
-                .buildKeyword();
-
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
-                .keyword(keyword)
                 .build()
                 .createRequest();
 
@@ -149,16 +143,10 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        Keyword keyword = TestKeyword.builder()
-                .id(1L)
-                .build()
-                .buildKeyword();
-
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
         when(topicRepository.save(any())).thenThrow(RuntimeException.class);
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
-                .keyword(keyword)
                 .build()
                 .createRequest();
 
