@@ -57,12 +57,7 @@ public class TopicServiceIntegrationTest {
     void reportTopicByMember_createTopicReport() {
         // given
         Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
-        TopicResponse response = topicService.createMembersTopic(
-                member.getId(),
-                TopicTestDtoHelper.builder()
-                        .topicSide(TopicSide.TOPIC_A)
-                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
-                        .build().createRequest());
+        TopicResponse response = createMembersTopic(member.getId());
 
         // when
         topicService.reportTopicByMember(response.topicId(), member.getId());
@@ -78,12 +73,7 @@ public class TopicServiceIntegrationTest {
     void reportTopicByMember_reportTwice_doNotCreateReportAgain_throwException() {
         // given
         Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
-        TopicResponse response = topicService.createMembersTopic(
-                member.getId(),
-                TopicTestDtoHelper.builder()
-                        .topicSide(TopicSide.TOPIC_A)
-                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
-                        .build().createRequest());
+        TopicResponse response = createMembersTopic(member.getId());
 
         // when
         topicService.reportTopicByMember(response.topicId(), member.getId());
@@ -91,5 +81,27 @@ public class TopicServiceIntegrationTest {
                 .isInstanceOf(TopicReportDuplicateException.class);
         Topic topic = topicRepository.findByIdAndActiveTrue(response.topicId()).get();
         assertThat(topic.getReports().size()).isOne();
+    }
+
+    @Test
+    void activateMembersTopic_deactivateTopic() {
+        // given
+        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
+        TopicResponse response = createMembersTopic(member.getId());
+
+        // when
+        topicService.activateMembersTopic(member.getId(), response.topicId(), false);
+
+        // then
+        assertThat(topicRepository.findByIdAndActiveTrue(response.topicId())).isEmpty();
+    }
+
+    private TopicResponse createMembersTopic(final Long memberId) {
+        return topicService.createMembersTopic(
+                memberId,
+                TopicTestDtoHelper.builder()
+                        .topicSide(TopicSide.TOPIC_A)
+                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
+                        .build().createRequest());
     }
 }

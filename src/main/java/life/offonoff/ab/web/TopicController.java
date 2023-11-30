@@ -72,4 +72,14 @@ public class TopicController {
        topicService.reportTopicByMember(topicId, memberId);
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{topicId}/status")
+    public ResponseEntity<Void> activateTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId,
+            @RequestParam Boolean active
+    ) {
+        topicService.activateMembersTopic(memberId, topicId, active);
+        return ResponseEntity.ok().build();
+    }
 }

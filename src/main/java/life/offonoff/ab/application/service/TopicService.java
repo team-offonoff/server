@@ -7,6 +7,7 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -59,6 +60,24 @@ public class TopicService {
         // topic 생성 이벤트 발행
         eventPublisher.publishEvent(new TopicCreateEvent(topic));
         return TopicResponse.from(topic);
+    }
+
+    @Transactional
+    public void activateMembersTopic(final Long memberId, final Long topicId, final Boolean active) {
+        Member member = findMember(memberId);
+        Topic topic = findTopic(topicId);
+
+        if (member.getRole().equals(Role.USER)) {
+            boolean requestedByAuthor = member.getId().equals(topic.getAuthor().getId());
+            if (!requestedByAuthor) {
+                throw new IllegalTopicStatusChangeException(memberId, topicId);
+            }
+        }
+
+        boolean sameStatus = topic.isActive() == active;
+        if (!sameStatus) {
+            topic.activate(active);
+        }
     }
 
     private Member findMember(final Long memberId) {

@@ -1,5 +1,9 @@
 == 토픽 API
 ### 1. 토픽 생성
+
+[source.html]
+POST /topics
+
 - 회원 가입 기능 개발 후 jwt 헤더에 추가 예정
 - 이미지 업로드 위한 S3 세팅 예정
 
@@ -9,7 +13,8 @@ operation::topic-controller-test/create-topic[snippets="request-fields,http-requ
 
 ### 2. 토픽 신고
 
-*POST* /topics/{topicId}/report
+[source.html]
+POST /topics/{topicId}/report
 
 #### OK
 
@@ -23,3 +28,18 @@ operation::topic-controller-test/create-topic-report_with-non-existent-topic_-to
 #### E2. 이미 신고한 토픽일때
 
 operation::topic-controller-test/create-topic-report_already-reported_-topic-report-duplicate-exception[snippets="http-request,http-response"]
+
+### 3. 토픽 활성화/비활성화(삭제)
+
+[source.html]
+PATCH /topics/{topicId}/status?active=
+비활성화(삭제): active=false
+활성화: active=true
+
+#### OK
+
+operation::topic-controller-test/deactivate-topic[snippets="http-request,http-response"]
+
+#### E1. 작성자가 아닌 유저가 토픽 삭제
+
+operation::topic-controller-test/deactivate-topic_by-non-author-user_-illegal-topic-status-change-exception[snippets="http-request,http-response"]
