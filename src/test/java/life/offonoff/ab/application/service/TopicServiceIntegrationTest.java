@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
@@ -44,13 +45,13 @@ public class TopicServiceIntegrationTest {
                 member.getId(),
                 TopicTestDtoHelper.builder()
                         .topicSide(TopicSide.TOPIC_A)
-                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
+                        .keywords(List.of(new Keyword("key", TopicSide.TOPIC_A)))
                         .build().createRequest()).topicId();
 
         // then
         Optional<Keyword> keyword = keywordRepository.findByNameAndSide("key", TopicSide.TOPIC_A);
         assertThat(keyword).isNotEmpty();
-        assertThat(keyword.get().getTopics().get(0).getId()).isEqualTo(topicId);
+        assertThat(keyword.get().getTopicKeywords().get(0).getTopic().getId()).isEqualTo(topicId);
     }
 
     @Test
@@ -100,8 +101,6 @@ public class TopicServiceIntegrationTest {
         return topicService.createMembersTopic(
                 memberId,
                 TopicTestDtoHelper.builder()
-                        .topicSide(TopicSide.TOPIC_A)
-                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
                         .build().createRequest());
     }
 }

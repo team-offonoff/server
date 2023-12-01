@@ -26,7 +26,8 @@ public class TopicBooleanExpression {
     }
 
     public static BooleanExpression eqKeyword(Long keywordId) {
-        return keywordId != null ? topic.keyword.id.eq(keywordId) : null;
+        // return keywordId != null ? topic.keyword.id.eq(keywordId) : null;
+        return keywordId != null ? null : null;
     }
 
     public static BooleanExpression hideOrNot(Long memberId, Boolean hidden) {

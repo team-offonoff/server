@@ -11,7 +11,7 @@ public record TopicResponse(
         Long topicId,
         TopicSide topicSide,
         String topicTitle,
-        Long keywordId,
+        List<KeywordResponse> keywords,
         List<ChoiceResponse> choices
 ) {
     public static TopicResponse from(Topic topic) {
@@ -19,7 +19,9 @@ public record TopicResponse(
                 topic.getId(),
                 topic.getSide(),
                 topic.getTitle(),
-                topic.getKeyword().getId(),
+                topic.getTopicKeywords().stream()
+                        .map(topicKeyword -> KeywordResponse.from(topicKeyword.getKeyword()))
+                        .toList(),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList());
     }
 }

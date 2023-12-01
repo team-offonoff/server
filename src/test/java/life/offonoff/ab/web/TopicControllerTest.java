@@ -111,7 +111,7 @@ public class TopicControllerTest extends RestDocsTest {
                     .id((long) (i + 1))
                     .title("title" + i)
                     .author(author)
-                    .keyword(keyword)
+                    .keywords(List.of(keyword))
                     .voteCount(i)
                     .build()
                     .buildTopic();

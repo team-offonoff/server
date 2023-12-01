@@ -1,12 +1,12 @@
 package life.offonoff.ab.repository.topic;
 
 import jakarta.persistence.EntityManager;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Import(TestQueryDslConfig.class)
@@ -84,7 +84,7 @@ class TopicRepositoryTest {
         for (int i = 0; i < size; i++) {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
-                    .keyword(keyword)
+                    .keywords(List.of(keyword))
                     .author(member)
                     .build()
                     .buildTopic()

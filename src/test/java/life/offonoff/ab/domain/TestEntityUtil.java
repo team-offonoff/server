@@ -1,9 +1,10 @@
 package life.offonoff.ab.domain;
 
-import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicKeyword;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -18,6 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestEntityUtil {
 
@@ -97,7 +100,9 @@ public class TestEntityUtil {
     @Builder
     public static class TestKeyword {
         private Long id;
-        private String name;
+
+        @Builder.Default
+        private String name = "key";
 
         public Keyword buildKeyword() {
             Keyword keyword = new Keyword(name, TopicSide.TOPIC_A);
@@ -111,7 +116,8 @@ public class TestEntityUtil {
         private Long id;
         private TopicSide side;
         private String title;
-        private Keyword keyword;
+        @Builder.Default
+        private List<Keyword> keywords = new ArrayList<>();
         private Member author;
         private int voteCount;
 
@@ -124,7 +130,9 @@ public class TestEntityUtil {
             Topic topic = new Topic(title, side, deadline);
             ReflectionTestUtils.setField(topic, "id", id);
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
-            ReflectionTestUtils.setField(topic, "keyword", keyword);
+            ReflectionTestUtils.setField(topic, "topicKeywords",
+                                         keywords.stream().map(
+                                                 keyword -> new TopicKeyword(topic, keyword)).toList());
             ReflectionTestUtils.setField(topic, "author", author);
             ReflectionTestUtils.setField(topic, "status", status);
             return topic;
