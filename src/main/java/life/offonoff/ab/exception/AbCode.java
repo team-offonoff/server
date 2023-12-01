@@ -5,7 +5,7 @@ public enum AbCode {
     INVALID_LENGTH_OF_FIELD,
 
     // Not Found,
-    CATEGORY_NOT_FOUND,
+    KEYWORD_NOT_FOUND,
     TOPIC_NOT_FOUND,
       // Member
     MEMBER_NOT_FOUND,

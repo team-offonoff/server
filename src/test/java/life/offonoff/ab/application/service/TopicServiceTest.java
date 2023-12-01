@@ -5,14 +5,14 @@ import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
 import life.offonoff.ab.application.service.request.ImageTextChoiceContentCreateRequest;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.LengthInvalidException;
-import life.offonoff.ab.repository.CategoryRepository;
+import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static life.offonoff.ab.domain.TestEntityUtil.TestCategory;
+import static life.offonoff.ab.domain.TestEntityUtil.TestKeyword;
 import static life.offonoff.ab.domain.TestEntityUtil.TestMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,7 +53,7 @@ public class TopicServiceTest {
     TopicService topicService;
 
     @Mock
-    CategoryRepository categoryRepository;
+    KeywordRepository keywordRepository;
     @Mock
     ChoiceRepository choiceRepository;
     @Mock
@@ -71,7 +71,7 @@ public class TopicServiceTest {
     @Test
     void TopicCreateRequest_equalOrLessThanMaxLength25_success() {
         assertDoesNotThrow(() -> TopicTestDtoHelper.builder()
-                .topicTitle("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
+                .title("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
                 .build().createRequest()
         );
     }
@@ -79,7 +79,7 @@ public class TopicServiceTest {
     @Test
     void TopicCreateRequest_greaterThanMaxLength25_throwsError() {
         assertThatThrownBy(() -> TopicTestDtoHelper.builder()
-                .topicTitle("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
+                .title("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
                 .build().createRequest()
         ).isInstanceOf(LengthInvalidException.class);
     }
@@ -93,23 +93,23 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        Category category = TestCategory.builder()
+        Keyword keyword = TestKeyword.builder()
                 .id(1L)
                 .build()
-                .buildCategory();
+                .buildKeyword();
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(keyword));
 
         // when
         TopicResponse topicResponse = topicService.createMembersTopic(
                 member.getId(),
                 TopicTestDtoHelper.builder()
-                        .category(category)
+                        .keyword(keyword)
                         .build().createRequest());
 
         // then
-        assertThat(topicResponse.categoryId()).isEqualTo(category.getId());
+        assertThat(topicResponse.keywordId()).isEqualTo(keyword.getId());
     }
 
     @Test
@@ -121,16 +121,15 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        Category category = TestCategory.builder()
+        Keyword keyword = TestKeyword.builder()
                 .id(1L)
                 .build()
-                .buildCategory();
+                .buildKeyword();
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
-                .category(category)
+                .keyword(keyword)
                 .build()
                 .createRequest();
 
@@ -150,17 +149,16 @@ public class TopicServiceTest {
                 .build()
                 .buildMember();
 
-        Category category = TestCategory.builder()
+        Keyword keyword = TestKeyword.builder()
                 .id(1L)
                 .build()
-                .buildCategory();
+                .buildKeyword();
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         when(topicRepository.save(any())).thenThrow(RuntimeException.class);
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
-                .category(category)
+                .keyword(keyword)
                 .build()
                 .createRequest();
 
@@ -242,13 +240,13 @@ public class TopicServiceTest {
     @Builder
     public static class TopicTestDtoHelper {
 
-        private Category category;
+        private Keyword keyword;
 
         @Builder.Default
         private TopicSide topicSide = TopicSide.TOPIC_A;
 
         @Builder.Default
-        private String topicTitle = "title";
+        private String title = "title";
 
         @Builder.Default
         private List<ChoiceCreateRequest> choices = List.of(
@@ -264,14 +262,14 @@ public class TopicServiceTest {
         private Long deadline = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
 
         public TopicCreateRequest createRequest() {
-            Long categoryId = 0L;
-            if (category != null) {
-                categoryId = category.getId();
+            String keywordName = "keyword";
+            if (keyword != null) {
+                keywordName = keyword.getName();
             }
             return TopicCreateRequest.builder()
-                    .topicSide(topicSide)
-                    .categoryId(categoryId)
-                    .topicTitle(topicTitle)
+                    .side(topicSide)
+                    .keywordName(keywordName)
+                    .title(title)
                     .choices(choices)
                     .deadline(deadline)
                     .build();
@@ -289,15 +287,15 @@ public class TopicServiceTest {
                         choice.choiceOption()));
             }
 
-            Long categoryId = 0L;
-            if (category != null) {
-                categoryId = category.getId();
+            Long keywordId = 0L;
+            if (keyword != null) {
+                keywordId = keyword.getId();
             }
             return TopicResponse.builder()
                     .topicId(0L)
                     .topicSide(topicSide)
-                    .topicTitle(topicTitle)
-                    .categoryId(categoryId)
+                    .topicTitle(title)
+                    .keywordId(keywordId)
                     .choices(choiceResponses)
                     .build();
         }

@@ -1,7 +1,7 @@
 package life.offonoff.ab.repository.topic;
 
 import jakarta.persistence.EntityManager;
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
@@ -72,19 +72,19 @@ class TopicRepositoryTest {
 
     @Test
     @DisplayName("카테고리 ID로 토픽 Slice 조회")
-    void 토픽_검색_Category() {
+    void 토픽_검색_Keyword() {
         // given
         int size = 5;
 
         Member member = createMember("email", "password");
 
-        Category category = createCategory(1);
+        Keyword keyword = createKeyword(1);
 
         List<Topic> topics = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
-                    .category(category)
+                    .keyword(keyword)
                     .publishMember(member)
                     .build()
                     .buildTopic()
@@ -94,7 +94,7 @@ class TopicRepositoryTest {
 
         PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
         TopicSearchRequest request = TopicSearchRequest.builder()
-                .categoryId(category.getId())
+                .keywordId(keyword.getId())
                 .build();
         // when
         Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);

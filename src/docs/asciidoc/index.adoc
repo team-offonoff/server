@@ -6,6 +6,5 @@
 :seclinks:
 
 include::topic.adoc[]
-include::category.adoc[]
 include::oauth.adoc[]
 include::auth.adoc[]

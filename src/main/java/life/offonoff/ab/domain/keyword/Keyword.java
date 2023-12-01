@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.category;
+package life.offonoff.ab.domain.keyword;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.topic.Topic;
@@ -13,20 +13,26 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Category {
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "UniqueNameInSide", columnNames = { "name", "side" })
+})
+public class Keyword {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private TopicSide topicSide;
 
-    @OneToMany(mappedBy = "category")
+    @Column(length = 6)
+    private String name;
+
+    private TopicSide side;
+
+    @OneToMany(mappedBy = "keyword")
     private List<Topic> topics = new ArrayList<>();
 
     //== Constructor ==//
-    public Category(String name, TopicSide topicSide) {
+    public Keyword(String name, TopicSide side) {
         this.name = name;
-        this.topicSide = topicSide;
+        this.side = side;
     }
 
     public void addTopic(Topic topic) {

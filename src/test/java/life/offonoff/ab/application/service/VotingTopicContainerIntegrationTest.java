@@ -4,13 +4,11 @@ import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.vote.TestVoteConfig;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.config.vote.ContainerVotingTopicConfig;
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +35,10 @@ public class VotingTopicContainerIntegrationTest {
     void votingTopic_added_when_topic_created() {
         // given
         // 카테고리 생성
-        Category category = TestCategory.builder()
-                .name("category")
-                .build().buildCategory();
-        em.persist(category);
+        Keyword keyword = TestKeyword.builder()
+                .name("키워드") // 6자까지만 가능
+                .build().buildKeyword();
+        em.persist(keyword);
 
         // publish member 생성
         Member member = TestMember.builder()
@@ -48,7 +46,7 @@ public class VotingTopicContainerIntegrationTest {
         em.persist(member);
 
         TopicCreateRequest request = TopicServiceTest.TopicTestDtoHelper.builder()
-                .category(category)
+                .keyword(keyword)
                 .build()
                 .createRequest();
 

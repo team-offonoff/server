@@ -1,6 +1,6 @@
 package life.offonoff.ab.domain;
 
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
@@ -18,8 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TestEntityUtil {
 
@@ -45,11 +43,11 @@ public class TestEntityUtil {
         return new Topic(topicTitle, side);
     }
 
-    //== Category ==//
+    //== Keyword ==//
 
-    public static Category createCategory(int seq) {
-        String name = "CATEGORY_" + seq;
-        return new Category(name, TopicSide.TOPIC_A);
+    public static Keyword createKeyword(int seq) {
+        String name = "키워드" + seq; // 6자까지만 가능
+        return new Keyword(name, TopicSide.TOPIC_A);
     }
     //== Comment ==//
 
@@ -97,14 +95,14 @@ public class TestEntityUtil {
     }
 
     @Builder
-    public static class TestCategory {
+    public static class TestKeyword {
         private Long id;
         private String name;
 
-        public Category buildCategory() {
-            Category category = new Category(name, TopicSide.TOPIC_A);
-            ReflectionTestUtils.setField(category, "id", id);
-            return category;
+        public Keyword buildKeyword() {
+            Keyword keyword = new Keyword(name, TopicSide.TOPIC_A);
+            ReflectionTestUtils.setField(keyword, "id", id);
+            return keyword;
         }
     }
 
@@ -113,7 +111,7 @@ public class TestEntityUtil {
         private Long id;
         private TopicSide side;
         private String title;
-        private Category category;
+        private Keyword keyword;
         private Member publishMember;
         private int voteCount;
 
@@ -126,7 +124,7 @@ public class TestEntityUtil {
             Topic topic = new Topic(title, side, deadline);
             ReflectionTestUtils.setField(topic, "id", id);
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
-            ReflectionTestUtils.setField(topic, "category", category);
+            ReflectionTestUtils.setField(topic, "keyword", keyword);
             ReflectionTestUtils.setField(topic, "publishMember", publishMember);
             ReflectionTestUtils.setField(topic, "status", status);
             return topic;

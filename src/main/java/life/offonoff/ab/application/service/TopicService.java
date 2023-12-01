@@ -5,15 +5,16 @@ import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
-import life.offonoff.ab.domain.category.Category;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
-import life.offonoff.ab.repository.CategoryRepository;
+import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -35,7 +36,7 @@ import java.time.ZoneId;
 @Transactional(readOnly = true)
 @Service
 public class TopicService {
-    private final CategoryRepository categoryRepository;
+    private final KeywordRepository keywordRepository;
     private final ChoiceRepository choiceRepository;
     private final TopicRepository topicRepository;
     private final MemberRepository memberRepository;
@@ -46,9 +47,9 @@ public class TopicService {
     @Transactional
     public TopicResponse createMembersTopic(final Long memberId, final TopicCreateRequest request) {
         Member member = findMember(memberId);
-        Category category = findCategory(request.categoryId());
+        Keyword keyword = findOrCreateKeyword(request.keywordName(), request.side());
         LocalDateTime deadline = convertTime(request.deadline());
-        Topic topic = new Topic(member, category, request.topicTitle(), request.topicSide(), deadline);
+        Topic topic = new Topic(member, keyword, request.title(), request.side(), deadline);
         topicRepository.save(topic);
 
         request.choices().stream()
@@ -60,6 +61,11 @@ public class TopicService {
         return TopicResponse.from(topic);
     }
 
+    private Keyword findOrCreateKeyword(String keyword, TopicSide side) {
+        return keywordRepository.findByNameAndSide(keyword, side)
+                .orElseGet(() -> new Keyword(keyword, side));
+    }
+
     private LocalDateTime convertTime(Long deadline) {
         return Instant.ofEpochSecond(deadline)
                 .atZone(ZoneId.systemDefault())
@@ -69,11 +75,6 @@ public class TopicService {
     private Choice createTopicsChoice(final Topic topic, final ChoiceCreateRequest request) {
         ChoiceContent choiceContent = request.choiceContentRequest().toEntity();
         return new Choice(topic, request.choiceOption(), choiceContent);
-    }
-
-    private Category findCategory(final Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     // TODO: Find member

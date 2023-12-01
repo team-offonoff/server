@@ -25,8 +25,8 @@ public class TopicBooleanExpression {
         return compareTime != null ? topic.deadline.lt(compareTime) : null;
     }
 
-    public static BooleanExpression eqCategory(Long categoryId) {
-        return categoryId != null ? topic.category.id.eq(categoryId) : null;
+    public static BooleanExpression eqKeyword(Long keywordId) {
+        return keywordId != null ? topic.keyword.id.eq(keywordId) : null;
     }
 
     public static BooleanExpression hideOrNot(Long memberId, Boolean hidden) {
