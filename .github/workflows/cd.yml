@@ -31,9 +31,17 @@ jobs:
       run: chmod +x ./gradlew
       shell: bash
 
-    - name: Build and Test with Gradle
-      run: ./gradlew clean build
+    - name: Create directory
+      run: mkdir -p ./src/main/resources/static/docs
       shell: bash
+
+    - name: Build and Test with Gradle
+      run: |
+        ./gradlew clean build
+
+    - name: Check generated files
+      run: |
+        ls ./src/main/resources/static/docs
 
     - name: Get current time
       uses: 1466587594/get-current-time@v2 
@@ -61,3 +69,4 @@ jobs:
         version_label: github-action-${{steps.current-time.outputs.formattedTime}}
         region: ap-northeast-2
         deployment_package: deploy/deploy.zip
+        wait_for_environment_recovery: 200 # 배포 후 환경 복구 대기시간
