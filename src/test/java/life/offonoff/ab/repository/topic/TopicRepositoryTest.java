@@ -46,7 +46,7 @@ class TopicRepositoryTest {
         for (int i = 0; i < size; i++) {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
-                    .publishMember(member)
+                    .author(member)
                     .build()
                     .buildTopic()
             );
@@ -85,7 +85,7 @@ class TopicRepositoryTest {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
                     .keyword(keyword)
-                    .publishMember(member)
+                    .author(member)
                     .build()
                     .buildTopic()
             );

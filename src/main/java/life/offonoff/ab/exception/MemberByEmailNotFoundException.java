@@ -1,10 +1,10 @@
 package life.offonoff.ab.exception;
 
-public class MemberByEmailNotFountException extends MemberNotFountException {
+public class MemberByEmailNotFoundException extends MemberNotFoundException {
 
     private final String email;
 
-    public MemberByEmailNotFountException(final String email) {
+    public MemberByEmailNotFoundException(final String email) {
         super();
         this.email = email;
     }

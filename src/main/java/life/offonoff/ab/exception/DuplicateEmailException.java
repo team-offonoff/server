@@ -16,11 +16,6 @@ public class DuplicateEmailException extends DuplicateException {
     }
 
     @Override
-    public int getHttpStatusCode() {
-        return 400;
-    }
-
-    @Override
     public AbCode getAbCode() {
         return AbCode.DUPLICATE_EMAIL;
     }

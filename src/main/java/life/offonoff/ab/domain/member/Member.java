@@ -10,7 +10,6 @@ import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.IllegalJoinStatusException;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class Member extends BaseEntity {
     @Embedded
     private NotificationEnabled notificationEnabled;
 
-    @OneToMany(mappedBy = "publishMember")
+    @OneToMany(mappedBy = "author")
     private List<Topic> publishedTopics = new ArrayList<>();
 
     @OneToMany(mappedBy = "writer")
@@ -52,7 +51,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
-    private int active = 1;
+    private boolean active = true;
 
     //== Constructor ==//
     public Member(String email, String password, Provider provider) {
@@ -136,8 +135,8 @@ public class Member extends BaseEntity {
     }
 
     //== Method ==//
-    public void inactive() {
-        this.active = 0;
+    public void activate(boolean active) {
+        this.active = active;
     }
 
     public boolean hideAlready(Topic topic) {

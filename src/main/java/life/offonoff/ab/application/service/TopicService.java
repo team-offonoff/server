@@ -7,6 +7,7 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -14,8 +15,8 @@ import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
-import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
+import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.TopicResponse;
@@ -61,6 +62,29 @@ public class TopicService {
         return TopicResponse.from(topic);
     }
 
+    @Transactional
+    public void activateMembersTopic(final Long memberId, final Long topicId, final Boolean active) {
+        Member member = findMember(memberId);
+        Topic topic = findTopic(topicId);
+
+        if (member.getRole().equals(Role.USER)) {
+            boolean requestedByAuthor = member.getId().equals(topic.getAuthor().getId());
+            if (!requestedByAuthor) {
+                throw new IllegalTopicStatusChangeException(memberId, topicId);
+            }
+        }
+
+        boolean sameStatus = topic.isActive() == active;
+        if (!sameStatus) {
+            topic.activate(active);
+        }
+    }
+
+    private Member findMember(final Long memberId) {
+        return memberRepository.findByIdAndActiveTrue(memberId)
+                               .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
     private Keyword findOrCreateKeyword(String keyword, TopicSide side) {
         return keywordRepository.findByNameAndSide(keyword, side)
                 .orElseGet(() -> new Keyword(keyword, side));
@@ -77,15 +101,9 @@ public class TopicService {
         return new Choice(topic, request.choiceOption(), choiceContent);
     }
 
-    // TODO: Find member
-    private Member findMember(final Long memberId) {
-        return memberRepository.findById(memberId)
-                               .orElseThrow(() -> new MemberByIdNotFountException(memberId));
-    }
-
     //== Search ==//
-    public Topic searchById(final Long topicId) {
-        return topicRepository.findById(topicId)
+    public Topic findTopic(final Long topicId) {
+        return topicRepository.findByIdAndActiveTrue(topicId)
                               .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
@@ -101,9 +119,9 @@ public class TopicService {
 
     //== Hide ==//
     @Transactional
-    public void hide(final Long memberId, final Long topicId, final Boolean hide) {
+    public void hideTopicForMember(final Long memberId, final Long topicId, final Boolean hide) {
         Member member = findMember(memberId);
-        Topic topic = this.searchById(topicId);
+        Topic topic = this.findTopic(topicId);
 
         if (hide) {
             doHide(member, topic);
@@ -129,7 +147,7 @@ public class TopicService {
     @Transactional
     public void vote(final Long topicId, final VoteRequest request) {
         Member member = findMember(request.memberId());
-        Topic topic = searchById(topicId);
+        Topic topic = findTopic(topicId);
 
         validateVotable(topic, request);
 
@@ -155,5 +173,18 @@ public class TopicService {
         if (!topic.votable(request.requestTime())) {
             throw new UnableToVoteException(request.requestTime());
         }
+    }
+
+    @Transactional
+    public void reportTopicByMember(final Long topicId, final Long memberId) {
+        final Member member = findMember(memberId);
+        final Topic topic = findTopic(topicId);
+
+        if (topic.isReportedBy(member)) {
+            throw new TopicReportDuplicateException(topicId, memberId);
+        }
+        topic.reportBy(member);
+
+        // TODO: report 많을 때 알림
     }
 }

@@ -3,15 +3,18 @@ package life.offonoff.ab.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.TopicService;
+import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
+import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.exception.IllegalTopicStatusChangeException;
+import life.offonoff.ab.exception.TopicNotFoundException;
+import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
-import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
-import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import org.junit.jupiter.api.Test;
@@ -31,13 +34,14 @@ import java.util.List;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = TopicController.class,
@@ -89,7 +93,7 @@ public class TopicControllerTest extends RestDocsTest {
         Comparator<Topic> voteCountDesc = (t1, t2) -> t2.getVoteCount() - t1.getVoteCount();
 
         // create Member
-        Member publishMember = TestMember.builder()
+        Member author = TestMember.builder()
                 .id(1L)
                 .nickname("nicknameA")
                 .build().buildMember();
@@ -106,7 +110,7 @@ public class TopicControllerTest extends RestDocsTest {
                     .builder()
                     .id((long) (i + 1))
                     .title("title" + i)
-                    .publishMember(publishMember)
+                    .author(author)
                     .keyword(keyword)
                     .voteCount(i)
                     .build()
@@ -118,9 +122,59 @@ public class TopicControllerTest extends RestDocsTest {
         return PagingUtil.toSlice(topics, pageable);
     }
 
+    @Test
+    void createTopicReport() throws Exception {
+        mvc.perform(post(TopicUri.REPORT, 1).with(csrf().asHeader()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void createTopicReport_withNonExistentTopic_TopicNotFoundException() throws Exception {
+        doThrow(new TopicNotFoundException(1L))
+                .when(topicService).reportTopicByMember(any(), any());
+
+        mvc.perform(post(TopicUri.REPORT, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(""))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("abCode").value("TOPIC_NOT_FOUND"))
+                .andDo(print());
+    }
+
+    @Test
+    void createTopicReport_alreadyReported_TopicReportDuplicateException() throws Exception {
+        doThrow(new TopicReportDuplicateException(1L, 2L))
+                .when(topicService).reportTopicByMember(any(), any());
+
+        mvc.perform(post(TopicUri.REPORT, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("DUPLICATE_TOPIC_REPORT"))
+                .andDo(print());
+    }
+
+    @Test
+    void deactivateTopic() throws Exception {
+        mvc.perform(patch(TopicUri.REMOVE, 1, false).with(csrf().asHeader()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deactivateTopic_byNonAuthorUser_IllegalTopicStatusChangeException() throws Exception {
+        doThrow(new IllegalTopicStatusChangeException(1L, 2L))
+                .when(topicService).activateMembersTopic(any(), any(), any());
+
+        mvc.perform(patch(TopicUri.REMOVE, 2, false).with(csrf().asHeader()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("ILLEGAL_TOPIC_STATUS_CHANGE"));
+    }
+
     private static class TopicUri {
-        private static String BASE = "/topics";
-        private static String OPENED = "/open";
-        private static String NOW = "/now";
+        private static final String BASE = "/topics";
+        private static final String OPENED = "/open";
+        private static final String NOW = "/now";
+        private static final String REPORT = BASE + "/{topicId}/report";
+        private static final String REMOVE = BASE + "/{topicId}/status?active={active}";
     }
 }

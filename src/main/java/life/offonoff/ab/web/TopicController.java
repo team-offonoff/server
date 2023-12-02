@@ -1,14 +1,12 @@
 package life.offonoff.ab.web;
 
-import static org.springframework.data.domain.Sort.Direction.*;
-
 import jakarta.validation.Valid;
-import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.web.common.aspect.auth.Authorized;
-import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.domain.topic.TopicStatus;
+import life.offonoff.ab.web.common.aspect.auth.Authorized;
+import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.TopicDetailResponse;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 
 @RequiredArgsConstructor
@@ -56,11 +56,30 @@ public class TopicController {
 
     @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
-            Long memberId,
+            @Authorized Long memberId,
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {
-        topicService.hide(memberId, topicId, hide);
+        topicService.hideTopicForMember(memberId, topicId, hide);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{topicId}/report")
+    public ResponseEntity<Void> reportTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId
+    ) {
+       topicService.reportTopicByMember(topicId, memberId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{topicId}/status")
+    public ResponseEntity<Void> activateTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId,
+            @RequestParam Boolean active
+    ) {
+        topicService.activateMembersTopic(memberId, topicId, active);
         return ResponseEntity.ok().build();
     }
 }

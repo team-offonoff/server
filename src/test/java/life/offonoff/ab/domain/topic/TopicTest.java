@@ -28,7 +28,7 @@ class TopicTest {
         // then
         assertAll(
                 () -> assertThat(topic.getKeyword()).isEqualTo(keyword),
-                () -> assertThat(topic.getPublishMember()).isEqualTo(member)
+                () -> assertThat(topic.getAuthor()).isEqualTo(member)
         );
     }
 }

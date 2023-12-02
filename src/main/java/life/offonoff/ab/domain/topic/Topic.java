@@ -44,8 +44,8 @@ public class Topic extends BaseEntity {
     private TopicSide side;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "publish_member_id")
-    private Member publishMember;
+    @JoinColumn(name = "author_id")
+    private Member author;
 
     @OneToMany(mappedBy = "topic")
     private List<Comment> comments = new ArrayList<>();
@@ -57,6 +57,9 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hides = new ArrayList<>();
 
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TopicReport> reports = new ArrayList<>();
+
     @OneToOne(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private VotingResult votingResult;
 
@@ -67,7 +70,7 @@ public class Topic extends BaseEntity {
     private int voteCount = 0;
     private int hideCount = 0;
     private LocalDateTime deadline;
-    private int active = 1;
+    private boolean active = true;
 
     // Constructor
     public Topic(String title, TopicSide side, LocalDateTime deadline) {
@@ -93,7 +96,7 @@ public class Topic extends BaseEntity {
 
     //== 연관관계 매핑 ==//
     public void associate(Member member, Keyword keyword, TopicContent content) {
-        this.publishMember = member;
+        this.author = member;
         member.publishTopic(this);
 
         this.keyword = keyword;
@@ -122,8 +125,8 @@ public class Topic extends BaseEntity {
         voteCount++;
     }
 
-    public void remove() {
-        this.active = 0;
+    public void activate(boolean active) {
+        this.active = active;
     }
 
     public void addChoice(Choice choice) {
@@ -150,5 +153,14 @@ public class Topic extends BaseEntity {
 
     public void noticed() {
         this.status = TopicStatus.NOTICED;
+    }
+
+    public boolean isReportedBy(Member member) {
+        return reports.stream()
+                .anyMatch(report -> report.getMember().getId().equals(member.getId()));
+    }
+
+    public void reportBy(Member member) {
+        reports.add(new TopicReport(member, this));
     }
 }

@@ -28,7 +28,7 @@ public class TopicSpecifications {
     private static Specification<Topic> hiddenByMember(Long memberId) {
         return (t, query, cb) -> {
             if (query.getResultType().equals(Topic.class)) { // data query 일 때
-                t.fetch("publishMember", JoinType.INNER);
+                t.fetch("author", JoinType.INNER);
             }
 
             Join<Topic, HiddenTopic> ht = t.join("hides", JoinType.INNER);
@@ -43,7 +43,7 @@ public class TopicSpecifications {
         return (t, query, cb) -> {
             // fetch join with publish Member
             if (query.getResultType().equals(Topic.class)) { // data query 일 때
-                t.fetch("publishMember", JoinType.INNER);
+                t.fetch("author", JoinType.INNER);
             }
 
             // subquery (not hidden by memberId)

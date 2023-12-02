@@ -100,7 +100,7 @@ public class AuthService {
 
         // email existence
         if (!memberService.exists(email)) {
-            throw new MemberByEmailNotFountException(email);
+            throw new MemberByEmailNotFoundException(email);
         }
 
         // match password

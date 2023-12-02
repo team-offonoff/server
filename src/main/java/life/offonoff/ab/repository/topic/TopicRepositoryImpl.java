@@ -28,7 +28,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
     public Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable) {
         List<Topic> result = queryFactory
                 .selectFrom(topic)
-                .join(topic.publishMember).fetchJoin()
+                .join(topic.author).fetchJoin()
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
                         eqKeyword(request.getKeywordId()),

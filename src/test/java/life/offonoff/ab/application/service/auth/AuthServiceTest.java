@@ -5,7 +5,7 @@ import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.exception.DuplicateException;
-import life.offonoff.ab.exception.MemberNotFountException;
+import life.offonoff.ab.exception.MemberNotFoundException;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
@@ -15,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.*;
@@ -68,7 +66,7 @@ class AuthServiceTest {
         when(memberService.exists(anyString())).thenReturn(false);
 
         // when
-        assertThatThrownBy(() -> authService.signIn(request)).isInstanceOf(MemberNotFountException.class);
+        assertThatThrownBy(() -> authService.signIn(request)).isInstanceOf(MemberNotFoundException.class);
     }
 
     @Test
