@@ -12,7 +12,6 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.content.QTopicContent;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.web.response.topic.TopicDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -38,13 +37,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
     public Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable) {
         List<Topic> result = queryFactory
                 .selectFrom(topic)
-<<<<<<< Updated upstream
                 .join(topic.author).fetchJoin()
-=======
-                .join(topic.publishMember).fetchJoin()
-                .join(topic.keyword).fetchJoin()
-//                .join(topic.content).fetchJoin()
->>>>>>> Stashed changes
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
                         // eqKeyword(request.getKeywordId()), // TODO

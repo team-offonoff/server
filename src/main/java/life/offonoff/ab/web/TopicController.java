@@ -1,23 +1,13 @@
 package life.offonoff.ab.web;
 
-<<<<<<< Updated upstream
-=======
-import static org.springframework.data.domain.Sort.Direction.*;
-import static org.springframework.http.ResponseEntity.*;
-
->>>>>>> Stashed changes
 import jakarta.validation.Valid;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
-<<<<<<< Updated upstream
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.TopicDetailResponse;
-=======
-import life.offonoff.ab.web.response.topic.TopicDetailResponse;
->>>>>>> Stashed changes
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -26,12 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.http.ResponseEntity.*;
 
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/topics")
 public class TopicController {
+
     private final TopicService topicService;
 
     // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
@@ -40,7 +32,7 @@ public class TopicController {
             @Authorized Long memberId,
             @Valid @RequestBody final TopicCreateRequest request
     ) {
-        return ok(topicService.createMembersTopic(memberId, request));
+        return ResponseEntity.ok(topicService.createMembersTopic(memberId, request));
     }
   
     /**
@@ -58,7 +50,7 @@ public class TopicController {
         request.setTopicStatus(TopicStatus.VOTING);
         request.setMemberId(memberId);
 
-        return ok(PageResponse.of(topicService.findAll(request, pageable)));
+        return ResponseEntity.ok(PageResponse.of(topicService.findAll(request, pageable)));
     }
 
     @PatchMapping("/{topicId}/hide")
@@ -67,7 +59,6 @@ public class TopicController {
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {
-<<<<<<< Updated upstream
         topicService.hideTopicForMember(memberId, topicId, hide);
         return ResponseEntity.ok().build();
     }
@@ -78,7 +69,7 @@ public class TopicController {
             @PathVariable("topicId") Long topicId
     ) {
        topicService.reportTopicByMember(topicId, memberId);
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 
     @PatchMapping("/{topicId}/status")
@@ -88,10 +79,6 @@ public class TopicController {
             @RequestParam Boolean active
     ) {
         topicService.activateMembersTopic(memberId, topicId, active);
-        return ResponseEntity.ok().build();
-=======
-        topicService.hide(memberId, topicId, hide);
         return ok().build();
->>>>>>> Stashed changes
     }
 }

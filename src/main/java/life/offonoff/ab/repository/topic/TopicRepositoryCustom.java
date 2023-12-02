@@ -2,7 +2,6 @@ package life.offonoff.ab.repository.topic;
 
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.web.response.topic.TopicDetailResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 

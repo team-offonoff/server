@@ -35,13 +35,8 @@ public class MemberService {
     //== exists ==//
     public boolean exists(final Long memberId) {
         try {
-<<<<<<< Updated upstream
-            find(memberId);
-        } catch (MemberNotFoundException notFountException) {
-=======
             findById(memberId);
-        } catch (MemberNotFountException notFountException) {
->>>>>>> Stashed changes
+        } catch (MemberNotFoundException notFountException) {
             return false;
         }
         return true;
@@ -49,13 +44,8 @@ public class MemberService {
 
     public boolean exists(final String email) {
         try {
-<<<<<<< Updated upstream
-            find(email);
-        } catch (MemberNotFoundException notFountException) {
-=======
             findByEmail(email);
-        } catch (MemberNotFountException notFountException) {
->>>>>>> Stashed changes
+        } catch (MemberNotFoundException notFountException) {
             return false;
         }
         return true;
