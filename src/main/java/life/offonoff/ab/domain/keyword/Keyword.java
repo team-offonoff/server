@@ -23,7 +23,7 @@ public class Keyword {
 
     @Column(length = 6)
     private String name;
-
+    @Enumerated(EnumType.STRING)
     private TopicSide side;
 
     @OneToMany(mappedBy = "keyword")

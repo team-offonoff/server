@@ -30,7 +30,7 @@ public enum AbCode {
     // Auth
     UNSUPPORTED_AUTH_FORMAT,
     EMPTY_AUTHORIZATION,
-    
+
     // Token
     INVALID_TOKEN,
     EXPIRED_TOKEN,
