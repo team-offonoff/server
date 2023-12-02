@@ -1,9 +1,9 @@
 package life.offonoff.ab.application.service;
 
 import jakarta.persistence.EntityManager;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.vote.TestVoteConfig;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
-import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static org.assertj.core.api.Assertions.*;
+import java.util.List;
+
+import static life.offonoff.ab.domain.TestEntityUtil.TestKeyword;
+import static life.offonoff.ab.domain.TestEntityUtil.TestMember;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @SpringBootTest
@@ -46,7 +49,7 @@ public class VotingTopicContainerIntegrationTest {
         em.persist(member);
 
         TopicCreateRequest request = TopicServiceTest.TopicTestDtoHelper.builder()
-                .keyword(keyword)
+                .keywords(List.of(keyword))
                 .build()
                 .createRequest();
 

@@ -18,6 +18,7 @@ import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.ChoiceResponse;
 import life.offonoff.ab.web.response.ImageTextChoiceContentResponse;
+import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.Builder;
 import org.junit.jupiter.api.BeforeEach;
@@ -105,11 +106,11 @@ public class TopicServiceTest {
         TopicResponse topicResponse = topicService.createMembersTopic(
                 member.getId(),
                 TopicTestDtoHelper.builder()
-                        .keyword(keyword)
+                        .keywords(List.of(keyword))
                         .build().createRequest());
 
         // then
-        assertThat(topicResponse.keywordId()).isEqualTo(keyword.getId());
+        assertThat(topicResponse.keywords().get(0).keywordId()).isEqualTo(keyword.getId());
     }
 
     @Test
@@ -122,6 +123,7 @@ public class TopicServiceTest {
                 .buildMember();
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
+        when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(new Keyword("key", TopicSide.TOPIC_A)));
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
                 .build()
@@ -144,7 +146,6 @@ public class TopicServiceTest {
                 .buildMember();
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
-        when(topicRepository.save(any())).thenThrow(RuntimeException.class);
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
                 .build()
@@ -228,7 +229,8 @@ public class TopicServiceTest {
     @Builder
     public static class TopicTestDtoHelper {
 
-        private Keyword keyword;
+        @Builder.Default
+        private List<Keyword> keywords = List.of(new Keyword("key1", TopicSide.TOPIC_A), new Keyword("key2", TopicSide.TOPIC_A));
 
         @Builder.Default
         private TopicSide topicSide = TopicSide.TOPIC_A;
@@ -250,13 +252,9 @@ public class TopicServiceTest {
         private Long deadline = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
 
         public TopicCreateRequest createRequest() {
-            String keywordName = "keyword";
-            if (keyword != null) {
-                keywordName = keyword.getName();
-            }
             return TopicCreateRequest.builder()
                     .side(topicSide)
-                    .keywordName(keywordName)
+                    .keywordNames(keywords.stream().map(Keyword::getName).toList())
                     .title(title)
                     .choices(choices)
                     .deadline(deadline)
@@ -275,15 +273,16 @@ public class TopicServiceTest {
                         choice.choiceOption()));
             }
 
-            Long keywordId = 0L;
-            if (keyword != null) {
-                keywordId = keyword.getId();
+            List<KeywordResponse> keywordResponses = new ArrayList<>();
+            for (int i = 0; i < keywords.size(); i++) {
+                final Keyword keyword = keywords.get(i);
+                keywordResponses.add(new KeywordResponse((long) i, keyword.getName(), keyword.getSide()));
             }
             return TopicResponse.builder()
                     .topicId(0L)
                     .topicSide(topicSide)
                     .topicTitle(title)
-                    .keywordId(keywordId)
+                    .keywords(keywordResponses)
                     .choices(choiceResponses)
                     .build();
         }

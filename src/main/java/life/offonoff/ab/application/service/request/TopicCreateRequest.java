@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.service.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.domain.topic.TopicSide;
@@ -13,8 +14,8 @@ import java.util.List;
 public record TopicCreateRequest(
         @NotNull(message = "토픽의 Side를 선택해주세요. (A/B)")
         TopicSide side,
-        @NotBlank(message = "토픽의 키워드를 입력해주세요.")
-        String keywordName,
+        @NotEmpty(message = "토픽의 키워드를 입력해주세요.")
+        List<String> keywordNames,
         @NotBlank(message = "토픽의 title을 입력해주세요.")
         String title,
         List<ChoiceCreateRequest> choices,
