@@ -17,9 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static life.offonoff.ab.domain.keyword.QKeyword.keyword;
 import static life.offonoff.ab.domain.topic.QTopic.*;
 import static life.offonoff.ab.domain.topic.QTopicKeyword.topicKeyword;
 import static life.offonoff.ab.repository.topic.booleanexpression.TopicBooleanExpression.*;

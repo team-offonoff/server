@@ -5,6 +5,8 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicKeyword;
+import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
 
@@ -41,29 +43,32 @@ class TopicRepositoryTest {
         // given
         int size = 5;
 
-        Member author = createMember("emailPublish", "password");
-        em.persist(author);
+        Member member = createMember("email", "password");
 
-        Member retrieveMember = createMember("emailRetrieve", "password");
-        em.persist(retrieveMember);
+        Keyword keyword = createKeyword(1);
 
         List<Topic> topics = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            topics.add(TestTopic.builder()
+            Topic topic = TestTopic.builder()
                     .voteCount(size - i)
-                    .author(author)
+                    .keywords(List.of(keyword))
+                    .author(member)
                     .build()
-                    .buildTopic()
-            );
+                    .buildTopic();
+
+            topics.add(topic);
         }
         topicRepository.saveAll(topics);
 
+        List<Topic> topics1 = topicRepository.findAll();
+        System.out.println(topics1);
+
         PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
         TopicSearchRequest request = TopicSearchRequest.builder()
-                .memberId(retrieveMember.getId())
                 .topicStatus(TopicStatus.VOTING)
-                .hidden(false)
                 .build();
+
+        System.out.println(request.getTopicStatus());
         // when
         Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
 
