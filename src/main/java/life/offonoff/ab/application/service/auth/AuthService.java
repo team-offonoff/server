@@ -7,8 +7,8 @@ import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.*;
-import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
+import life.offonoff.ab.util.token.TokenProvider;
 import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
@@ -27,7 +27,7 @@ public class AuthService {
 
     private final MemberService memberService;
 
-    private final JwtProvider jwtProvider;
+    private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     //== Sign Up ==//
@@ -57,14 +57,14 @@ public class AuthService {
 
     //== JoinStatus ==//
     public JoinStatusResponse getJoinStatus(Long memberId) {
-        Member member = memberService.find(memberId);
+        Member member = memberService.findById(memberId);
         return new JoinStatusResponse(member.getId(), member.getJoinStatus());
     }
 
     @Transactional
     public JoinStatusResponse registerProfile(ProfileRegisterRequest request) {
 
-        Member member = memberService.find(request.getMemberId());
+        Member member = memberService.findById(request.getMemberId());
         member.registerPersonalInfo(request.toPersonalInfo());
 
         return new ProfileRegisterResponse(member.getId(), member.getJoinStatus());
@@ -73,13 +73,13 @@ public class AuthService {
     @Transactional
     public JoinStatusResponse registerTerms(TermsRequest request) {
 
-        Member member = memberService.find(request.getMemberId());
+        Member member = memberService.findById(request.getMemberId());
         member.agreeTerms(request.toTermsEnabled());
 
         Long memberId = member.getId();
         return new TermsResponse(memberId,
                                  member.getJoinStatus(),
-                                 jwtProvider.generateAccessToken(memberId));
+                                 tokenProvider.generateToken(memberId));
     }
 
     //== Sign In ==//
@@ -87,16 +87,16 @@ public class AuthService {
 
         beforeSignIn(request);
 
-        Member member = memberService.find(request.getEmail());
+        Member member = memberService.findByEmail(request.getEmail());
 
         return new SignInResponse(member.getId(),
                                   member.getJoinStatus(),
-                                  jwtProvider.generateAccessToken(member.getId()));
+                                  tokenProvider.generateToken(member.getId()));
     }
 
     private void beforeSignIn(SignInRequest request) {
         String email = request.getEmail();
-        Member member = memberService.find(email);
+        Member member = memberService.findByEmail(email);
 
         // email existence
         if (!memberService.exists(email)) {

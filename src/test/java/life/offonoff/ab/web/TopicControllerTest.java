@@ -17,6 +17,7 @@ import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import life.offonoff.ab.web.response.topic.TopicDetailResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -79,7 +80,7 @@ public class TopicControllerTest extends RestDocsTest {
     @Test
     @WithMockUser
     void getTopicSlice() throws Exception {
-        when(topicService.searchAll(any(), any())).thenReturn(createTopicSlice());
+        when(topicService.findAll(any(), any())).thenReturn(createTopicSlice());
 
         mvc.perform(
                         get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
@@ -88,7 +89,7 @@ public class TopicControllerTest extends RestDocsTest {
                 .andDo(print());
     }
 
-    private Slice<Topic> createTopicSlice() {
+    private Slice<TopicDetailResponse> createTopicSlice() {
         PageRequest pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "voteCount");
         Comparator<Topic> voteCountDesc = (t1, t2) -> t2.getVoteCount() - t1.getVoteCount();
 
@@ -119,7 +120,8 @@ public class TopicControllerTest extends RestDocsTest {
             topics.add(topic);
         }
         topics.sort(voteCountDesc);
-        return PagingUtil.toSlice(topics, pageable);
+        return PagingUtil.toSlice(topics, pageable)
+                .map(TopicDetailResponse::new);
     }
 
     @Test

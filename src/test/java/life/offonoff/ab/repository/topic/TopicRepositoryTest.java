@@ -7,6 +7,11 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
+<<<<<<< Updated upstream
+=======
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.web.response.topic.TopicDetailResponse;
+>>>>>>> Stashed changes
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +45,21 @@ class TopicRepositoryTest {
         // given
         int size = 5;
 
-        Member member = createMember("email", "password");
+        Member publishMember = createMember("emailPublish", "password");
+        em.persist(publishMember);
+
+        Member retrieveMember = createMember("emailRetrieve", "password");
+        em.persist(retrieveMember);
 
         List<Topic> topics = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
+<<<<<<< Updated upstream
                     .author(member)
+=======
+                    .publishMember(publishMember)
+>>>>>>> Stashed changes
                     .build()
                     .buildTopic()
             );
@@ -55,8 +68,10 @@ class TopicRepositoryTest {
 
         PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
         TopicSearchRequest request = TopicSearchRequest.builder()
-                                                       .topicStatus(TopicStatus.VOTING)
-                                                       .build();
+                .memberId(retrieveMember.getId())
+                .topicStatus(TopicStatus.VOTING)
+                .hidden(false)
+                .build();
         // when
         Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
 

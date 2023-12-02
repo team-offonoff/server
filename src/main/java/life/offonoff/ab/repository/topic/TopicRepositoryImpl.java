@@ -1,12 +1,18 @@
 package life.offonoff.ab.repository.topic;
 
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import life.offonoff.ab.domain.keyword.QKeyword;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicStatus;
+import life.offonoff.ab.domain.topic.content.QTopicContent;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.web.response.topic.TopicDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -15,7 +21,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static life.offonoff.ab.domain.keyword.QKeyword.*;
+import static life.offonoff.ab.domain.member.QMember.member;
 import static life.offonoff.ab.domain.topic.QTopic.*;
+import static life.offonoff.ab.domain.topic.choice.QChoice.choice;
+import static life.offonoff.ab.domain.topic.content.QTopicContent.topicContent;
 import static life.offonoff.ab.repository.topic.booleanexpression.TopicBooleanExpression.*;
 
 @RequiredArgsConstructor
@@ -28,13 +38,18 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
     public Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable) {
         List<Topic> result = queryFactory
                 .selectFrom(topic)
+<<<<<<< Updated upstream
                 .join(topic.author).fetchJoin()
+=======
+                .join(topic.publishMember).fetchJoin()
+                .join(topic.keyword).fetchJoin()
+//                .join(topic.content).fetchJoin()
+>>>>>>> Stashed changes
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
                         // eqKeyword(request.getKeywordId()), // TODO
                         hideOrNot(request.getMemberId(), request.getHidden())
-                )
-                .orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
+                ).orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -53,6 +68,8 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
                         ltDeadline(cond.endCompareTime())
                 ).fetch();
     }
+
+
 
     static class TopicOrderBy {
 

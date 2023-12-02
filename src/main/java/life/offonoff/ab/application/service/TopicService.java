@@ -20,6 +20,7 @@ import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.TopicResponse;
+import life.offonoff.ab.web.response.topic.TopicDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -104,8 +105,13 @@ public class TopicService {
     }
 
     //== Search ==//
+<<<<<<< Updated upstream
     public Topic findTopic(final Long topicId) {
         return topicRepository.findByIdAndActiveTrue(topicId)
+=======
+    public Topic findById(final Long topicId) {
+        return topicRepository.findById(topicId)
+>>>>>>> Stashed changes
                               .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
@@ -115,15 +121,20 @@ public class TopicService {
      * @param pageable
      * @return
      */
-    public Slice<Topic> searchAll(final TopicSearchRequest request, final Pageable pageable) {
-        return topicRepository.findAll(request, pageable);
+    public Slice<TopicDetailResponse> findAll(final TopicSearchRequest request, final Pageable pageable) {
+        return topicRepository.findAll(request, pageable)
+                .map(TopicDetailResponse::new);
     }
 
     //== Hide ==//
     @Transactional
     public void hideTopicForMember(final Long memberId, final Long topicId, final Boolean hide) {
         Member member = findMember(memberId);
+<<<<<<< Updated upstream
         Topic topic = this.findTopic(topicId);
+=======
+        Topic topic = this.findById(topicId);
+>>>>>>> Stashed changes
 
         if (hide) {
             doHide(member, topic);
@@ -149,7 +160,11 @@ public class TopicService {
     @Transactional
     public void vote(final Long topicId, final VoteRequest request) {
         Member member = findMember(request.memberId());
+<<<<<<< Updated upstream
         Topic topic = findTopic(topicId);
+=======
+        Topic topic = findById(topicId);
+>>>>>>> Stashed changes
 
         validateVotable(topic, request);
 

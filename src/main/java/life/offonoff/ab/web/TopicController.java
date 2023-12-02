@@ -1,13 +1,23 @@
 package life.offonoff.ab.web;
 
+<<<<<<< Updated upstream
+=======
+import static org.springframework.data.domain.Sort.Direction.*;
+import static org.springframework.http.ResponseEntity.*;
+
+>>>>>>> Stashed changes
 import jakarta.validation.Valid;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
+<<<<<<< Updated upstream
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.TopicDetailResponse;
+=======
+import life.offonoff.ab.web.response.topic.TopicDetailResponse;
+>>>>>>> Stashed changes
 import life.offonoff.ab.web.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +40,7 @@ public class TopicController {
             @Authorized Long memberId,
             @Valid @RequestBody final TopicCreateRequest request
     ) {
-        return ResponseEntity.ok(
-                topicService.createMembersTopic(memberId, request));
+        return ok(topicService.createMembersTopic(memberId, request));
     }
   
     /**
@@ -49,9 +58,7 @@ public class TopicController {
         request.setTopicStatus(TopicStatus.VOTING);
         request.setMemberId(memberId);
 
-        return ResponseEntity.ok(PageResponse.of(topicService.searchAll(request, pageable)
-                                                             .map(TopicDetailResponse::new))
-        );
+        return ok(PageResponse.of(topicService.findAll(request, pageable)));
     }
 
     @PatchMapping("/{topicId}/hide")
@@ -60,6 +67,7 @@ public class TopicController {
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {
+<<<<<<< Updated upstream
         topicService.hideTopicForMember(memberId, topicId, hide);
         return ResponseEntity.ok().build();
     }
@@ -81,5 +89,9 @@ public class TopicController {
     ) {
         topicService.activateMembersTopic(memberId, topicId, active);
         return ResponseEntity.ok().build();
+=======
+        topicService.hide(memberId, topicId, hide);
+        return ok().build();
+>>>>>>> Stashed changes
     }
 }
