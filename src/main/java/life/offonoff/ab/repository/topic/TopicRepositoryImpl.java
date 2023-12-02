@@ -1,15 +1,13 @@
 package life.offonoff.ab.repository.topic;
 
-import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import life.offonoff.ab.domain.keyword.QKeyword;
+import life.offonoff.ab.domain.topic.QTopicKeyword;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicKeyword;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.domain.topic.content.QTopicContent;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +17,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static life.offonoff.ab.domain.keyword.QKeyword.*;
-import static life.offonoff.ab.domain.member.QMember.member;
+import static life.offonoff.ab.domain.keyword.QKeyword.keyword;
 import static life.offonoff.ab.domain.topic.QTopic.*;
-import static life.offonoff.ab.domain.topic.choice.QChoice.choice;
-import static life.offonoff.ab.domain.topic.content.QTopicContent.topicContent;
+import static life.offonoff.ab.domain.topic.QTopicKeyword.topicKeyword;
 import static life.offonoff.ab.repository.topic.booleanexpression.TopicBooleanExpression.*;
 
 @RequiredArgsConstructor
@@ -38,9 +35,10 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
         List<Topic> result = queryFactory
                 .selectFrom(topic)
                 .join(topic.author).fetchJoin()
+                .join(topic.topicKeywords, topicKeyword)
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
-                        // eqKeyword(request.getKeywordId()), // TODO
+                        eqKeyword(request.getKeywordId()),
                         hideOrNot(request.getMemberId(), request.getHidden())
                 ).orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())

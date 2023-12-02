@@ -10,7 +10,7 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.web.response.TopicResponse;
+import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
