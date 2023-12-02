@@ -3,8 +3,7 @@ package life.offonoff.ab.application.service;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
-import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.member.Provider;
+import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +38,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void createTopicWithNewKeyword_saveKeyword() {
         // given
-        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
+        Member member = createMember();
 
         // when
         Long topicId = topicService.createMembersTopic(
@@ -57,7 +57,8 @@ public class TopicServiceIntegrationTest {
     @Test
     void reportTopicByMember_createTopicReport() {
         // given
-        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
+        Member member = createMember();
+
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -73,7 +74,8 @@ public class TopicServiceIntegrationTest {
     @Test
     void reportTopicByMember_reportTwice_doNotCreateReportAgain_throwException() {
         // given
-        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
+        Member member = createMember();
+
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -87,7 +89,8 @@ public class TopicServiceIntegrationTest {
     @Test
     void activateMembersTopic_deactivateTopic() {
         // given
-        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
+        Member member = createMember();
+
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -95,6 +98,14 @@ public class TopicServiceIntegrationTest {
 
         // then
         assertThat(topicRepository.findByIdAndActiveTrue(response.topicId())).isEmpty();
+    }
+
+    private Member createMember() {
+        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
+        member.registerPersonalInfo(new PersonalInfo("nickname", LocalDate.now(), Gender.MALE, "job"));
+        member.agreeTerms(new TermsEnabled(true));
+
+        return member;
     }
 
     private TopicResponse createMembersTopic(final Long memberId) {
