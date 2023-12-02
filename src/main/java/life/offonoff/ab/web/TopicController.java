@@ -7,8 +7,7 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
-import life.offonoff.ab.web.response.TopicDetailResponse;
-import life.offonoff.ab.web.response.TopicResponse;
+import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -42,7 +41,7 @@ public class TopicController {
      * @return sliced(paged) Topic 리스트
      */
     @GetMapping("/open/now")
-    public ResponseEntity<PageResponse<TopicDetailResponse>> getTopicInfos(
+    public ResponseEntity<PageResponse<TopicResponse>> getTopicInfos(
             @Authorized Long memberId,
             TopicSearchRequest request,
             @PageableDefault(page = 0, size = 10, sort = "voteCount", direction = DESC) Pageable pageable

@@ -27,7 +27,7 @@ class AuthorizationTokenResolverTest {
     void resolve_token() {
         // given
         Long memberId = 1L;
-        
+
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer Token");
 
