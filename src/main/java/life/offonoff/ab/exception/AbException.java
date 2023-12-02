@@ -6,9 +6,14 @@ public abstract class AbException extends RuntimeException {
         super(message);
     }
 
+    public AbException(Exception exception) {
+        super(exception);
+    }
+
     /**
      * 체크 에외 -> 언체크 예외 변환 시 필요
      */
+
     public AbException(String message, Exception cause) {
         super(message, cause);
     }

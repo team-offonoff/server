@@ -7,11 +7,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
-<<<<<<< Updated upstream
-=======
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.web.response.topic.TopicDetailResponse;
->>>>>>> Stashed changes
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +41,8 @@ class TopicRepositoryTest {
         // given
         int size = 5;
 
-        Member publishMember = createMember("emailPublish", "password");
-        em.persist(publishMember);
+        Member author = createMember("emailPublish", "password");
+        em.persist(author);
 
         Member retrieveMember = createMember("emailRetrieve", "password");
         em.persist(retrieveMember);
@@ -55,11 +51,7 @@ class TopicRepositoryTest {
         for (int i = 0; i < size; i++) {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
-<<<<<<< Updated upstream
-                    .author(member)
-=======
-                    .publishMember(publishMember)
->>>>>>> Stashed changes
+                    .author(author)
                     .build()
                     .buildTopic()
             );
