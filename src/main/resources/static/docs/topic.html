@@ -519,7 +519,7 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080
       "text" : "choiceB"
     }
   } ],
-  "deadline" : 1701625556
+  "deadline" : 1701627298
 }</code></pre>
 </div>
 </div>
@@ -669,11 +669,21 @@ Content-Length: 203
 </div>
 </div>
 <div class="sect2">
-<h3 id="_3_토픽_활성화비활성화삭제">3. 토픽 활성화/비활성화(삭제)</h3>
+<h3 id="_3_토픽_활성화비활성화">3. 토픽 활성화/비활성화</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>신고가 많이 쌓였거나, 운영 등의 이유로 활성화/비활성화</p>
+</li>
+<li>
+<p>TODO: 유저가 자신의 토픽 삭제하는 API는 추가 예정. 전체적인 형태는 비슷할 예정</p>
+</li>
+</ul>
+</div>
 <div class="listingblock html">
 <div class="content">
 <pre class="highlight"><code>PATCH /topics/{topicId}/status?active=
-비활성화(삭제): active=false
+비활성화: active=false
 활성화: active=true</code></pre>
 </div>
 </div>
@@ -699,9 +709,9 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080</cod
 </div>
 </div>
 <div class="sect3">
-<h4 id="_e1_작성자가_아닌_유저가_토픽_삭제">E1. 작성자가 아닌 유저가 토픽 삭제</h4>
+<h4 id="_e1_작성자가_아닌_유저가_상태_변경_시도">E1. 작성자가 아닌 유저가 상태 변경 시도</h4>
 <div class="sect4">
-<h5 id="_e1_작성자가_아닌_유저가_토픽_삭제_http_request">HTTP request</h5>
+<h5 id="_e1_작성자가_아닌_유저가_상태_변경_시도_http_request">HTTP request</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PATCH /topics/2/status?active=false HTTP/1.1
@@ -711,7 +721,7 @@ Host: offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com:8080</cod
 </div>
 </div>
 <div class="sect4">
-<h5 id="_e1_작성자가_아닌_유저가_토픽_삭제_http_response">HTTP response</h5>
+<h5 id="_e1_작성자가_아닌_유저가_상태_변경_시도_http_response">HTTP response</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
@@ -737,7 +747,7 @@ Content-Length: 232
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-12-02 14:19:20 +0900
+Last updated 2023-12-04 03:03:26 +0900
 </div>
 </div>
 </body>
