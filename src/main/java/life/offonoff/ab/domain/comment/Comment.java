@@ -5,11 +5,13 @@ import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Comment extends BaseEntity {
@@ -28,6 +30,7 @@ public class Comment extends BaseEntity {
     private Topic topic;
 
     private int likeCount = 0;
+    private int hateCount = 0;
 
     // Constructor
     public Comment(String content) {
@@ -40,10 +43,13 @@ public class Comment extends BaseEntity {
         member.addComment(this);
 
         this.topic = topic;
-        topic.addComment(this);
     }
 
     public void liked() {
         likeCount++;
+    }
+
+    public void hated() {
+        hateCount++;
     }
 }

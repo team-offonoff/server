@@ -20,7 +20,7 @@ public class MemberController {
 
     @GetMapping("/info")
     public ResponseEntity<MemberInfoResponse> getMemberInfo(@Authorized Long memberId) {
-        MemberInfoResponse response = MemberInfoResponse.of(memberService.find(memberId));
+        MemberInfoResponse response = MemberInfoResponse.of(memberService.findById(memberId));
         return ResponseEntity.ok(response);
     }
 }

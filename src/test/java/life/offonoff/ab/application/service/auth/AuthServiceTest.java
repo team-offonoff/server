@@ -44,8 +44,8 @@ class AuthServiceTest {
 
         when(memberService.exists(anyString())).thenReturn(true);
         when(passwordEncoder.isMatch(anyString(), anyString())).thenReturn(true);
-        when(memberService.find(anyString())).thenReturn(member);
-        when(jwtProvider.generateAccessToken(nullable(Long.class))).thenReturn("access_token");
+        when(memberService.findByEmail(anyString())).thenReturn(member);
+        when(jwtProvider.generateToken(nullable(Long.class))).thenReturn("access_token");
 
         // when
         SignInResponse response = authService.signIn(request);

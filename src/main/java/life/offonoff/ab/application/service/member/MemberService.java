@@ -22,12 +22,12 @@ public class MemberService {
     }
 
     //== find ==//
-    public Member find(final Long memberId) {
+    public Member findById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId)); // custom exception 추가 후 예외 핸들
     }
 
-    public Member find(final String email) {
+    public Member findByEmail(final String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberByEmailNotFoundException(email));
     }
@@ -35,7 +35,7 @@ public class MemberService {
     //== exists ==//
     public boolean exists(final Long memberId) {
         try {
-            find(memberId);
+            findById(memberId);
         } catch (MemberNotFoundException notFountException) {
             return false;
         }
@@ -44,7 +44,7 @@ public class MemberService {
 
     public boolean exists(final String email) {
         try {
-            find(email);
+            findByEmail(email);
         } catch (MemberNotFoundException notFountException) {
             return false;
         }

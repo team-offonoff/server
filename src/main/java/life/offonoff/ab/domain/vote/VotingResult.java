@@ -15,7 +15,6 @@ public class VotingResult extends BaseEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
     private Topic topic;
 
     private int totalVoteCount;

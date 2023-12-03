@@ -1,7 +1,7 @@
-package life.offonoff.ab.web.response;
+package life.offonoff.ab.web.response.topic.choice.content;
 
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContentType;
-import life.offonoff.ab.web.response.ChoiceContentResponseFactory.ChoiceContentResponse;
+import life.offonoff.ab.web.response.topic.choice.content.ChoiceContentResponseFactory.ChoiceContentResponse;
 
 public record ImageTextChoiceContentResponse(
         String text,

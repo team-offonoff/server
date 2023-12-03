@@ -1,4 +1,4 @@
-package life.offonoff.ab.web.response;
+package life.offonoff.ab.web.response.topic.choice.content;
 
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.topic.choice.content.ImageTextChoiceContent;

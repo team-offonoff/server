@@ -1,8 +1,9 @@
-package life.offonoff.ab.web.response;
+package life.offonoff.ab.web.response.topic.choice;
 
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
-import life.offonoff.ab.web.response.ChoiceContentResponseFactory.ChoiceContentResponse;
+import life.offonoff.ab.web.response.topic.choice.content.ChoiceContentResponseFactory;
+import life.offonoff.ab.web.response.topic.choice.content.ChoiceContentResponseFactory.ChoiceContentResponse;
 
 public record ChoiceResponse(
         Long choiceId,

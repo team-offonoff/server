@@ -7,8 +7,7 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
-import life.offonoff.ab.web.response.TopicDetailResponse;
-import life.offonoff.ab.web.response.TopicResponse;
+import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -16,12 +15,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.http.ResponseEntity.*;
 
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/topics")
 public class TopicController {
+
     private final TopicService topicService;
 
     // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
@@ -30,8 +31,7 @@ public class TopicController {
             @Authorized Long memberId,
             @Valid @RequestBody final TopicCreateRequest request
     ) {
-        return ResponseEntity.ok(
-                topicService.createMembersTopic(memberId, request));
+        return ResponseEntity.ok(topicService.createMembersTopic(memberId, request));
     }
   
     /**
@@ -41,7 +41,7 @@ public class TopicController {
      * @return sliced(paged) Topic 리스트
      */
     @GetMapping("/open/now")
-    public ResponseEntity<PageResponse<TopicDetailResponse>> getTopicInfos(
+    public ResponseEntity<PageResponse<TopicResponse>> getTopicInfos(
             @Authorized Long memberId,
             TopicSearchRequest request,
             @PageableDefault(page = 0, size = 10, sort = "voteCount", direction = DESC) Pageable pageable
@@ -49,9 +49,7 @@ public class TopicController {
         request.setTopicStatus(TopicStatus.VOTING);
         request.setMemberId(memberId);
 
-        return ResponseEntity.ok(PageResponse.of(topicService.searchAll(request, pageable)
-                                                             .map(TopicDetailResponse::new))
-        );
+        return ResponseEntity.ok(PageResponse.of(topicService.findAll(request, pageable)));
     }
 
     @PatchMapping("/{topicId}/hide")
@@ -70,7 +68,7 @@ public class TopicController {
             @PathVariable("topicId") Long topicId
     ) {
        topicService.reportTopicByMember(topicId, memberId);
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 
     @PatchMapping("/{topicId}/status")
@@ -80,6 +78,6 @@ public class TopicController {
             @RequestParam Boolean active
     ) {
         topicService.activateMembersTopic(memberId, topicId, active);
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 }

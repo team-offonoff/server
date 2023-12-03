@@ -1,33 +1,85 @@
 package life.offonoff.ab.web.common.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
-import life.offonoff.ab.util.token.JwtProvider;
+import life.offonoff.ab.exception.auth.EmptyAuthorizationException;
+import life.offonoff.ab.exception.auth.UnsupportedAuthFormatException;
+import life.offonoff.ab.exception.auth.token.UnsupportedAuthTokenTypeException;
+import life.offonoff.ab.util.token.TokenProvider;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Component
 public class AuthorizationTokenResolver {
 
-    private final JwtProvider jwtProvider;
-
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String AUTHORIZATION_TOKEN_DELIMITER = " ";
 
+    private final TokenProvider tokenProvider;
+
+    //== resolve ==//
     public Long resolveToken(HttpServletRequest request) {
-        String authorizationToken = (String) request.getAttribute(AUTHORIZATION_HEADER);
-        return getMemberId(authorizationToken);
+        String authToken = request.getHeader(AUTHORIZATION_HEADER);
+
+        TokenTypeAndValue typeAndValue = getAuthToken(authToken);
+
+        return getMemberId(typeAndValue);
     }
 
-    private Long getMemberId(String authorizationToken) {
-        String[] typeAndValue = authorizationToken.split(" ");
-        String type = typeAndValue[0];
-        String value = typeAndValue[1];
+    //== Support methods & classes ==//
+    private Long getMemberId(TokenTypeAndValue typeAndValue) {
 
-        if (type.equals(TokenType.BEARER)) {
-            jwtProvider.parseMemberId(value);
+        if (typeAndValue.isTypeOf(TokenType.BEARER)) {
+            return tokenProvider.getMemberIdFrom(typeAndValue.getTokenValue());
         }
 
-        throw new RuntimeException();
+        throw new UnsupportedAuthTokenTypeException(typeAndValue.getTokenType());
+    }
+
+    private TokenTypeAndValue getAuthToken(String authToken) {
+
+        validateAuthToken(authToken);
+
+        return bindTokenTypeAndValue(authToken);
+    }
+
+    private void validateAuthToken(String authToken) {
+        // not null
+        if (!StringUtils.hasText(authToken)) {
+            throw new EmptyAuthorizationException();
+        }
+
+        // tokenType + " " + tokenValue 형식 확인
+        String[] tokenElements = authToken.split(AUTHORIZATION_TOKEN_DELIMITER);
+        if (tokenElements.length != 2) {
+            throw new UnsupportedAuthFormatException(authToken);
+        }
+    }
+
+    private TokenTypeAndValue bindTokenTypeAndValue(String authToken) {
+        String[] tokenElements = authToken.split(" ");
+
+        String tokenType = tokenElements[0];
+        String tokenValue = tokenElements[1];
+
+        return new TokenTypeAndValue(tokenType, tokenValue);
+    }
+
+    @Getter
+    static class TokenTypeAndValue {
+        final String tokenType;
+        final String tokenValue;
+
+        TokenTypeAndValue(String type, String value) {
+            this.tokenType = type;
+            this.tokenValue = value;
+        }
+
+        boolean isTypeOf(String type) {
+            return tokenType.equals(type);
+        }
     }
 
     static class TokenType {

@@ -19,7 +19,7 @@ import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.web.response.TopicResponse;
+import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -115,8 +115,9 @@ public class TopicService {
      * @param pageable
      * @return
      */
-    public Slice<Topic> searchAll(final TopicSearchRequest request, final Pageable pageable) {
-        return topicRepository.findAll(request, pageable);
+    public Slice<TopicResponse> findAll(final TopicSearchRequest request, final Pageable pageable) {
+        return topicRepository.findAll(request, pageable)
+                .map(TopicResponse::from);
     }
 
     //== Hide ==//
@@ -124,6 +125,7 @@ public class TopicService {
     public void hideTopicForMember(final Long memberId, final Long topicId, final Boolean hide) {
         Member member = findMember(memberId);
         Topic topic = this.findTopic(topicId);
+
 
         if (hide) {
             doHide(member, topic);
