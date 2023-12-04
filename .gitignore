@@ -42,8 +42,8 @@ out/
 ### QueryDSL ###
 /src/main/generated/
 
-#### Generated rest docs ###
-#/src/main/resources/static/docs/**
+### Generated rest docs ###
+/src/main/resources/static/docs/**
 
 ### Generated deploy files ###
 deploy
