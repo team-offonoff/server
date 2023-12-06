@@ -1,0 +1,13 @@
+== 댓글 API
+### 1. 댓글 등록
+
+[source.html]
+POST /comments
+
+#### OK
+
+operation::comment-controller-test/create-comment[snippets="http-request,http-response"]
+
+### 2. 댓글 조회
+
+operation::comment-controller-test/get_comments_of_topic[snippets="query-parameters,http-request,http-response"]
