@@ -48,7 +48,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
     private boolean active = true;

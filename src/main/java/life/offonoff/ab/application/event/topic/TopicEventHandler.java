@@ -41,7 +41,7 @@ public class TopicEventHandler {
      */
     @EventListener
     public void votingEnded(VotingEndEvent event) {
-        log.info("# Topic Voting Ended / topic-id : {}", event.topic());
+        log.info("# Topic Voting Ended / topic-id : {}", event.topic().getId());
 
         noticeService.noticeVotingResult(event.result());
     }
