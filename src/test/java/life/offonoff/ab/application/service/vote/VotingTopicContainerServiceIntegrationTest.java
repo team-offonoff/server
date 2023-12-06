@@ -6,6 +6,7 @@ import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTop
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.member.MemberRepository;
+import life.offonoff.ab.repository.notice.NotificationRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,8 @@ public class VotingTopicContainerServiceIntegrationTest {
     TopicRepository topicRepository;
     @MockBean
     MemberRepository memberRepository;
+    @MockBean
+    NotificationRepository notificationRepository;
 
     @Test
     @DisplayName("투표가 끝난 토픽은 status 수정 & Voting Result 매핑")
@@ -91,7 +94,8 @@ public class VotingTopicContainerServiceIntegrationTest {
         when(container.getVotingEnded(criteria)).thenReturn(votingTopics);
         when(topicRepository.findById(topic.getId())).thenReturn(Optional.of(topic));
         when(memberRepository.findAllVotedTo(topic.getId())).thenReturn(voteMembers);
-
+        doNothing().when(notificationRepository).saveAll(any());
+        
         // when
         votingTopicContainerService.endVote(criteria);
 

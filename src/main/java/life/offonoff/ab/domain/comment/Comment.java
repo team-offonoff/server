@@ -37,14 +37,18 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    //== 연관관계 매핑 ==//
+    public Comment(Member member, Topic topic, String content) {
+        associate(member, topic);
+        this.content = content;
+    }
+
     public void associate(Member member, Topic topic) {
         this.writer = member;
         member.addComment(this);
 
         this.topic = topic;
+        topic.commented();
     }
-
     public void liked() {
         likeCount++;
     }
