@@ -81,6 +81,7 @@ asciidoctor {
     baseDirFollowsSourceFile() // (8)
     inputs.dir snippetsDir // (9)
     dependsOn test // (10)
+    outputDir="$buildDir/resources/main/static/docs"
 }
 
 asciidoctor.doFirst {
@@ -89,7 +90,7 @@ asciidoctor.doFirst {
 
 task copyDocument(type: Copy) { // (12)
     dependsOn asciidoctor
-    from file("build/docs/asciidoc")
+    from file("$buildDir/resources/main/static/docs")
     into file("src/main/resources/static/docs")
 }
 
@@ -114,4 +115,12 @@ processResources.dependsOn copyMainResources
 
 jar {
     enabled = false // Do not make plain jar
+}
+
+bootJar {
+    dependsOn asciidoctor
+}
+
+resolveMainClassName {
+    dependsOn asciidoctor
 }

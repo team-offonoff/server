@@ -29,17 +29,20 @@ operation::topic-controller-test/create-topic-report_with-non-existent-topic_-to
 
 operation::topic-controller-test/create-topic-report_already-reported_-topic-report-duplicate-exception[snippets="http-request,http-response"]
 
-### 3. 토픽 활성화/비활성화(삭제)
+### 3. 토픽 활성화/비활성화
+
+- 신고가 많이 쌓였거나, 운영 등의 이유로 활성화/비활성화
+- TODO: 유저가 자신의 토픽 삭제하는 API는 추가 예정. 전체적인 형태는 비슷할 예정
 
 [source.html]
 PATCH /topics/{topicId}/status?active=
-비활성화(삭제): active=false
+비활성화: active=false
 활성화: active=true
 
 #### OK
 
 operation::topic-controller-test/deactivate-topic[snippets="http-request,http-response"]
 
-#### E1. 작성자가 아닌 유저가 토픽 삭제
+#### E1. 작성자가 아닌 유저가 상태 변경 시도
 
 operation::topic-controller-test/deactivate-topic_by-non-author-user_-illegal-topic-status-change-exception[snippets="http-request,http-response"]
