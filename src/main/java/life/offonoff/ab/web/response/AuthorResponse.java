@@ -10,8 +10,9 @@ public class AuthorResponse {
 
     private Long id;
     private String nickname;
+    private String profileImageURl;
 
     public static AuthorResponse from(Member member) {
-        return new AuthorResponse(member.getId(), member.getNickname());
+        return new AuthorResponse(member.getId(), member.getNickname(), member.getProfileImageUrl());
     }
 }

@@ -36,6 +36,8 @@ public class Member extends BaseEntity {
     @Embedded
     private NotificationEnabled notificationEnabled;
 
+    private String profileImageUrl;
+
     @OneToMany(mappedBy = "author")
     private List<Topic> publishedTopics = new ArrayList<>();
 
