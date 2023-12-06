@@ -6,13 +6,14 @@ import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.VoteCancelRequest;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.exception.IllegalTopicStatusChangeException;
-import life.offonoff.ab.exception.TopicNotFoundException;
-import life.offonoff.ab.exception.TopicReportDuplicateException;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
@@ -29,6 +30,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -57,7 +60,6 @@ public class TopicControllerTest extends RestDocsTest {
     TopicService topicService;
 
     @Test
-    @WithMockUser
     void createTopic() throws Exception {
         TopicTestDtoHelperBuilder builder = TopicTestDtoHelper.builder();
         TopicCreateRequest request = builder.build().createRequest();
@@ -172,11 +174,84 @@ public class TopicControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("abCode").value("ILLEGAL_TOPIC_STATUS_CHANGE"));
     }
 
+    @Test
+    void voteForTopic_byNonAuthor_success() throws Exception {
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+
+        mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                             .writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void voteForTopic_byAuthor_throwException() throws Exception {
+        doThrow(new VoteByAuthorException(1L, 2L))
+                .when(topicService).voteForTopicByMember(any(), any(), any());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                             .writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("VOTED_BY_AUTHOR"));
+    }
+
+    @Test
+    void voteForTopic_votedAtFuture_throwException() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime votedAt = now.plusMinutes(30);
+
+        doThrow(new FutureTimeRequestException(votedAt, now))
+                .when(topicService).voteForTopicByMember(any(), any(), any());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, votedAt.atZone(ZoneId.systemDefault()).toEpochSecond());
+        mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                             .writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("FUTURE_TIME_REQUEST"));
+    }
+
+    @Test
+    void cancelVoteForTopic_existingVote_success() throws Exception {
+        VoteCancelRequest request = new VoteCancelRequest(
+                LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+        mvc.perform(delete(TopicUri.VOTE, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                             .writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void cancelVoteForTopic_nonExistingVote_throwException() throws Exception {
+        doThrow(new MemberNotVoteException(2L, 1L))
+                .when(topicService).cancelVoteForTopicByMember(any(), any(), any());
+        VoteCancelRequest request = new VoteCancelRequest(
+                LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+        mvc.perform(delete(TopicUri.VOTE, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                             .writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("MEMBER_NOT_VOTE"));
+    }
+
     private static class TopicUri {
         private static final String BASE = "/topics";
         private static final String OPENED = "/open";
         private static final String NOW = "/now";
         private static final String REPORT = BASE + "/{topicId}/report";
         private static final String REMOVE = BASE + "/{topicId}/status?active={active}";
+        private static final String VOTE = BASE + "/{topicId}/vote";
     }
 }

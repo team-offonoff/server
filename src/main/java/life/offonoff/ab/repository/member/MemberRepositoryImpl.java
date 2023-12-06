@@ -23,7 +23,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .selectFrom(member)
                 .join(vote)
                 .on(
-                        member.id.eq(vote.member.id)
+                        member.id.eq(vote.voter.id)
                         .and(vote.topic.id.eq(topicId))
                 ).where(member.notificationEnabled.votingResult.isTrue())
                 .fetch();

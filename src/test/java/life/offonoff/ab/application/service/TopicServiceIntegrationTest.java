@@ -1,27 +1,38 @@
 package life.offonoff.ab.application.service;
 
+import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.member.MemberService;
+import life.offonoff.ab.application.service.request.VoteCancelRequest;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.vote.Vote;
+import life.offonoff.ab.exception.FutureTimeRequestException;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
+import life.offonoff.ab.exception.VoteByAuthorException;
+import life.offonoff.ab.exception.MemberNotVoteException;
 import life.offonoff.ab.repository.KeywordRepository;
+import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 import static life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -34,6 +45,7 @@ public class TopicServiceIntegrationTest {
     @Autowired KeywordRepository keywordRepository;
 
     @Autowired TopicRepository topicRepository;
+    @Autowired VoteRepository voteRepository;
 
     @Test
     void createTopicWithNewKeyword_saveKeyword() {
@@ -98,6 +110,85 @@ public class TopicServiceIntegrationTest {
 
         // then
         assertThat(topicRepository.findByIdAndActiveTrue(response.topicId())).isEmpty();
+    }
+
+    @Test
+    void voteForTopicByMember_byNonAuthor_success() {
+        Member author = createMember();
+        Member voter = createMember();
+        TopicResponse response = createMembersTopic(author.getId());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        ThrowingCallable code = () ->
+                topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+
+        assertThatNoException().isThrownBy(code);
+        List<Vote> votes = topicRepository.findById(response.topicId()).get().getVotes();
+        assertThat(votes).isNotEmpty();
+        assertThat(voteRepository.findAll()).isNotEmpty();
+    }
+
+    @Test
+    void voteForTopicByMember_byAuthor_throwException() {
+        Member author = createMember();
+        TopicResponse response = createMembersTopic(author.getId());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        ThrowingCallable code = () ->
+                topicService.voteForTopicByMember(response.topicId(), author.getId(), request);
+
+        assertThatThrownBy(code)
+                .isInstanceOf(VoteByAuthorException.class);
+    }
+
+    @Test
+    void voteForTopicByMember_votedAtFuture_throwException() {
+        Member author = createMember();
+        Member voter = createMember();
+        TopicResponse response = createMembersTopic(author.getId());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond());
+        ThrowingCallable code = () ->
+                topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+
+        assertThatThrownBy(code)
+                .isInstanceOf(FutureTimeRequestException.class);
+    }
+
+    @Test
+    void cancelVoteForTopicByMember_existingVote_success() {
+        Member author = createMember();
+        Member voter = createMember();
+        TopicResponse response = createMembersTopic(author.getId());
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+
+        topicService.cancelVoteForTopicByMember(
+                response.topicId(), voter.getId(),
+                new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
+        // Topic is still alive
+        Topic topic = topicRepository.findById(response.topicId()).get();
+        assertThat(topic.getVotes()).isEmpty();
+        // No votes left
+        assertThat(voteRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void cancelVoteForTopicByMember_nonExistingVote_throwException() {
+        Member author = createMember();
+        Member voter = createMember();
+        TopicResponse response = createMembersTopic(author.getId());
+
+        ThrowingCallable code = () -> topicService.cancelVoteForTopicByMember(
+                response.topicId(), voter.getId(),
+                new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
+
+        assertThatThrownBy(code)
+                .isInstanceOf(MemberNotVoteException.class);
     }
 
     private Member createMember() {

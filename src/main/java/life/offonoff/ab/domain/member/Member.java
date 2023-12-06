@@ -42,7 +42,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "writer")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "voter", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
@@ -151,10 +151,6 @@ public class Member extends BaseEntity {
     public boolean votedAlready(Topic topic) {
         return votes.stream()
                 .anyMatch(v -> v.has(topic));
-    }
-
-    public void cancelVote(Topic topic) {
-        this.votes.removeIf(v -> v.has(topic));
     }
 
     public void readNotification(Notification notification) {

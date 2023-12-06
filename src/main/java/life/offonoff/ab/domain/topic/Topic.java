@@ -49,7 +49,7 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "topic")
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
     // 운영 측면에서 hide 정보 추적
@@ -141,7 +141,7 @@ public class Topic extends BaseEntity {
         this.votingResult = votingResult;
     }
 
-    public boolean votable(LocalDateTime requestTime) {
+    public boolean isBeforeDeadline(LocalDateTime requestTime) {
         return requestTime.isBefore(deadline);
     }
 
@@ -164,5 +164,9 @@ public class Topic extends BaseEntity {
 
     public void addKeyword(TopicKeyword keyword) {
         this.topicKeywords.add(keyword);
+    }
+
+    public boolean isWrittenBy(Member member) {
+        return this.author.getId().equals(member.getId());
     }
 }

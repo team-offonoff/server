@@ -13,6 +13,8 @@ public enum AbCode {
     EMAIL_NOT_FOUND,
 
     UNABLE_TO_VOTE,
+    VOTED_BY_AUTHOR,
+    MEMBER_NOT_VOTE,
 
     // Mapping
     INVALID_KAKAO_OAUTH_MAPPING,
@@ -34,5 +36,8 @@ public enum AbCode {
     // Token
     INVALID_TOKEN,
     EXPIRED_TOKEN,
-    INVALID_SIGNATURE_TOKEN;
+    INVALID_SIGNATURE_TOKEN,
+
+    FUTURE_TIME_REQUEST
+    ;
 }
