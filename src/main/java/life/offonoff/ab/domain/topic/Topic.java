@@ -47,9 +47,6 @@ public class Topic extends BaseEntity {
     private Member author;
 
     @OneToMany(mappedBy = "topic")
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "topic")
     private List<Vote> votes = new ArrayList<>();
 
     // 운영 측면에서 hide 정보 추적
@@ -113,11 +110,6 @@ public class Topic extends BaseEntity {
         hideCount++;
     }
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-        commentCount++;
-    }
-
     public void addVote(Vote vote) {
         votes.add(vote);
         voteCount++;
@@ -164,5 +156,9 @@ public class Topic extends BaseEntity {
 
     public void addKeyword(TopicKeyword keyword) {
         this.topicKeywords.add(keyword);
+    }
+
+    public void commented() {
+        this.commentCount++;
     }
 }
