@@ -9,6 +9,7 @@ import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.CommentResponse;
+import life.offonoff.ab.web.response.MemberResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -53,9 +54,7 @@ class CommentControllerTest extends RestDocsTest {
         CommentResponse response = new CommentResponse(
                 commentId,
                 topicId,
-                writerId,
-                writerNickname,
-                writerProfileImageUrl,
+                new MemberResponse(writerId, writerNickname, writerProfileImageUrl),
                 content,
                 likes,
                 hates
@@ -78,8 +77,8 @@ class CommentControllerTest extends RestDocsTest {
         Long topicId = 1L;
 
         // comment1
-        CommentResponse response1 = new CommentResponse(1L, topicId, 1L, "member1", "imageUrl1", "content1", 0, 0);
-        CommentResponse response2 = new CommentResponse(2L, topicId, 2L, "member2", "imageUrl2", "content2", 0, 0);
+        CommentResponse response1 = new CommentResponse(1L, topicId, new MemberResponse(1L, "member1", "imageUrl1"), "content1", 0, 0);
+        CommentResponse response2 = new CommentResponse(2L, topicId,  new MemberResponse(2L, "member2", "imageUrl2"), "content2", 0, 0);
 
         when(commentService.findAll(anyLong(), any(Pageable.class)))
                 .thenReturn(new SliceImpl<>(List.of(response1, response2)));

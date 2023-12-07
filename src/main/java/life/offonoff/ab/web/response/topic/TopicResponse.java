@@ -2,7 +2,8 @@ package life.offonoff.ab.web.response.topic;
 
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
-import life.offonoff.ab.web.response.AuthorResponse;
+import life.offonoff.ab.web.response.CommentResponse;
+import life.offonoff.ab.web.response.MemberResponse;
 import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
 import life.offonoff.ab.web.response.topic.content.TopicContentResponseFactory;
@@ -22,7 +23,8 @@ public record TopicResponse(
         TopicContentResponse topicContent,
         List<KeywordResponse> keywords,
         List<ChoiceResponse> choices,
-        AuthorResponse author
+        MemberResponse author
+//        CommentResponse lastComment
 ) {
     public static TopicResponse from(Topic topic) {
         return new TopicResponse(
@@ -37,7 +39,9 @@ public record TopicResponse(
                         .map(topicKeyword -> KeywordResponse.from(topicKeyword.getKeyword()))
                         .toList(),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
-                AuthorResponse.from(topic.getAuthor()));
+                MemberResponse.from(topic.getAuthor())
+//                topic.getLastComment().isPresent() ? CommentResponse.from(topic.getLastComment().get()) : null
+        );
     }
 
 

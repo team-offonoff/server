@@ -34,12 +34,12 @@ public class CommentService {
         Comment comment = new Comment(member, topic, request.getContent());
         commentRepository.save(comment);
 
-        return new CommentResponse(comment);
+        return CommentResponse.from(comment);
     }
 
     public Slice<CommentResponse> findAll(Long topicId, Pageable pageable) {
         return commentRepository.findAll(topicId, pageable)
-                                .map(CommentResponse::new);
+                                .map(CommentResponse::from);
     }
 
     private Member findMember(Long memberId) {

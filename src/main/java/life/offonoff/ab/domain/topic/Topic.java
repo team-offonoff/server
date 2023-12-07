@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,6 +49,9 @@ public class Topic extends BaseEntity {
 
     @OneToMany(mappedBy = "topic")
     private List<Vote> votes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "topic")
+    private List<Comment> comments = new ArrayList<>();
 
     // 운영 측면에서 hide 정보 추적
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -103,6 +107,13 @@ public class Topic extends BaseEntity {
     //== Getter ==//
     public Long getDeadlineSecond() {
         return deadline.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public Optional<Comment> getLastComment() {
+        if (comments.size() > 0) {
+            return Optional.of(comments.get(0));
+        }
+        return Optional.empty();
     }
 
     public void addHide(HiddenTopic hiddenTopic) {

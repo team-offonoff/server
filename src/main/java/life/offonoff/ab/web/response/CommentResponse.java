@@ -10,22 +10,18 @@ public class CommentResponse {
 
     private Long commentId;
     private Long topicId;
-    private Long writerId;
-    private String writerNickname;
-    private String writerProfileImageUrl;
+    private MemberResponse writer;
     private String content;
     private Integer likes;
     private Integer hates;
 
-    public CommentResponse(Comment comment) {
-        this.commentId = comment.getId();
-        this.topicId = comment.getTopic().getId();
-        this.writerId = comment.getWriter().getId();
-        this.writerNickname = comment.getWriter().getNickname();
-        this.writerProfileImageUrl = comment.getWriter().getProfileImageUrl();
-        this.content = comment.getContent();
-        this.likes = comment.getLikeCount();
-        this.hates = comment.getHateCount();
+    public static CommentResponse from(Comment comment) {
+        return new CommentResponse(comment.getId(),
+                comment.getTopic().getId(),
+                MemberResponse.from(comment.getWriter()),
+                comment.getContent(),
+                comment.getLikeCount(),
+                comment.getHateCount());
     }
 
 }
