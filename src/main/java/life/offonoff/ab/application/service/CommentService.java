@@ -42,8 +42,8 @@ public class CommentService {
                                 .map(CommentResponse::from);
     }
 
-    private Member findMember(Long memberId) {
-        return memberRepository.findById(memberId)
+    private Member findMember(final Long memberId) {
+        return memberRepository.findByIdAndActiveTrue(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 

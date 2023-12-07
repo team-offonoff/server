@@ -4,7 +4,8 @@ import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.config.WebConfig;
 
-import life.offonoff.ab.repository.pagination.PagingUtil;
+import life.offonoff.ab.exception.AbCode;
+import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
@@ -17,12 +18,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.request.ParameterDescriptor;
-import org.springframework.restdocs.request.RequestDocumentation;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
@@ -45,19 +45,18 @@ class CommentControllerTest extends RestDocsTest {
 
     @Test
     void createComment() throws Exception {
+        Long writerId = 1L;
         Long topicId = 1L;
-        Long commentId = 1L; String content = "content";
-        int hates = 0; int likes = 0;
-        Long writerId = 1L; String writerNickname = "writer"; String writerProfileImageUrl = "imageUrl";
+        String content = "content";
 
         CommentRequest request = new CommentRequest(topicId, content);
         CommentResponse response = new CommentResponse(
-                commentId,
+                1L,
                 topicId,
-                new MemberResponse(writerId, writerNickname, writerProfileImageUrl),
+                new MemberResponse(writerId, "writerNickname", "writerProfileImageUrl"),
                 content,
-                likes,
-                hates
+                0,
+                0
         );
 
         when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenReturn(response);
@@ -67,8 +66,25 @@ class CommentControllerTest extends RestDocsTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.writerId").value(writerId))
+                .andExpect(jsonPath("$.writer.id").value(writerId))
                 .andDo(print());
+    }
+
+    @Test
+    void createComment_invalid_topic_exception() throws Exception {
+        Long topicId = 1L;
+        String content = "content";
+
+        CommentRequest request = new CommentRequest(topicId, content);
+
+        when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenThrow(new TopicNotFoundException(topicId));
+
+        mvc.perform(post(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.abCode").value(AbCode.TOPIC_NOT_FOUND.name()));
     }
 
     @Test
@@ -95,6 +111,20 @@ class CommentControllerTest extends RestDocsTest {
                                 parameterWithName("size").description("page size; default 50")
                         )
                 ));
+    }
+
+    @Test
+    void get_comments_of_topic_empty_comments() throws Exception {
+        Long topicId = 1L;
+
+        when(commentService.findAll(anyLong(), any(Pageable.class)))
+                .thenReturn(new SliceImpl<>(Collections.emptyList()));
+
+        mvc.perform(get(CommentUri.BASE)
+                        .queryParam("topic-id", String.valueOf(topicId))
+                        .queryParam("page", String.valueOf(0))
+                        .queryParam("size", String.valueOf(50)))
+                .andExpect(status().isOk());
     }
 
     private static class CommentUri {

@@ -8,6 +8,14 @@ POST /comments
 
 operation::comment-controller-test/create-comment[snippets="http-request,http-response"]
 
+#### E1 존재하지 않는 토픽 ID
+
+operation::comment-controller-test/create-comment_invalid_topic_exception[snippets="http-request,http-response"]
+
 ### 2. 댓글 조회
 
+#### OK - 댓글이 하나 이상 존재
 operation::comment-controller-test/get_comments_of_topic[snippets="query-parameters,http-request,http-response"]
+
+#### OK - 댓글이 하나도 없는 상황
+operation::comment-controller-test/get_comments_of_topic_empty_comments[snippets="http-request,http-response"]
