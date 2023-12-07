@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.VoteCancelRequest;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
@@ -78,6 +80,26 @@ public class TopicController {
             @RequestParam Boolean active
     ) {
         topicService.activateMembersTopic(memberId, topicId, active);
+        return ok().build();
+    }
+
+    @PostMapping("/{topicId}/vote")
+    public ResponseEntity<Void> voteForTopic(
+        @Authorized Long memberId,
+        @PathVariable("topicId") Long topicId,
+        @Valid @RequestBody final VoteRequest request
+    ) {
+        topicService.voteForTopicByMember(topicId, memberId, request);
+        return ok().build();
+    }
+
+    @DeleteMapping("/{topicId}/vote")
+    public ResponseEntity<Void> cancelVoteForTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId,
+            @Valid @RequestBody final VoteCancelRequest request
+    ) {
+        topicService.cancelVoteForTopicByMember(topicId, memberId, request);
         return ok().build();
     }
 }

@@ -1,10 +1,7 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
-import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.application.service.request.ImageTextChoiceContentCreateRequest;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.application.service.request.VoteRequest;
+import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -14,6 +11,7 @@ import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
+import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
@@ -59,6 +57,8 @@ public class TopicServiceTest {
     ChoiceRepository choiceRepository;
     @Mock
     TopicRepository topicRepository;
+    @Mock
+    VoteRepository voteRepository;
     @Mock
     MemberRepository memberRepository;
     @Mock
@@ -169,28 +169,31 @@ public class TopicServiceTest {
     void create_vote() {
         // given
         Long topicId = 1L;
-        Long memberId = 1L;
-        LocalDateTime deadline = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusHours(1);
 
-        Member member = TestMember.builder()
-                .id(memberId)
+        Member author = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+        Member voter = TestMember.builder()
+                .id(2L)
                 .build().buildMember();
 
         Topic topic = TestTopic.builder()
                 .id(topicId)
                 .deadline(deadline)
+                .author(author)
                 .build().buildTopic();
 
-        VoteRequest request = new VoteRequest(member.getId(), ChoiceOption.CHOICE_A, deadline.minusDays(1), true);
+        VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
 
-        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
         when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
 
         // when
-        topicService.vote(topicId, request);
+        topicService.voteForTopicByMember(topicId, 2L, request);
 
         // then
-        assertThat(member.votedAlready(topic)).isTrue();
+        assertThat(voter.votedAlready(topic)).isTrue();
     }
 
     @Test
@@ -198,32 +201,34 @@ public class TopicServiceTest {
     void cancel_vote() {
         // given
         Long topicId = 1L;
-        Long memberId = 1L;
-        LocalDateTime deadline = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusHours(1);
 
-        Member member = TestMember.builder()
-                .id(memberId)
+        Member author = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+        Member voter = TestMember.builder()
+                .id(2L)
                 .build().buildMember();
 
         Topic topic = TestTopic.builder()
                 .id(topicId)
                 .deadline(deadline)
+                .author(author)
                 .build().buildTopic();
 
         // Vote 생성
-        Vote vote = new Vote(ChoiceOption.CHOICE_A);
-        vote.associate(member, topic);
+        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        vote.associate(voter, topic);
 
-        VoteRequest request = new VoteRequest(member.getId(), ChoiceOption.CHOICE_A, deadline.minusDays(1), false);
-
-        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
         when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
+        when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
 
         // when
-        topicService.vote(topicId, request);
+        topicService.cancelVoteForTopicByMember(topicId, 2L, new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
 
         // then
-        assertThat(member.votedAlready(topic)).isFalse();
+        assertThat(author.votedAlready(topic)).isFalse();
     }
 
     @Builder
@@ -249,7 +254,7 @@ public class TopicServiceTest {
         );
 
         @Builder.Default
-        private Long deadline = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
+        private Long deadline = LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toEpochSecond();
 
         public TopicCreateRequest createRequest() {
             return TopicCreateRequest.builder()

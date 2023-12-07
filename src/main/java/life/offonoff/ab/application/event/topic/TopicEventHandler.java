@@ -31,7 +31,7 @@ public class TopicEventHandler {
      */
     @EventListener
     public void addTopic(TopicCreateEvent event) {
-        log.info("# Topic Created / topic-id : {}, deadline : {}", event.topic(), event.topic().getDeadline());
+        log.info("# Topic Created / topic-id : {}, deadline : {}", event.topic().getId(), event.topic().getDeadline());
 
         votingTopicService.startVote(new VotingTopic(event.topic()));
     }

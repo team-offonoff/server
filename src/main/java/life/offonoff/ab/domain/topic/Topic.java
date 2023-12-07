@@ -47,11 +47,8 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "author_id")
     private Member author;
 
-    @OneToMany(mappedBy = "topic")
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "topic")
-    private List<Comment> comments = new ArrayList<>();
 
     // 운영 측면에서 hide 정보 추적
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -109,13 +106,6 @@ public class Topic extends BaseEntity {
         return deadline.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
-    public Optional<Comment> getLastComment() {
-        if (comments.size() > 0) {
-            return Optional.of(comments.get(0));
-        }
-        return Optional.empty();
-    }
-
     public void addHide(HiddenTopic hiddenTopic) {
         this.hides.add(hiddenTopic);
         hideCount++;
@@ -144,7 +134,7 @@ public class Topic extends BaseEntity {
         this.votingResult = votingResult;
     }
 
-    public boolean votable(LocalDateTime requestTime) {
+    public boolean isBeforeDeadline(LocalDateTime requestTime) {
         return requestTime.isBefore(deadline);
     }
 
@@ -171,5 +161,9 @@ public class Topic extends BaseEntity {
 
     public void commented() {
         this.commentCount++;
+    }
+
+    public boolean isWrittenBy(Member member) {
+        return this.author.getId().equals(member.getId());
     }
 }
