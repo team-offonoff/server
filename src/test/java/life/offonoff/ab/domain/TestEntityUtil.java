@@ -61,7 +61,7 @@ public class TestEntityUtil {
     //== Vote ==//
 
     public static Vote createVote(ChoiceOption option) {
-        return new Vote(option);
+        return new Vote(option, LocalDateTime.now());
     }
     //== Choice ==//
 

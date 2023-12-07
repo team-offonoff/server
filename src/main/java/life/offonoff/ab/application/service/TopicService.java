@@ -1,22 +1,21 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
-import life.offonoff.ab.application.service.request.ChoiceCreateRequest;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.application.service.request.VoteRequest;
+import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.KeywordRepository;
+import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
@@ -42,6 +41,7 @@ public class TopicService {
     private final ChoiceRepository choiceRepository;
     private final TopicRepository topicRepository;
     private final MemberRepository memberRepository;
+    private final VoteRepository voteRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -51,7 +51,7 @@ public class TopicService {
         Member member = findMember(memberId);
         List<Keyword> keywords = request.keywordNames().stream()
                 .map(name -> findOrCreateKeyword(name, request.side())).toList();
-        LocalDateTime deadline = convertTime(request.deadline());
+        LocalDateTime deadline = convertUnixTime(request.deadline());
         Topic topic = new Topic(member, keywords, request.title(), request.side(), deadline);
         topicRepository.save(topic);
 
@@ -92,8 +92,8 @@ public class TopicService {
                 .orElseGet(() -> keywordRepository.save(new Keyword(keyword, side)));
     }
 
-    private LocalDateTime convertTime(Long deadline) {
-        return Instant.ofEpochSecond(deadline)
+    private LocalDateTime convertUnixTime(Long unixTime) {
+        return Instant.ofEpochSecond(unixTime)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
@@ -149,34 +149,56 @@ public class TopicService {
 
     //== Vote ==//
     @Transactional
-    public void vote(final Long topicId, final VoteRequest request) {
-        Member member = findMember(request.memberId());
+    public void voteForTopicByMember(final Long topicId, final Long memberId, final VoteRequest request) {
+        Member member = findMember(memberId);
         Topic topic = findTopic(topicId);
+        final LocalDateTime votedAt = convertUnixTime(request.votedAt());
 
-        validateVotable(topic, request);
+        checkTopicVotable(topic, member, votedAt);
 
-        if (request.vote()) {
-            doVote(member, topic, request);
-            return;
-        }
-        cancelVote(member, topic);
+        doVote(member, topic, votedAt, request.choiceOption());
     }
 
-    private void doVote(final Member member, final Topic topic, VoteRequest request) {
-        Vote vote = new Vote(request.choiceOption());
+    private void doVote(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
+        Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
+        voteRepository.save(vote);
     }
 
-    private void cancelVote(final Member member, final Topic topic) {
-        if (member.votedAlready(topic)) {
-            member.cancelVote(topic);
+    private static void checkTopicVotable(final Topic topic, final Member member, final LocalDateTime votedAt) {
+        if (!topic.isBeforeDeadline(votedAt)) {
+            throw new UnableToVoteException(votedAt);
+        }
+        if (topic.isWrittenBy(member)) {
+            throw new VoteByAuthorException(topic.getId(), member.getId());
+        }
+        final LocalDateTime now = LocalDateTime.now();
+        boolean votedAtFuture = votedAt.isAfter(now);
+        if (votedAtFuture) {
+            throw new FutureTimeRequestException(votedAt, now);
         }
     }
 
-    private static void validateVotable(final Topic topic, final VoteRequest request) {
-        if (!topic.votable(request.requestTime())) {
-            throw new UnableToVoteException(request.requestTime());
-        }
+    @Transactional
+    public void cancelVoteForTopicByMember(final Long topicId, final Long memberId, final VoteCancelRequest request) {
+        Member member = findMember(memberId);
+        Topic topic = findTopic(topicId);
+        final LocalDateTime votedAt = convertUnixTime(request.canceledAt());
+
+        checkTopicVotable(topic, member, votedAt);
+
+        Vote vote = findVoteByMemberIdAndTopicId(memberId, topicId);
+        deleteVote(vote);
+    }
+
+    private void deleteVote(Vote vote) {
+        vote.removeAssociations();
+        voteRepository.delete(vote);
+    }
+
+    private Vote findVoteByMemberIdAndTopicId(Long memberId, Long topicId) {
+        return voteRepository.findByVoterIdAndTopicId(memberId, topicId)
+                .orElseThrow(() -> new MemberNotVoteException(memberId, topicId));
     }
 
     @Transactional

@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -20,7 +22,7 @@ public class Vote extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member voter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
@@ -29,17 +31,25 @@ public class Vote extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ChoiceOption selectedOption;
 
+    private LocalDateTime votedAt;
+
     //== Constructor ==//
-    public Vote(ChoiceOption choiceOption) {
+    public Vote(ChoiceOption choiceOption, LocalDateTime votedAt) {
         this.selectedOption = choiceOption;
+        this.votedAt = votedAt;
     }
 
     //== Method ==//
-    public void associate(Member member, Topic topic) {
-        this.member = member;
-        member.addVote(this);
+    public void associate(Member voter, Topic topic) {
+        this.voter = voter;
+        voter.addVote(this);
         this.topic = topic;
         topic.addVote(this);
+    }
+
+    public void removeAssociations() {
+        voter.getVotes().remove(this);
+        topic.getVotes().remove(this);
     }
 
     public boolean has(Topic topic) {
