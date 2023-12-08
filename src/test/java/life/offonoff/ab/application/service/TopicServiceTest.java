@@ -106,11 +106,11 @@ public class TopicServiceTest {
         TopicResponse topicResponse = topicService.createMembersTopic(
                 member.getId(),
                 TopicTestDtoHelper.builder()
-                        .keywords(List.of(keyword))
+                        .keyword(keyword)
                         .build().createRequest());
 
         // then
-        assertThat(topicResponse.keywords().get(0).keywordId()).isEqualTo(keyword.getId());
+        assertThat(topicResponse.keyword().keywordId()).isEqualTo(keyword.getId());
     }
 
     @Test
@@ -144,8 +144,11 @@ public class TopicServiceTest {
                 .id(1L)
                 .build()
                 .buildMember();
+        Keyword keyword = new Keyword("key", TopicSide.TOPIC_A);
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
+        when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(keyword));
+        when(topicRepository.save(any())).thenThrow(RuntimeException.class);
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
                 .build()
@@ -233,9 +236,8 @@ public class TopicServiceTest {
 
     @Builder
     public static class TopicTestDtoHelper {
-
         @Builder.Default
-        private List<Keyword> keywords = List.of(new Keyword("key1", TopicSide.TOPIC_A), new Keyword("key2", TopicSide.TOPIC_A));
+        private Keyword keyword = new Keyword("key", TopicSide.TOPIC_A);
 
         @Builder.Default
         private TopicSide topicSide = TopicSide.TOPIC_A;
@@ -259,7 +261,7 @@ public class TopicServiceTest {
         public TopicCreateRequest createRequest() {
             return TopicCreateRequest.builder()
                     .side(topicSide)
-                    .keywordNames(keywords.stream().map(Keyword::getName).toList())
+                    .keywordName(keyword.getName())
                     .title(title)
                     .choices(choices)
                     .deadline(deadline)
@@ -278,16 +280,15 @@ public class TopicServiceTest {
                         choice.choiceOption()));
             }
 
-            List<KeywordResponse> keywordResponses = new ArrayList<>();
-            for (int i = 0; i < keywords.size(); i++) {
-                final Keyword keyword = keywords.get(i);
-                keywordResponses.add(new KeywordResponse((long) i, keyword.getName(), keyword.getSide()));
+            Long keywordId = keyword.getId();
+            if (keywordId == null) {
+                keywordId = 1L;
             }
             return TopicResponse.builder()
                     .topicId(0L)
                     .topicSide(topicSide)
                     .topicTitle(title)
-                    .keywords(keywordResponses)
+                    .keyword(new KeywordResponse(keywordId, keyword.getName(), keyword.getSide()))
                     .choices(choiceResponses)
                     .build();
         }

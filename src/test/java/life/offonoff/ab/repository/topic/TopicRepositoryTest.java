@@ -5,11 +5,8 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicKeyword;
-import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +48,7 @@ class TopicRepositoryTest {
         for (int i = 0; i < size; i++) {
             Topic topic = TestTopic.builder()
                     .voteCount(size - i)
-                    .keywords(List.of(keyword))
+                    .keyword(keyword)
                     .author(member)
                     .build()
                     .buildTopic();
@@ -96,7 +93,7 @@ class TopicRepositoryTest {
         for (int i = 0; i < size; i++) {
             topics.add(TestTopic.builder()
                     .voteCount(size - i)
-                    .keywords(List.of(keyword))
+                    .keyword(keyword)
                     .author(member)
                     .build()
                     .buildTopic()
