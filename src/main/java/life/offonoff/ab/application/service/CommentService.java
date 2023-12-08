@@ -48,7 +48,7 @@ public class CommentService {
     }
 
     private Topic findTopic(Long topicId) {
-        return topicRepository.findById(topicId)
+        return topicRepository.findByIdAndActiveTrue(topicId)
                 .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 }
