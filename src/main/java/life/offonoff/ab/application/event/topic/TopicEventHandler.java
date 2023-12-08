@@ -41,11 +41,7 @@ public class TopicEventHandler {
      */
     @EventListener
     public void votingEnded(VotingEndEvent event) {
-<<<<<<< HEAD
-        log.info("# Topic Voting Ended / topic-id : {}", event.topic().getId());
-=======
         log.info("# Topic Voting Ended / topic-id : {}, deadline : {}", event.topic().getId(), event.topic().getDeadline());
->>>>>>> main
 
         noticeService.noticeVotingResult(event.result());
     }
