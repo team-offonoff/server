@@ -1,7 +1,7 @@
 package life.offonoff.ab.domain.keyword;
 
 import jakarta.persistence.*;
-import life.offonoff.ab.domain.topic.TopicKeyword;
+import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class Keyword {
     private TopicSide side;
 
     @OneToMany(mappedBy = "keyword")
-    private List<TopicKeyword> topicKeywords = new ArrayList<>();
+    private List<Topic> topics = new ArrayList<>();
 
     //== Constructor ==//
     public Keyword(String name, TopicSide side) {
@@ -35,7 +35,7 @@ public class Keyword {
         this.side = side;
     }
 
-    public void addTopic(TopicKeyword topic) {
-        this.topicKeywords.add(topic);
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
     }
 }

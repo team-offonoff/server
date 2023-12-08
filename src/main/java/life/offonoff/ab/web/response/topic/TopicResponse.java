@@ -20,7 +20,7 @@ public record TopicResponse(
         Long deadline,
         int voteCount,
         TopicContentResponse topicContent,
-        List<KeywordResponse> keywords,
+        KeywordResponse keyword,
         List<ChoiceResponse> choices,
         AuthorResponse author
 ) {
@@ -32,10 +32,7 @@ public record TopicResponse(
                 topic.getDeadlineSecond(),
                 topic.getVoteCount(),
                 TopicContentResponseFactory.create(topic.getContent()),
-                topic.getTopicKeywords()
-                        .stream()
-                        .map(topicKeyword -> KeywordResponse.from(topicKeyword.getKeyword()))
-                        .toList(),
+                KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 AuthorResponse.from(topic.getAuthor()));
     }

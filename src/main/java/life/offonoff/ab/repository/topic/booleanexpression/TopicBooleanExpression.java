@@ -3,16 +3,12 @@ package life.offonoff.ab.repository.topic.booleanexpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-import life.offonoff.ab.domain.keyword.QKeyword;
-import life.offonoff.ab.domain.topic.QTopicKeyword;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 
 import java.time.LocalDateTime;
 
-import static life.offonoff.ab.domain.keyword.QKeyword.keyword;
 import static life.offonoff.ab.domain.topic.QTopic.topic;
-import static life.offonoff.ab.domain.topic.QTopicKeyword.topicKeyword;
 import static life.offonoff.ab.domain.topic.hide.QHiddenTopic.hiddenTopic;
 
 public class TopicBooleanExpression {
@@ -30,7 +26,7 @@ public class TopicBooleanExpression {
     }
 
     public static BooleanExpression eqKeyword(Long keywordId) {
-         return keywordId != null ? topicKeyword.keyword.id.eq(keywordId) : null;
+        return keywordId != null ? topic.keyword.id.eq(keywordId) : null;
     }
 
     public static BooleanExpression hideOrNot(Long memberId, Boolean hidden) {
