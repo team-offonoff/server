@@ -11,10 +11,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,8 +26,8 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DataJpaTest
-@Import(TestQueryDslConfig.class)
+@Transactional
+@SpringBootTest
 class TopicRepositoryTest {
 
     @Autowired
@@ -58,14 +60,12 @@ class TopicRepositoryTest {
         topicRepository.saveAll(topics);
 
         List<Topic> topics1 = topicRepository.findAll();
-        System.out.println(topics1);
 
         PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
         TopicSearchRequest request = TopicSearchRequest.builder()
                 .topicStatus(TopicStatus.VOTING)
                 .build();
 
-        System.out.println(request.getTopicStatus());
         // when
         Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
 

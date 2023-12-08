@@ -5,6 +5,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VotingResult;
 import life.offonoff.ab.repository.member.MemberRepository;
+import life.offonoff.ab.repository.notice.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,8 @@ class FcmNoticeServiceTest {
     MemberRepository memberRepository;
     @Mock
     ApplicationEventPublisher eventPublisher;
+    @Mock
+    NotificationRepository notificationRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -58,6 +61,7 @@ class FcmNoticeServiceTest {
 
         // when
         noticeService.noticeVotingResult(result);
+
         // then
         assertThat(member.getNotifications().size()).isGreaterThan(0);
     }

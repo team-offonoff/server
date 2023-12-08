@@ -3,7 +3,6 @@ package life.offonoff.ab.domain.topic;
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.keyword.Keyword;
-import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.content.TopicContent;
@@ -47,9 +46,6 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "author_id")
     private Member author;
 
-    @OneToMany(mappedBy = "topic")
-    private List<Comment> comments = new ArrayList<>();
-
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
@@ -60,7 +56,7 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TopicReport> reports = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "voting_result_id")
     private VotingResult votingResult;
 
@@ -116,11 +112,6 @@ public class Topic extends BaseEntity {
         hideCount++;
     }
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-        commentCount++;
-    }
-
     public void addVote(Vote vote) {
         votes.add(vote);
         voteCount++;
@@ -163,6 +154,10 @@ public class Topic extends BaseEntity {
 
     public void reportBy(Member member) {
         reports.add(new TopicReport(member, this));
+    }
+
+    public void commented() {
+        this.commentCount++;
     }
 
     public boolean isWrittenBy(Member member) {

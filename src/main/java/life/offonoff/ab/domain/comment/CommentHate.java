@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class CommentLike extends BaseEntity {
+public class CommentHate extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,10 +23,10 @@ public class CommentLike extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    public CommentLike(Member member, Comment comment) {
+    public CommentHate(Member member, Comment comment) {
         this.member = member;
         this.comment = comment;
-        comment.liked();
+        comment.hated();
     }
 
     //== Method ==//
