@@ -5,11 +5,18 @@ import life.offonoff.ab.domain.member.JoinStatus;
 public class IllegalJoinStatusException extends AbException {
 
     private static final String MESSAGE = "올바른 회원 등록 단계가 아닙니다.";
+    private final Long memberId;
     private final JoinStatus joinStatus;
 
-    public IllegalJoinStatusException(JoinStatus joinStatus) {
+    public IllegalJoinStatusException(Long memberId, JoinStatus joinStatus) {
         super(MESSAGE);
+        this.memberId = memberId;
         this.joinStatus = joinStatus;
+    }
+
+    @Override
+    public Object getPayload() {
+        return memberId;
     }
 
     @Override

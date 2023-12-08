@@ -35,4 +35,6 @@ operation::auth-controller-test/sign-in_exception_wrong_password[snippets="http-
 operation::auth-controller-test/sign-in_exception_email_not_found[snippets="http-request,http-response"]
 
 ==== 회원가입 완료 전 로그인 요청
+``ILLEGAL_JOIN_STATUS`` 일 땐 ``errorContent.payload``에 멤버 ID 포함하여 응답
+
 operation::auth-controller-test/signin_before_join-completed[snippets="http-request,http-response"]
