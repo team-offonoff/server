@@ -1,5 +1,6 @@
 package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.report.TopicReportEvent;
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
 import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
@@ -211,6 +212,7 @@ public class TopicService {
         }
         topic.reportBy(member);
 
-        // TODO: report 많을 때 알림
+        eventPublisher.publishEvent(
+                new TopicReportEvent(TopicResponse.from(topic), topic.getReports().size()));
     }
 }
