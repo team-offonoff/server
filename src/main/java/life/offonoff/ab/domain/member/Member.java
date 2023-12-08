@@ -61,7 +61,7 @@ public class Member extends BaseEntity {
 
     public void registerAuthInfo(AuthenticationInfo authInfo) {
         if (this.authInfo != null) {
-            throw new IllegalJoinStatusException(getJoinStatus());
+            throw new IllegalJoinStatusException(id, getJoinStatus());
         }
 
         this.authInfo = authInfo;
@@ -69,7 +69,7 @@ public class Member extends BaseEntity {
 
     public void registerPersonalInfo(PersonalInfo personalInfo) {
         if (this.personalInfo != null) {
-            throw new IllegalJoinStatusException(getJoinStatus());
+            throw new IllegalJoinStatusException(id, getJoinStatus());
         }
 
         this.personalInfo = personalInfo;
@@ -77,7 +77,7 @@ public class Member extends BaseEntity {
 
     public void agreeTerms(TermsEnabled termsEnabled) {
         if (this.termsEnabled != null) {
-            throw new IllegalJoinStatusException(getJoinStatus());
+            throw new IllegalJoinStatusException(id, getJoinStatus());
         }
 
         this.termsEnabled = termsEnabled;

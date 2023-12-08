@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
         final ErrorWrapper error = new ErrorWrapper(
                 abException.getAbCode(),
-                ErrorContent.of(abException.getMessage(), abException.getHint(), abException.getHttpStatusCode())
+                ErrorContent.of(abException.getMessage(), abException.getHint(), abException.getHttpStatusCode(), abException.getPayload())
         );
         return ResponseEntity
                 .status(HttpStatus.valueOf(abException.getHttpStatusCode()))

@@ -110,7 +110,7 @@ public class AuthService {
 
         // join status
         if (!member.joinCompleted()) {
-            throw new IllegalJoinStatusException(member.getJoinStatus());
+            throw new IllegalJoinStatusException(member.getId(), member.getJoinStatus());
         }
     }
 
