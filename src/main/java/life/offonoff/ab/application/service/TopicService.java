@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,10 +49,9 @@ public class TopicService {
     @Transactional
     public TopicResponse createMembersTopic(final Long memberId, final TopicCreateRequest request) {
         Member member = findMember(memberId);
-        List<Keyword> keywords = request.keywordNames().stream()
-                .map(name -> findOrCreateKeyword(name, request.side())).toList();
+        Keyword keyword = findOrCreateKeyword(request.keywordName(), request.side());
         LocalDateTime deadline = convertUnixTime(request.deadline());
-        Topic topic = new Topic(member, keywords, request.title(), request.side(), deadline);
+        Topic topic = new Topic(member, keyword, request.title(), request.side(), deadline);
         topicRepository.save(topic);
 
         request.choices().stream()
@@ -90,7 +88,7 @@ public class TopicService {
 
     private Keyword findOrCreateKeyword(String keyword, TopicSide side) {
         return keywordRepository.findByNameAndSide(keyword, side)
-                .orElseGet(() -> keywordRepository.save(new Keyword(keyword, side)));
+                .orElseGet(() -> new Keyword(keyword, side));
     }
 
     private LocalDateTime convertUnixTime(Long unixTime) {

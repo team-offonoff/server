@@ -4,12 +4,9 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import life.offonoff.ab.domain.topic.QTopicKeyword;
-import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicKeyword;
-import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.repository.pagination.PagingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,8 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static life.offonoff.ab.domain.topic.QTopic.*;
-import static life.offonoff.ab.domain.topic.QTopicKeyword.topicKeyword;
+import static life.offonoff.ab.domain.topic.QTopic.topic;
 import static life.offonoff.ab.repository.topic.booleanexpression.TopicBooleanExpression.*;
 
 @RequiredArgsConstructor

@@ -3,7 +3,6 @@ package life.offonoff.ab.domain.topic;
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.keyword.Keyword;
-import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.content.TopicContent;
@@ -18,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,8 +28,9 @@ public class Topic extends BaseEntity {
 
     private String title;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TopicKeyword> topicKeywords = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "keyword_id")
+    private Keyword keyword;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_content_id")
@@ -81,22 +80,24 @@ public class Topic extends BaseEntity {
         this(title, side, LocalDateTime.now().plusHours(24));
     }
 
-    public Topic(Member member, List<Keyword> keywords, String title, TopicSide side) {
-        this(member, keywords, title, side, LocalDateTime.now().plusHours(24));
+    public Topic(Member member, Keyword keyword, String title, TopicSide side) {
+        this(member, keyword, title, side, LocalDateTime.now().plusHours(24));
     }
-    public Topic(Member member, List<Keyword> keywords, String title, TopicSide side, LocalDateTime deadline) {
+
+    public Topic(Member member, Keyword keyword, String title, TopicSide side, LocalDateTime deadline) {
         this.title = title;
         this.side = side;
         this.deadline = deadline;
-        associate(member, keywords, null);
+        associate(member, keyword, null);
     }
 
     //== 연관관계 매핑 ==//
-    public void associate(Member member, List<Keyword> keywords, TopicContent content) {
+    public void associate(Member member, Keyword keyword, TopicContent content) {
         this.author = member;
         member.publishTopic(this);
 
-        keywords.forEach(keyword -> new TopicKeyword(this, keyword));
+        this.keyword = keyword;
+        keyword.addTopic(this);
 
         this.content = content;
     }
@@ -153,10 +154,6 @@ public class Topic extends BaseEntity {
 
     public void reportBy(Member member) {
         reports.add(new TopicReport(member, this));
-    }
-
-    public void addKeyword(TopicKeyword keyword) {
-        this.topicKeywords.add(keyword);
     }
 
     public void commented() {

@@ -6,10 +6,8 @@ import life.offonoff.ab.domain.member.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TopicTest {
 
@@ -17,17 +15,20 @@ class TopicTest {
     @DisplayName("Topic 생성 후 Member와 Keyword에서 접근시 동일 객체")
     void Topic_생성_매핑_후_Member와Keyword_연관관계_테스트() {
         // given
-        Topic topic = TestEntityUtil.createTopic(0, TopicSide.TOPIC_A);
-        Keyword keyword = new Keyword("key", TopicSide.TOPIC_A);
+        int seq = 0;
+        TopicSide side = TopicSide.TOPIC_A;
+
+        Topic topic = TestEntityUtil.createTopic(seq, side);
+        Keyword keyword = TestEntityUtil.createKeyword(seq);
         Member member = TestEntityUtil.createMember("email", "password");
 
         // when
-        topic.associate(member, List.of(keyword), null);
+        topic.associate(member, keyword, null);
 
         // then
         assertAll(
-                () -> assertThat(topic.getTopicKeywords().get(0).getKeyword().getName()).isEqualTo("key"),
-                () -> assertThat(topic.getAuthor().getAuthInfo().getEmail()).isEqualTo("email")
+                () -> assertThat(topic.getKeyword()).isEqualTo(keyword),
+                () -> assertThat(topic.getAuthor()).isEqualTo(member)
         );
     }
 }

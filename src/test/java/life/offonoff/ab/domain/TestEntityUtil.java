@@ -1,10 +1,9 @@
 package life.offonoff.ab.domain;
 
-import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
+import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicKeyword;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -19,8 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TestEntityUtil {
 
@@ -116,8 +113,7 @@ public class TestEntityUtil {
         private Long id;
         private TopicSide side;
         private String title;
-        @Builder.Default
-        private List<Keyword> keywords = new ArrayList<>();
+        private Keyword keyword;
         private Member author;
         private int voteCount;
 
@@ -130,9 +126,7 @@ public class TestEntityUtil {
             Topic topic = new Topic(title, side, deadline);
             ReflectionTestUtils.setField(topic, "id", id);
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
-            ReflectionTestUtils.setField(topic, "topicKeywords",
-                                         keywords.stream().map(
-                                                 keyword -> new TopicKeyword(topic, keyword)).toList());
+            ReflectionTestUtils.setField(topic, "keyword", keyword);
             ReflectionTestUtils.setField(topic, "author", author);
             ReflectionTestUtils.setField(topic, "status", status);
             return topic;

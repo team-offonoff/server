@@ -5,11 +5,8 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicKeyword;
-import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.repository.TestQueryDslConfig;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +50,7 @@ class TopicRepositoryTest {
         for (int i = 0; i < size; i++) {
             Topic topic = TestTopic.builder()
                     .voteCount(size - i)
-                    .keywords(List.of(keyword))
+                    .keyword(keyword)
                     .author(member)
                     .build()
                     .buildTopic();
@@ -82,44 +79,44 @@ class TopicRepositoryTest {
         );
     }
 
-//    @Test
-//    @DisplayName("카테고리 ID로 토픽 Slice 조회")
-//    void 토픽_검색_Keyword() {
-//        // given
-//        int size = 5;
-//
-//        Member member = createMember("email", "password");
-//
-//        Keyword keyword = createKeyword(1);
-//
-//        List<Topic> topics = new ArrayList<>();
-//        for (int i = 0; i < size; i++) {
-//            topics.add(TestTopic.builder()
-//                    .voteCount(size - i)
-//                    .keywords(List.of(keyword))
-//                    .author(member)
-//                    .build()
-//                    .buildTopic()
-//            );
-//        }
-//        topicRepository.saveAll(topics);
-//
-//        PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
-//        TopicSearchRequest request = TopicSearchRequest.builder()
-//                .keywordId(keyword.getId())
-//                .build();
-//        // when
-//        Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
-//
-//        // then
-//        assertAll(
-//                () -> assertThat(topicSlice.isEmpty()).isFalse(),
-//                () -> assertThat(topicSlice.getSize()).isEqualTo(size),
-//                () -> assertThat(topicSlice.hasNext()).isFalse(),
-//                () -> assertThat(topicSlice.getContent()).containsExactlyElementsOf(topics),
-//                () -> assertThat(topicSlice.getContent()).isSortedAccordingTo((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
-//        );
-//    }
+    @Test
+    @DisplayName("카테고리 ID로 토픽 Slice 조회")
+    void 토픽_검색_Keyword() {
+        // given
+        int size = 5;
+
+        Member member = createMember("email", "password");
+
+        Keyword keyword = createKeyword(1);
+
+        List<Topic> topics = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            topics.add(TestTopic.builder()
+                    .voteCount(size - i)
+                    .keyword(keyword)
+                    .author(member)
+                    .build()
+                    .buildTopic()
+            );
+        }
+        topicRepository.saveAll(topics);
+
+        PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
+        TopicSearchRequest request = TopicSearchRequest.builder()
+                .keywordId(keyword.getId())
+                .build();
+        // when
+        Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
+
+        // then
+        assertAll(
+                () -> assertThat(topicSlice.isEmpty()).isFalse(),
+                () -> assertThat(topicSlice.getSize()).isEqualTo(size),
+                () -> assertThat(topicSlice.hasNext()).isFalse(),
+                () -> assertThat(topicSlice.getContent()).containsExactlyElementsOf(topics),
+                () -> assertThat(topicSlice.getContent()).isSortedAccordingTo((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
+        );
+    }
 
     @Test
     @DisplayName("")

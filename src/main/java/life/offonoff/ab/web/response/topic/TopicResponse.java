@@ -21,7 +21,7 @@ public record TopicResponse(
         Long deadline,
         int voteCount,
         TopicContentResponse topicContent,
-        List<KeywordResponse> keywords,
+        KeywordResponse keyword,
         List<ChoiceResponse> choices,
         MemberResponse author
 //        CommentResponse lastComment
@@ -34,10 +34,7 @@ public record TopicResponse(
                 topic.getDeadlineSecond(),
                 topic.getVoteCount(),
                 TopicContentResponseFactory.create(topic.getContent()),
-                topic.getTopicKeywords()
-                        .stream()
-                        .map(topicKeyword -> KeywordResponse.from(topicKeyword.getKeyword()))
-                        .toList(),
+                KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor())
 //                topic.getLastComment().isPresent() ? CommentResponse.from(topic.getLastComment().get()) : null
