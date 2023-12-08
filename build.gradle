@@ -55,6 +55,8 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'com.slack.api:slack-api-client:1.36.1'
 }
 
 def generated = 'src/main/generated'
