@@ -21,4 +21,7 @@ public abstract class AbException extends RuntimeException {
     public abstract String getHint();
     public abstract int getHttpStatusCode();
     public abstract AbCode getAbCode();
+    public Object getPayload() {
+        return null;
+    }
 }

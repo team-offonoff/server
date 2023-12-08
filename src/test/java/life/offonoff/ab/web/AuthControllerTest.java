@@ -1,13 +1,11 @@
 package life.offonoff.ab.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import life.offonoff.ab.application.service.auth.AuthService;
 import life.offonoff.ab.application.service.request.TermsRequest;
 import life.offonoff.ab.application.service.request.auth.ProfileRegisterRequest;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.config.WebConfig;
-import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Gender;
 import life.offonoff.ab.domain.member.JoinStatus;
 import life.offonoff.ab.domain.member.Provider;
@@ -16,9 +14,9 @@ import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
+import life.offonoff.ab.web.response.auth.join.SignUpResponse;
 import life.offonoff.ab.web.response.auth.join.TermsResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
-import life.offonoff.ab.web.response.auth.join.SignUpResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,11 +28,14 @@ import org.springframework.http.MediaType;
 import java.time.LocalDate;
 
 import static life.offonoff.ab.web.AuthControllerTest.AuthUri.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = AuthController.class,
         excludeFilters = {
@@ -133,7 +134,7 @@ class AuthControllerTest extends RestDocsTest {
                                                                     Gender.MALE,
                                                                     "job");
         when(authService.registerProfile(any(ProfileRegisterRequest.class)))
-                .thenThrow(new IllegalJoinStatusException(JoinStatus.COMPLETE));
+                .thenThrow(new IllegalJoinStatusException(1L, JoinStatus.COMPLETE));
 
         // then
         mvc.perform(post(BASE + SIGN_UP + PROFILE)
@@ -171,7 +172,7 @@ class AuthControllerTest extends RestDocsTest {
         TermsRequest request = new TermsRequest(memberId, true);
 
         when(authService.registerTerms(any(TermsRequest.class)))
-                .thenThrow(new IllegalJoinStatusException(JoinStatus.PERSONAL_REGISTERED));
+                .thenThrow(new IllegalJoinStatusException(1L, JoinStatus.PERSONAL_REGISTERED));
 
         // when
         mvc.perform(post(BASE + SIGN_UP + TERMS)
@@ -254,7 +255,7 @@ class AuthControllerTest extends RestDocsTest {
         SignInRequest request = new SignInRequest(email, password);
 
         when(authService.signIn(any(SignInRequest.class)))
-                .thenThrow(new IllegalJoinStatusException(JoinStatus.AUTH_REGISTERED));
+                .thenThrow(new IllegalJoinStatusException(1L, JoinStatus.AUTH_REGISTERED));
 
         // then
         mvc.perform(post(BASE + SIGN_IN)
