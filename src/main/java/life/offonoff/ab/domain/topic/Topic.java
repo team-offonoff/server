@@ -125,12 +125,6 @@ public class Topic extends BaseEntity {
         this.choices.add(choice);
     }
 
-    public void removeHiddenBy(Member member) {
-        this.hides.removeIf(h -> h.has(member));
-        member.cancelHide(this);
-        hideCount--;
-    }
-
     public void setVotingResult(VotingResult votingResult) {
         this.votingResult = votingResult;
     }

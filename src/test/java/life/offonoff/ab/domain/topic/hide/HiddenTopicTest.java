@@ -47,7 +47,7 @@ class HiddenTopicTest {
 
         // then
         assertAll(
-                () -> assertThat(hiddenTopic.has(member)).isTrue()
+                () -> assertThat(member.hideAlready(topic)).isTrue()
         );
 
     }

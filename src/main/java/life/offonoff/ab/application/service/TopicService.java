@@ -125,7 +125,6 @@ public class TopicService {
         Member member = findMember(memberId);
         Topic topic = this.findTopic(topicId);
 
-
         if (hide) {
             doHide(member, topic);
             return;
@@ -134,16 +133,12 @@ public class TopicService {
     }
 
     private void doHide(final Member member, final Topic topic) {
-        if (!member.hideAlready(topic)) {
-            HiddenTopic hiddenTopic = new HiddenTopic();
-            hiddenTopic.associate(member, topic);
-        }
+        HiddenTopic hiddenTopic = new HiddenTopic();
+        hiddenTopic.associate(member, topic);
     }
 
     private void cancelHide(final Member member, final Topic topic) {
-        if (member.hideAlready(topic)) {
-            member.cancelHide(topic);
-        }
+        member.cancelHide(topic);
     }
 
     //== Vote ==//

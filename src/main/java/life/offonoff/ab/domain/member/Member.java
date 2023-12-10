@@ -3,6 +3,8 @@ package life.offonoff.ab.domain.member;
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.HatedComment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
@@ -44,10 +46,16 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "writer")
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "liker", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikedComment> likedComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "hater", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HatedComment> hatedComments = new ArrayList<>();
+
     @OneToMany(mappedBy = "voter", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
@@ -86,17 +94,39 @@ public class Member extends BaseEntity {
     }
 
     //== 연관관계 매핑 ==//
-
     public void publishTopic(Topic topic) {
         publishedTopics.add(topic);
     }
 
-    public void hideTopic(HiddenTopic hiddenTopic) {
-        hiddenTopics.add(hiddenTopic);
+    public boolean hideTopic(HiddenTopic hiddenTopic) {
+        if (!hideAlready(hiddenTopic.getTopic())) {
+            hiddenTopics.add(hiddenTopic);
+
+            return true;
+        }
+        return false;
     }
 
     public void addComment(Comment comment) {
         comments.add(comment);
+    }
+
+    public boolean likeComment(LikedComment likedComment) {
+        if (!likeAlready(likedComment.getComment())) {
+            likedComments.add(likedComment);
+
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hateComment(HatedComment hatedComment) {
+        if (!hateAlready(hatedComment.getComment())) {
+            this.hatedComments.add(hatedComment);
+
+            return true;
+        }
+        return false;
     }
 
     public void addVote(Vote vote) {
@@ -141,15 +171,19 @@ public class Member extends BaseEntity {
         this.active = active;
     }
 
+        //== HIDE ==//
     public boolean hideAlready(Topic topic) {
         return hiddenTopics.stream()
                 .anyMatch(h -> h.has(topic));
     }
 
     public void cancelHide(Topic topic) {
-        hiddenTopics.removeIf(h -> h.has(topic));
+        if (hideAlready(topic)) {
+            hiddenTopics.removeIf(h -> h.has(topic));
+        }
     }
 
+        //== VOTE ==//
     public boolean votedAlready(Topic topic) {
         return votes.stream()
                 .anyMatch(v -> v.has(topic));
@@ -162,6 +196,28 @@ public class Member extends BaseEntity {
     public boolean joinCompleted() {
         return this.getJoinStatus() == JoinStatus.COMPLETE;
     }
+
+        //== HATE ==//
+    public boolean hateAlready(Comment comment) {
+        return hatedComments.stream()
+                .anyMatch(h -> h.has(comment));
+    }
+
+    public void cancelHate(Comment comment) {
+        if (hateAlready(comment)) {
+            hatedComments.removeIf(h -> h.has(comment));
+        }
+    }
+
+        //== LIKE ==//
+    public boolean likeAlready(Comment comment) {
+        return likedComments.stream()
+                .anyMatch(h -> h.has(comment));
+    }
+
+    public void cancelLike(Comment comment) {
+        if (likeAlready(comment)) {
+            likedComments.removeIf(l -> l.has(comment));
+        }
+    }
 }
-
-
