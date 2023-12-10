@@ -2,8 +2,11 @@ package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.HatedComment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.exception.CommentNotFoundException;
 import life.offonoff.ab.exception.MemberByIdNotFoundException;
 import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.repository.comment.CommentRepository;
@@ -25,6 +28,28 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final TopicRepository topicRepository;
 
+    //== find ==//
+    public Comment findById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
+    }
+
+    public Slice<CommentResponse> findAll(Long topicId, Pageable pageable) {
+        return commentRepository.findAll(topicId, pageable)
+                .map(CommentResponse::from);
+    }
+
+    private Member findMember(final Long memberId) {
+        return memberRepository.findByIdAndActiveTrue(memberId)
+                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
+    private Topic findTopic(Long topicId) {
+        return topicRepository.findByIdAndActiveTrue(topicId)
+                .orElseThrow(() -> new TopicNotFoundException(topicId));
+    }
+
+    //== save ==//
     @Transactional
     public CommentResponse register(Long memberId, CommentRequest request) {
 
@@ -37,18 +62,45 @@ public class CommentService {
         return CommentResponse.from(comment);
     }
 
-    public Slice<CommentResponse> findAll(Long topicId, Pageable pageable) {
-        return commentRepository.findAll(topicId, pageable)
-                                .map(CommentResponse::from);
+    //== like ==//
+    @Transactional
+    public void likeCommentForMember(final Long memberId, final Long commentId, final Boolean like) {
+        Member liker = findMember(memberId);
+        Comment comment = findById(commentId);
+
+        if (like) {
+            doLike(liker, comment);
+            return;
+        }
+        cancelLike(liker, comment);
     }
 
-    private Member findMember(final Long memberId) {
-        return memberRepository.findByIdAndActiveTrue(memberId)
-                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    private void doLike(Member liker, Comment comment) {
+        LikedComment likedComment = new LikedComment(liker, comment);
     }
 
-    private Topic findTopic(Long topicId) {
-        return topicRepository.findByIdAndActiveTrue(topicId)
-                .orElseThrow(() -> new TopicNotFoundException(topicId));
+    private void cancelLike(Member liker, Comment comment) {
+        liker.cancelLike(comment);
+    }
+
+    //== hate ==//
+    @Transactional
+    public void hateCommentForMember(final Long memberId, final Long commentId, final Boolean hate) {
+        Member hater = findMember(memberId);
+        Comment comment = findById(commentId);
+
+        if (hate) {
+            doHate(hater, comment);
+            return;
+        }
+        cancelHate(hater, comment);
+    }
+
+    private void doHate(Member hater, Comment comment) {
+        HatedComment hatedComment = new HatedComment(hater, comment);
+    }
+
+    private void cancelHate(Member hater, Comment comment) {
+        hater.cancelHate(comment);
     }
 }

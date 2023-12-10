@@ -35,4 +35,26 @@ public class CommentController {
     ) {
         return ResponseEntity.ok(PageResponse.of(commentService.findAll(topicId, pageable)));
     }
+
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<Void> likeComment(
+            @Authorized Long memberId,
+            @PathVariable Long commentId,
+            @RequestParam Boolean like
+    ) {
+        commentService.likeCommentForMember(memberId, commentId, like);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @PostMapping("/{commentId}/hate")
+    public ResponseEntity<Void> hateComment(
+            @Authorized Long memberId,
+            @PathVariable Long commentId,
+            @RequestParam Boolean hate
+    ) {
+        commentService.hateCommentForMember(memberId, commentId, hate);
+        return ResponseEntity.ok()
+                             .build();
+    }
 }

@@ -7,6 +7,7 @@ public enum AbCode {
     // Not Found,
     KEYWORD_NOT_FOUND,
     TOPIC_NOT_FOUND,
+    COMMENT_NOT_FOUND,
 
     // Member
     MEMBER_NOT_FOUND,
@@ -38,6 +39,5 @@ public enum AbCode {
     EXPIRED_TOKEN,
     INVALID_SIGNATURE_TOKEN,
 
-    FUTURE_TIME_REQUEST
-    ;
+    FUTURE_TIME_REQUEST;
 }
