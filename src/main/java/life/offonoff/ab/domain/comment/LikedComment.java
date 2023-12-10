@@ -10,24 +10,29 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class CommentHate extends BaseEntity {
+public class LikedComment extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member liker;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    public CommentHate(Member member, Comment comment) {
-        this.member = member;
+    public LikedComment(Member member, Comment comment) {
         this.comment = comment;
-        comment.hated();
+        this.liker = member;
+
+        if (member.likeComment(this)) {
+            comment.liked();
+        }
     }
 
-    //== Method ==//
+    public boolean has(Comment comment) {
+        return this.comment == comment;
+    }
 }
