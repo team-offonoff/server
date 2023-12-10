@@ -36,13 +36,13 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "topic_content_id")
     private TopicContent content;
 
-    @OneToMany(mappedBy = "topic")
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE)
     private List<Choice> choices = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private TopicSide side;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "author_id")
     private Member author;
 
