@@ -15,7 +15,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Getter @Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
