@@ -160,7 +160,7 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void deactivateTopic() throws Exception {
-        mvc.perform(patch(TopicUri.REMOVE, 1, false).with(csrf().asHeader()))
+        mvc.perform(patch(TopicUri.STATUS, 1, false).with(csrf().asHeader()))
                 .andExpect(status().isOk());
     }
 
@@ -169,9 +169,15 @@ public class TopicControllerTest extends RestDocsTest {
         doThrow(new IllegalTopicStatusChangeException(1L, 2L))
                 .when(topicService).activateMembersTopic(any(), any(), any());
 
-        mvc.perform(patch(TopicUri.REMOVE, 2, false).with(csrf().asHeader()))
+        mvc.perform(patch(TopicUri.STATUS, 2, false).with(csrf().asHeader()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("abCode").value("ILLEGAL_TOPIC_STATUS_CHANGE"));
+    }
+
+    @Test
+    void deleteTopic() throws Exception {
+        mvc.perform(delete(TopicUri.DELETE, 1).with(csrf().asHeader()))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -251,7 +257,8 @@ public class TopicControllerTest extends RestDocsTest {
         private static final String OPENED = "/open";
         private static final String NOW = "/now";
         private static final String REPORT = BASE + "/{topicId}/report";
-        private static final String REMOVE = BASE + "/{topicId}/status?active={active}";
+        private static final String STATUS = BASE + "/{topicId}/status?active={active}";
         private static final String VOTE = BASE + "/{topicId}/vote";
+        private static final String DELETE = BASE + "/{topicId}";
     }
 }

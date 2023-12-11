@@ -83,6 +83,15 @@ public class TopicController {
         return ok().build();
     }
 
+    @DeleteMapping("/{topicId}")
+    public ResponseEntity<Void> deleteTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId
+    ) {
+        topicService.deleteMembersTopic(memberId, topicId);
+        return ok().build();
+    }
+
     @PostMapping("/{topicId}/vote")
     public ResponseEntity<Void> voteForTopic(
         @Authorized Long memberId,

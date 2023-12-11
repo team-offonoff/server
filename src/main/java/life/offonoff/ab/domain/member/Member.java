@@ -17,7 +17,6 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor
 @Entity
 public class Member extends BaseEntity {
@@ -40,10 +39,10 @@ public class Member extends BaseEntity {
 
     private String profileImageUrl;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Topic> publishedTopics = new ArrayList<>();
-
-    @OneToMany(mappedBy = "writer")
+    // TODO : 삭제된 멤버의 댓글 유지 여부
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "liker", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -197,6 +196,10 @@ public class Member extends BaseEntity {
         return this.getJoinStatus() == JoinStatus.COMPLETE;
     }
 
+    public boolean isAdmin() {
+        return getRole().equals(Role.ADMIN);
+    }
+
         //== HATE ==//
     public boolean hateAlready(Comment comment) {
         return hatedComments.stream()
@@ -219,5 +222,12 @@ public class Member extends BaseEntity {
         if (likeAlready(comment)) {
             likedComments.removeIf(l -> l.has(comment));
         }
+    }
+
+    public boolean isAuthorOf(Topic topic) {
+        return this == topic.getAuthor();
+    }
+
+    public void removeComment(Comment comment) {
     }
 }
