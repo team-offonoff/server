@@ -1,6 +1,5 @@
 package life.offonoff.ab.application.service;
 
-import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.VoteCancelRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
@@ -12,11 +11,12 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.FutureTimeRequestException;
+import life.offonoff.ab.exception.MemberNotVoteException;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.exception.VoteByAuthorException;
-import life.offonoff.ab.exception.MemberNotVoteException;
 import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
+import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -43,9 +43,9 @@ public class TopicServiceIntegrationTest {
     @Autowired TopicService topicService;
 
     @Autowired KeywordRepository keywordRepository;
-
     @Autowired TopicRepository topicRepository;
     @Autowired VoteRepository voteRepository;
+    @Autowired MemberRepository memberRepository;
 
     @Test
     void createTopicWithNewKeyword_saveKeyword() {
@@ -102,7 +102,6 @@ public class TopicServiceIntegrationTest {
     void activateMembersTopic_deactivateTopic() {
         // given
         Member member = createMember();
-
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -111,6 +110,36 @@ public class TopicServiceIntegrationTest {
         // then
         assertThat(topicRepository.findByIdAndActiveTrue(response.topicId())).isEmpty();
     }
+
+    @Test
+    void deleteMembersTopic_doesntAffectMember() {
+        // given
+        Member member = createMember();
+        TopicResponse response = createMembersTopic(member.getId());
+
+        // when
+        topicService.deleteMembersTopic(member.getId(), response.topicId());
+
+        // then
+        assertThat(memberRepository.findByIdAndActiveTrue(member.getId())).isNotEmpty();
+        assertThat(topicRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void deleteMembersTopic_doesntAffectKeyword() {
+        // given
+        Member member = createMember();
+        TopicResponse response = createMembersTopic(member.getId());
+
+        // when
+        Long keywordId = response.keyword().keywordId();
+        topicService.deleteMembersTopic(member.getId(), response.topicId());
+
+        // then
+        assertThat(keywordRepository.findById(keywordId)).isNotEmpty();
+        assertThat(topicRepository.findAll()).isEmpty();
+    }
+
 
     @Test
     void voteForTopicByMember_byNonAuthor_success() {

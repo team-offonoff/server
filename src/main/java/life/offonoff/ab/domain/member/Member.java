@@ -15,7 +15,6 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor
 @Entity
 public class Member extends BaseEntity {
@@ -38,7 +37,7 @@ public class Member extends BaseEntity {
 
     private String profileImageUrl;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Topic> publishedTopics = new ArrayList<>();
 
     @OneToMany(mappedBy = "writer")
@@ -161,6 +160,10 @@ public class Member extends BaseEntity {
 
     public boolean joinCompleted() {
         return this.getJoinStatus() == JoinStatus.COMPLETE;
+    }
+
+    public boolean isAdmin() {
+        return getRole().equals(Role.ADMIN);
     }
 }
 

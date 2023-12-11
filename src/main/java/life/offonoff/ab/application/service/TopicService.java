@@ -5,7 +5,6 @@ import life.offonoff.ab.application.event.topic.TopicCreateEvent;
 import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
@@ -68,16 +67,27 @@ public class TopicService {
         Member member = findMember(memberId);
         Topic topic = findTopic(topicId);
 
-        if (member.getRole().equals(Role.USER)) {
-            boolean requestedByAuthor = member.getId().equals(topic.getAuthor().getId());
-            if (!requestedByAuthor) {
-                throw new IllegalTopicStatusChangeException(memberId, topicId);
-            }
-        }
+        checkMemberCanTouchTopic(member, topic);
 
         boolean sameStatus = topic.isActive() == active;
         if (!sameStatus) {
             topic.activate(active);
+        }
+    }
+
+    @Transactional
+    public void deleteMembersTopic(final Long memberId, final Long topicId) {
+        Member member = findMember(memberId);
+        Topic topic = findTopic(topicId);
+
+        checkMemberCanTouchTopic(member, topic);
+
+        topicRepository.delete(topic);
+    }
+
+    private void checkMemberCanTouchTopic(Member member, Topic topic) {
+        if (!member.isAdmin() && !topic.isWrittenBy(member)) {
+            throw new IllegalTopicStatusChangeException(member.getId(), topic.getId());
         }
     }
 
