@@ -40,9 +40,9 @@ public class CommentController {
     public ResponseEntity<Void> likeComment(
             @Authorized Long memberId,
             @PathVariable Long commentId,
-            @RequestParam Boolean like
+            @RequestParam Boolean enable
     ) {
-        commentService.likeCommentForMember(memberId, commentId, like);
+        commentService.likeCommentForMember(memberId, commentId, enable);
         return ResponseEntity.ok()
                              .build();
     }
@@ -51,9 +51,16 @@ public class CommentController {
     public ResponseEntity<Void> hateComment(
             @Authorized Long memberId,
             @PathVariable Long commentId,
-            @RequestParam Boolean hate
+            @RequestParam Boolean enable
     ) {
-        commentService.hateCommentForMember(memberId, commentId, hate);
+        commentService.hateCommentForMember(memberId, commentId, enable);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(@Authorized Long memberId, @PathVariable Long commentId) {
+        commentService.deleteCommentForTopic(memberId, commentId);
         return ResponseEntity.ok()
                              .build();
     }
