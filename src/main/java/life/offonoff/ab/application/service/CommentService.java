@@ -6,9 +6,7 @@ import life.offonoff.ab.domain.comment.HatedComment;
 import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.exception.CommentNotFoundException;
-import life.offonoff.ab.exception.MemberByIdNotFoundException;
-import life.offonoff.ab.exception.TopicNotFoundException;
+import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -64,11 +62,11 @@ public class CommentService {
 
     //== like ==//
     @Transactional
-    public void likeCommentForMember(final Long memberId, final Long commentId, final Boolean like) {
+    public void likeCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
         Member liker = findMember(memberId);
         Comment comment = findById(commentId);
 
-        if (like) {
+        if (enable) {
             doLike(liker, comment);
             return;
         }
@@ -76,7 +74,7 @@ public class CommentService {
     }
 
     private void doLike(Member liker, Comment comment) {
-        LikedComment likedComment = new LikedComment(liker, comment);
+        new LikedComment(liker, comment);
     }
 
     private void cancelLike(Member liker, Comment comment) {
@@ -85,11 +83,11 @@ public class CommentService {
 
     //== hate ==//
     @Transactional
-    public void hateCommentForMember(final Long memberId, final Long commentId, final Boolean hate) {
+    public void hateCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
         Member hater = findMember(memberId);
         Comment comment = findById(commentId);
 
-        if (hate) {
+        if (enable) {
             doHate(hater, comment);
             return;
         }
@@ -97,10 +95,34 @@ public class CommentService {
     }
 
     private void doHate(Member hater, Comment comment) {
-        HatedComment hatedComment = new HatedComment(hater, comment);
+        new HatedComment(hater, comment);
     }
 
     private void cancelHate(Member hater, Comment comment) {
         hater.cancelHate(comment);
+    }
+
+    //== delete ==//
+    @Transactional
+    public void deleteCommentForTopic(final Long memberId, final Long commentId) {
+
+        Member member = findMember(memberId);
+        Comment comment = findById(commentId);
+
+        checkMemberCanTouchComment(member, comment);
+
+        comment.remove();
+        // 명시적 삭제
+        commentRepository.delete(comment);
+    }
+
+    private void checkMemberCanTouchComment(Member member, Comment comment) {
+        // member가 admin or 댓글 작성자 or 토픽 작성자
+        if (!member.isAdmin() &&
+            !member.isAuthorOf(comment.getTopic()) &&
+            !comment.isWrittenBy(member)
+        ) {
+            throw new IllegalCommentStatusChangeException(member.getId(), comment.getId());
+        }
     }
 }
