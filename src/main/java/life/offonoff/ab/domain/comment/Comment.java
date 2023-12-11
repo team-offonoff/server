@@ -56,4 +56,13 @@ public class Comment extends BaseEntity {
     public void hated() {
         hateCount++;
     }
+
+    public boolean isWrittenBy(Member member) {
+        return this.writer == member;
+    }
+
+    public void remove() {
+        topic.commentRemoved();
+        writer.removeComment(this);
+    }
 }

@@ -154,6 +154,10 @@ public class Topic extends BaseEntity {
         this.commentCount++;
     }
 
+    public void commentRemoved() {
+        this.commentCount--;
+    }
+
     public boolean isWrittenBy(Member member) {
         return this.author.getId().equals(member.getId());
     }
