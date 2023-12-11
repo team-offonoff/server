@@ -146,7 +146,7 @@ class CommentControllerTest extends RestDocsTest {
         Long accessMemberId = 1L;
 
         doThrow(new IllegalCommentStatusChangeException(accessMemberId, commentId))
-                .when(commentService).deleteCommentForTopic(nullable(Long.class), anyLong());
+                .when(commentService).deleteComment(nullable(Long.class), anyLong());
 
         mvc.perform(delete(CommentUri.DELETE, commentId)
                         .header("Authorization", "Bearer ACCESS_TOKEN"))

@@ -3,7 +3,12 @@ package life.offonoff.ab.application.service;
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.TestEntityUtil;
+import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.member.MemberTest;
+import life.offonoff.ab.domain.member.Provider;
+import life.offonoff.ab.domain.member.TestMemberUtil;
+import life.offonoff.ab.domain.topic.TestTopicUtil;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.web.response.CommentResponse;
@@ -15,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
+import static life.offonoff.ab.domain.member.TestMemberUtil.*;
 import static org.assertj.core.api.Assertions.*;
 
 @Transactional
@@ -62,5 +68,69 @@ class CommentServiceTest {
 
         // then
         assertThat(topic.getCommentCount()).isEqualTo(beforeCount + 1);
+    }
+
+    @Test
+    @DisplayName("ADMIN에 의한 댓글 삭제")
+    void delete_comment_by_admin() {
+        // given
+        Member adminMember = createAdminMember("email", "pwd");
+
+        Member writer = createCompletelyJoinedMember("writer", "pwd", "writer");
+        Topic topic = createTopic(0, TopicSide.TOPIC_A);
+
+        Comment comment = new Comment(writer, topic, "content");
+
+        em.persist(adminMember);
+        em.persist(writer);
+        em.persist(topic);
+        em.persist(comment);
+
+        // when
+        commentService.deleteComment(adminMember.getId(), comment.getId());
+
+        // then
+        assertThat(topic.getCommentCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("댓글 작성자에 의한 댓글 삭제")
+    void delete_comment_by_comment_writer() {
+        // given
+        Member writer = createCompletelyJoinedMember("writer", "pwd", "writer");
+        Topic topic = createTopic(0, TopicSide.TOPIC_A);
+
+        Comment comment = new Comment(writer, topic, "content");
+
+        em.persist(writer);
+        em.persist(topic);
+        em.persist(comment);
+
+        // when
+        commentService.deleteComment(writer.getId(), comment.getId());
+
+        // then
+        assertThat(topic.getCommentCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("토픽 작성자에 의한 댓글 삭제")
+    void delete_comment_by_topic_author() {
+        // given
+        Member topicAuthor = createCompletelyJoinedMember("author", "pwd", "author");
+        Member writer = createCompletelyJoinedMember("writer", "pwd", "writer");
+        Topic topic = TestTopicUtil.createTopicWithAuthor(TopicSide.TOPIC_A, topicAuthor);
+
+        Comment comment = new Comment(writer, topic, "content");
+
+        em.persist(writer);
+        em.persist(topic);
+        em.persist(comment);
+
+        // when
+        commentService.deleteComment(topicAuthor.getId(), comment.getId());
+
+        // then
+        assertThat(topic.getCommentCount()).isEqualTo(0);
     }
 }

@@ -104,7 +104,7 @@ public class CommentService {
 
     //== delete ==//
     @Transactional
-    public void deleteCommentForTopic(final Long memberId, final Long commentId) {
+    public void deleteComment(final Long memberId, final Long commentId) {
 
         Member member = findMember(memberId);
         Comment comment = findById(commentId);
