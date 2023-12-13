@@ -74,11 +74,17 @@ public class CommentService {
     }
 
     private void doLike(Member liker, Comment comment) {
+        liker.likeCommentIfNew(comment);
+
+        /* TODO: 두 설계 중에 어느 방법이 더 괜찮아 보이나요??
+                 아래 방식은 객체를 생성하고 내버려 두는 것이 설계상 어색하다 생각합니다.
+                 차라리 위 방식처럼 의미있는 행위를 만드는 것이 좋아보입니다.
         new LikedComment(liker, comment);
+         */
     }
 
     private void cancelLike(Member liker, Comment comment) {
-        liker.cancelLike(comment);
+        liker.cancelLikeIfExists(comment);
     }
 
     //== hate ==//
@@ -95,12 +101,13 @@ public class CommentService {
     }
 
     private void doHate(Member hater, Comment comment) {
-        new HatedComment(hater, comment);
+        hater.hateCommentIfNew(comment);
     }
 
     private void cancelHate(Member hater, Comment comment) {
-        hater.cancelHate(comment);
+        hater.cancelHateIfExists(comment);
     }
+
 
     //== delete ==//
     @Transactional
@@ -114,14 +121,12 @@ public class CommentService {
         comment.remove();
         // 명시적 삭제
         commentRepository.delete(comment);
+        // commentRepository.deleteIfMemberCanTouchComment(memberId, commentId);
     }
 
     private void checkMemberCanTouchComment(Member member, Comment comment) {
-        // member가 admin or 댓글 작성자 or 토픽 작성자
-        if (!member.isAdmin() &&
-            !member.isAuthorOf(comment.getTopic()) &&
-            !comment.isWrittenBy(member)
-        ) {
+        // member가 admin or 댓글 작성자
+        if (!member.isAdmin() && !comment.isWrittenBy(member)) {
             throw new IllegalCommentStatusChangeException(member.getId(), comment.getId());
         }
     }

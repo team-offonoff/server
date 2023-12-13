@@ -22,7 +22,7 @@ operation::comment-controller-test/get_comments_of_topic_empty_comments[snippets
 
 ### 3. 댓글 삭제
 
-#### OK - 멤버 (admin || 토픽 작성자 || 댓글 작성자) 에 속할 때
+#### OK - 멤버 (admin || 댓글 작성자) 에 속할 때
 operation::comment-controller-test/delete_comment[snippets="http-request,http-response"]
 
 #### E1 삭제 자격이 없을 때

@@ -143,12 +143,11 @@ public class TopicService {
     }
 
     private void doHide(final Member member, final Topic topic) {
-        HiddenTopic hiddenTopic = new HiddenTopic();
-        hiddenTopic.associate(member, topic);
+        member.hideTopicIfNew(topic);
     }
 
     private void cancelHide(final Member member, final Topic topic) {
-        member.cancelHide(topic);
+        member.cancelHideIfExists(topic);
     }
 
     //== Vote ==//
