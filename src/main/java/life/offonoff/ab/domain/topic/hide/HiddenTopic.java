@@ -23,16 +23,13 @@ public class HiddenTopic extends BaseEntity {
 
     //== Method ==//
     public void associate(Member member, Topic topic) {
-        // topic이 먼저 등록돼야 함.
-        this.topic = topic;
         this.member = member;
 
-        if (member.hideTopic(this)) {
-            topic.addHide(this);
-        }
+        this.topic = topic;
+        topic.addHide(this);
     }
 
     public boolean has(Topic topic) {
-        return this.topic == topic;
+        return this.topic.getId().equals(topic.getId());
     }
 }

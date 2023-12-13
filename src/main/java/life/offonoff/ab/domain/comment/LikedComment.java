@@ -23,16 +23,12 @@ public class LikedComment extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    public LikedComment(Member member, Comment comment) {
+    public LikedComment(Member liker, Comment comment) {
+        this.liker = liker;
         this.comment = comment;
-        this.liker = member;
-
-        if (member.likeComment(this)) {
-            comment.liked();
-        }
     }
 
     public boolean has(Comment comment) {
-        return this.comment == comment;
+        return this.comment.getId().equals(comment.getId());
     }
 }

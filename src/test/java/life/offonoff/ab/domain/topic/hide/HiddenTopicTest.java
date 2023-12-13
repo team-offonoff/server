@@ -19,31 +19,33 @@ class HiddenTopicTest {
     @DisplayName("토픽 블락 후 토픽의 blockCount 1 증가")
     void block_count_increase() {
         // given
-        int seq = 0;
-        Topic topic = new Topic("title", TopicSide.TOPIC_A);
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .author(createMember("author", "author"))
+                .build().buildTopic();
+
         Member member = new Member("email", "password", Provider.NONE);
 
         // when
-        HiddenTopic block = new HiddenTopic();
-        block.associate(member, topic);
+        member.hideTopicIfNew(topic);
 
         // then
-        assertAll(
-                () -> assertThat(topic.getHideCount()).isEqualTo(1),
-                () -> assertThat(member.getHiddenTopics()).contains(block)
-        );
+        assertThat(topic.getHideCount()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("토픽 hide 후 hide 여부 테스트")
     void 중복_hide테스트() {
         // given
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .author(createMember("author", "author"))
+                .build().buildTopic();
+
         Member member = new Member("email", "password", Provider.NONE);
-        Topic topic = new Topic("title", TopicSide.TOPIC_A);
 
         // when
-        HiddenTopic hiddenTopic = new HiddenTopic();
-        hiddenTopic.associate(member, topic);
+        member.hideTopicIfNew(topic);
 
         // then
         assertAll(

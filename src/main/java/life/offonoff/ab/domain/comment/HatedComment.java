@@ -25,15 +25,11 @@ public class HatedComment extends BaseEntity {
     private Comment comment;
 
     public HatedComment(Member member, Comment comment) {
-        this.comment = comment;
         this.hater = member;
-
-        if (member.hateComment(this)) {
-            comment.hated();
-        }
+        this.comment = comment;
     }
 
     public boolean has(Comment comment) {
-        return this.comment == comment;
+        return this.comment.getId().equals(comment.getId());
     }
 }

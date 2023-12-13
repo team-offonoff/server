@@ -49,11 +49,11 @@ public class Comment extends BaseEntity {
         this.topic = topic;
         topic.commented();
     }
-    public void liked() {
+    public void increaseLikeCount() {
         likeCount++;
     }
 
-    public void hated() {
+    public void increaseHateCount() {
         hateCount++;
     }
 
