@@ -12,14 +12,13 @@ import life.offonoff.ab.domain.vote.VotingResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter(AccessLevel.PROTECTED)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Topic extends BaseEntity {

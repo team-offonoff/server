@@ -11,7 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Getter @Setter(AccessLevel.PROTECTED)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class PersonalInfo {

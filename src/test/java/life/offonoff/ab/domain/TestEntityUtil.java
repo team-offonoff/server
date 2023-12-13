@@ -78,6 +78,7 @@ public class TestEntityUtil {
         private String nickname;
         private LocalDate birth;
         private Gender gender;
+        private Role role;
         private String job;
         private String email;
         private String password;
@@ -86,10 +87,13 @@ public class TestEntityUtil {
         private NotificationEnabled enabled = new NotificationEnabled(true, true, true, true);
 
         public Member buildMember() {
-            Member member = new Member(email, password, Provider.NONE);
+            AuthenticationInfo authInfo = new AuthenticationInfo(email, password, Provider.NONE);
+            Member member = new Member(authInfo);
+
             member.registerPersonalInfo(new PersonalInfo(nickname, birth, gender, job));
 
             ReflectionTestUtils.setField(member, "id", id);
+            ReflectionTestUtils.setField(authInfo, "role", role);
             return member;
         }
     }
@@ -132,4 +136,19 @@ public class TestEntityUtil {
             return topic;
         }
     }
+
+    @Builder
+    public static class TestComment {
+        private Long id;
+        private Member writer;
+        private Topic topic;
+        private String content;
+
+        public Comment buildComment() {
+            Comment comment = new Comment(writer, topic, content);
+            ReflectionTestUtils.setField(comment, "id", id);
+            return comment;
+        }
+    }
+
 }

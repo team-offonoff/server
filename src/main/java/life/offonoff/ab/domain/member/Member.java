@@ -15,7 +15,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter(AccessLevel.PROTECTED)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
@@ -64,7 +64,11 @@ public class Member extends BaseEntity {
 
     //== Constructor ==//
     public Member(String email, String password, Provider provider) {
-        this.authInfo = new AuthenticationInfo(email, password, provider);
+        this(new AuthenticationInfo(email, password, provider));
+    }
+
+    public Member(AuthenticationInfo authInfo) {
+        this.authInfo = authInfo;
         this.notificationEnabled = NotificationEnabled.allEnabled();
     }
 
@@ -97,35 +101,41 @@ public class Member extends BaseEntity {
         publishedTopics.add(topic);
     }
 
-    public boolean hideTopic(HiddenTopic hiddenTopic) {
-        if (!hideAlready(hiddenTopic.getTopic())) {
-            hiddenTopics.add(hiddenTopic);
-
-            return true;
+    public void hideTopicIfNew(Topic topic) {
+        if (hideAlready(topic)) {
+            return;
         }
-        return false;
+
+        HiddenTopic hiddenTopic = new HiddenTopic();
+        hiddenTopic.associate(this, topic);
+
+        hiddenTopics.add(hiddenTopic);
     }
 
     public void addComment(Comment comment) {
         comments.add(comment);
     }
 
-    public boolean likeComment(LikedComment likedComment) {
-        if (!likeAlready(likedComment.getComment())) {
-            likedComments.add(likedComment);
-
-            return true;
+    public void likeCommentIfNew(Comment comment) {
+        if (likeAlready(comment)) {
+            return;
         }
-        return false;
+
+        LikedComment likedComment = new LikedComment(this, comment);
+        comment.increaseLikeCount();
+
+        likedComments.add(likedComment);
     }
 
-    public boolean hateComment(HatedComment hatedComment) {
-        if (!hateAlready(hatedComment.getComment())) {
-            this.hatedComments.add(hatedComment);
-
-            return true;
+    public void hateCommentIfNew(Comment comment) {
+        if (hateAlready(comment)) {
+            return;
         }
-        return false;
+
+        HatedComment hatedComment = new HatedComment(this, comment);
+        comment.increaseHateCount();
+
+        this.hatedComments.add(hatedComment);
     }
 
     public void addVote(Vote vote) {
@@ -176,7 +186,7 @@ public class Member extends BaseEntity {
                 .anyMatch(h -> h.has(topic));
     }
 
-    public void cancelHide(Topic topic) {
+    public void cancelHideIfExists(Topic topic) {
         if (hideAlready(topic)) {
             hiddenTopics.removeIf(h -> h.has(topic));
         }
@@ -206,10 +216,8 @@ public class Member extends BaseEntity {
                 .anyMatch(h -> h.has(comment));
     }
 
-    public void cancelHate(Comment comment) {
-        if (hateAlready(comment)) {
-            hatedComments.removeIf(h -> h.has(comment));
-        }
+    public void cancelHateIfExists(Comment comment) {
+        hatedComments.removeIf(h -> h.has(comment));
     }
 
         //== LIKE ==//
@@ -218,10 +226,8 @@ public class Member extends BaseEntity {
                 .anyMatch(h -> h.has(comment));
     }
 
-    public void cancelLike(Comment comment) {
-        if (likeAlready(comment)) {
-            likedComments.removeIf(l -> l.has(comment));
-        }
+    public void cancelLikeIfExists(Comment comment) {
+        likedComments.removeIf(l -> l.has(comment));
     }
 
     public boolean isAuthorOf(Topic topic) {
@@ -229,5 +235,6 @@ public class Member extends BaseEntity {
     }
 
     public void removeComment(Comment comment) {
+        comments.remove(comment);
     }
 }
