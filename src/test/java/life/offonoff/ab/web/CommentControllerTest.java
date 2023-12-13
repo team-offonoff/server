@@ -5,6 +5,7 @@ import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.config.WebConfig;
 
 import life.offonoff.ab.exception.AbCode;
+import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.request.RequestDocumentation;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,7 +79,8 @@ class CommentControllerTest extends RestDocsTest {
 
         CommentRequest request = new CommentRequest(topicId, content);
 
-        when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenThrow(new TopicNotFoundException(topicId));
+        when(commentService.register(nullable(Long.class), any(CommentRequest.class)))
+                .thenThrow(new TopicNotFoundException(topicId));
 
         mvc.perform(post(CommentUri.BASE)
                         .header("Authorization", "Bearer ACCESS_TOKEN")
@@ -121,13 +124,64 @@ class CommentControllerTest extends RestDocsTest {
                 .thenReturn(new SliceImpl<>(Collections.emptyList()));
 
         mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
                         .queryParam("topic-id", String.valueOf(topicId))
                         .queryParam("page", String.valueOf(0))
                         .queryParam("size", String.valueOf(50)))
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void delete_comment() throws Exception {
+        Long commentId = 1L;
+
+        mvc.perform(delete(CommentUri.DELETE, commentId)
+                        .header("Authorization", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void delete_comment_member_cannot_touch() throws Exception {
+        Long commentId = 1L;
+        Long accessMemberId = 1L;
+
+        doThrow(new IllegalCommentStatusChangeException(accessMemberId, commentId))
+                .when(commentService).deleteComment(nullable(Long.class), anyLong());
+
+        mvc.perform(delete(CommentUri.DELETE, commentId)
+                        .header("Authorization", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void like_comment() throws Exception {
+        mvc.perform(post(CommentUri.LIKE, 1L)
+                .queryParam("enable", String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("enable").description("활성화 여부; `true`시에만 좋아요 처리")
+                        )
+                ));
+    }
+
+    @Test
+    void hatee_comment() throws Exception {
+        mvc.perform(post(CommentUri.HATE, 1L)
+                        .queryParam("enable", String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("enable").description("활성화 여부; `true`시에만 싫어요 처리")
+                        )
+                ));
+    }
+
     private static class CommentUri {
         private static final String BASE = "/comments";
+        private static final String COMMENT_ID = "/{commentId}";
+        private static final String DELETE = BASE + COMMENT_ID;
+        private static final String LIKE = BASE + COMMENT_ID + "/like";
+        private static final String HATE = BASE + COMMENT_ID + "/hate";
     }
 }

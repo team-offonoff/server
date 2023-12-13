@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Entity
-public class HiddenTopic extends BaseEntity{
+public class HiddenTopic extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,16 +24,12 @@ public class HiddenTopic extends BaseEntity{
     //== Method ==//
     public void associate(Member member, Topic topic) {
         this.member = member;
-        member.hideTopic(this);
+
         this.topic = topic;
         topic.addHide(this);
     }
 
     public boolean has(Topic topic) {
-        return this.topic == topic;
-    }
-
-    public boolean has(Member member) {
-        return this.member == member;
+        return this.topic.getId().equals(topic.getId());
     }
 }

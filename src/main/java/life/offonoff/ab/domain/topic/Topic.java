@@ -125,12 +125,6 @@ public class Topic extends BaseEntity {
         this.choices.add(choice);
     }
 
-    public void removeHiddenBy(Member member) {
-        this.hides.removeIf(h -> h.has(member));
-        member.cancelHide(this);
-        hideCount--;
-    }
-
     public void setVotingResult(VotingResult votingResult) {
         this.votingResult = votingResult;
     }
@@ -158,6 +152,10 @@ public class Topic extends BaseEntity {
 
     public void commented() {
         this.commentCount++;
+    }
+
+    public void commentRemoved() {
+        this.commentCount--;
     }
 
     public boolean isWrittenBy(Member member) {

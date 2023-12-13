@@ -35,4 +35,33 @@ public class CommentController {
     ) {
         return ResponseEntity.ok(PageResponse.of(commentService.findAll(topicId, pageable)));
     }
+
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<Void> likeComment(
+            @Authorized Long memberId,
+            @PathVariable Long commentId,
+            @RequestParam Boolean enable
+    ) {
+        commentService.likeCommentForMember(memberId, commentId, enable);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @PostMapping("/{commentId}/hate")
+    public ResponseEntity<Void> hateComment(
+            @Authorized Long memberId,
+            @PathVariable Long commentId,
+            @RequestParam Boolean enable
+    ) {
+        commentService.hateCommentForMember(memberId, commentId, enable);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(@Authorized Long memberId, @PathVariable Long commentId) {
+        commentService.deleteComment(memberId, commentId);
+        return ResponseEntity.ok()
+                             .build();
+    }
 }

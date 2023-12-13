@@ -49,11 +49,20 @@ public class Comment extends BaseEntity {
         this.topic = topic;
         topic.commented();
     }
-    public void liked() {
+    public void increaseLikeCount() {
         likeCount++;
     }
 
-    public void hated() {
+    public void increaseHateCount() {
         hateCount++;
+    }
+
+    public boolean isWrittenBy(Member member) {
+        return this.writer == member;
+    }
+
+    public void remove() {
+        topic.commentRemoved();
+        writer.removeComment(this);
     }
 }

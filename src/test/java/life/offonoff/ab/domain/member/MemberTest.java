@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberTest {
+public class MemberTest {
 
     @Test
     @DisplayName("AuthInfo 중복 등록시 예외")
@@ -94,5 +94,4 @@ class MemberTest {
         assertThatThrownBy(() -> member.agreeTerms(termsEnabled))
                 .isInstanceOf(IllegalJoinStatusException.class);
     }
-
 }

@@ -17,7 +17,8 @@ public class RestDocsConfiguration {
                         modifyHeaders()
                                 .remove("X-CSRF-TOKEN"), // 테스트에서 post 요청시 사용되는 CSRF 토큰 지우기
                         modifyUris()
-                                .host("offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com"),
+                                .host("offonoff-ab-env.eba-aax22s52.ap-northeast-2.elasticbeanstalk.com")
+                                .port(80),
                         prettyPrint()),
                 preprocessResponse(prettyPrint())
         );

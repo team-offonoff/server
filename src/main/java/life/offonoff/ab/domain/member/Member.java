@@ -3,6 +3,8 @@ package life.offonoff.ab.domain.member;
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.HatedComment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
@@ -39,14 +41,20 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Topic> publishedTopics = new ArrayList<>();
-
-    @OneToMany(mappedBy = "writer")
+    // TODO : 삭제된 멤버의 댓글 유지 여부
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "liker", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikedComment> likedComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "hater", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HatedComment> hatedComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "voter", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
@@ -56,7 +64,11 @@ public class Member extends BaseEntity {
 
     //== Constructor ==//
     public Member(String email, String password, Provider provider) {
-        this.authInfo = new AuthenticationInfo(email, password, provider);
+        this(new AuthenticationInfo(email, password, provider));
+    }
+
+    public Member(AuthenticationInfo authInfo) {
+        this.authInfo = authInfo;
         this.notificationEnabled = NotificationEnabled.allEnabled();
     }
 
@@ -85,17 +97,45 @@ public class Member extends BaseEntity {
     }
 
     //== 연관관계 매핑 ==//
-
     public void publishTopic(Topic topic) {
         publishedTopics.add(topic);
     }
 
-    public void hideTopic(HiddenTopic hiddenTopic) {
+    public void hideTopicIfNew(Topic topic) {
+        if (hideAlready(topic)) {
+            return;
+        }
+
+        HiddenTopic hiddenTopic = new HiddenTopic();
+        hiddenTopic.associate(this, topic);
+
         hiddenTopics.add(hiddenTopic);
     }
 
     public void addComment(Comment comment) {
         comments.add(comment);
+    }
+
+    public void likeCommentIfNew(Comment comment) {
+        if (likeAlready(comment)) {
+            return;
+        }
+
+        LikedComment likedComment = new LikedComment(this, comment);
+        comment.increaseLikeCount();
+
+        likedComments.add(likedComment);
+    }
+
+    public void hateCommentIfNew(Comment comment) {
+        if (hateAlready(comment)) {
+            return;
+        }
+
+        HatedComment hatedComment = new HatedComment(this, comment);
+        comment.increaseHateCount();
+
+        this.hatedComments.add(hatedComment);
     }
 
     public void addVote(Vote vote) {
@@ -140,15 +180,19 @@ public class Member extends BaseEntity {
         this.active = active;
     }
 
+        //== HIDE ==//
     public boolean hideAlready(Topic topic) {
         return hiddenTopics.stream()
                 .anyMatch(h -> h.has(topic));
     }
 
-    public void cancelHide(Topic topic) {
-        hiddenTopics.removeIf(h -> h.has(topic));
+    public void cancelHideIfExists(Topic topic) {
+        if (hideAlready(topic)) {
+            hiddenTopics.removeIf(h -> h.has(topic));
+        }
     }
 
+        //== VOTE ==//
     public boolean votedAlready(Topic topic) {
         return votes.stream()
                 .anyMatch(v -> v.has(topic));
@@ -165,6 +209,32 @@ public class Member extends BaseEntity {
     public boolean isAdmin() {
         return getRole().equals(Role.ADMIN);
     }
+
+        //== HATE ==//
+    public boolean hateAlready(Comment comment) {
+        return hatedComments.stream()
+                .anyMatch(h -> h.has(comment));
+    }
+
+    public void cancelHateIfExists(Comment comment) {
+        hatedComments.removeIf(h -> h.has(comment));
+    }
+
+        //== LIKE ==//
+    public boolean likeAlready(Comment comment) {
+        return likedComments.stream()
+                .anyMatch(h -> h.has(comment));
+    }
+
+    public void cancelLikeIfExists(Comment comment) {
+        likedComments.removeIf(l -> l.has(comment));
+    }
+
+    public boolean isAuthorOf(Topic topic) {
+        return this == topic.getAuthor();
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+    }
 }
-
-

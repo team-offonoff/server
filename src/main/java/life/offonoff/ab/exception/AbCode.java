@@ -7,6 +7,7 @@ public enum AbCode {
     // Not Found,
     KEYWORD_NOT_FOUND,
     TOPIC_NOT_FOUND,
+    COMMENT_NOT_FOUND,
 
     // Member
     MEMBER_NOT_FOUND,
@@ -28,6 +29,7 @@ public enum AbCode {
     ILLEGAL_JOIN_STATUS,
     DUPLICATE_TOPIC_REPORT,
     ILLEGAL_TOPIC_STATUS_CHANGE,
+    ILLEGAL_COMMENT_STATUS_CHANGE,
 
     // Auth
     UNSUPPORTED_AUTH_FORMAT,
@@ -38,6 +40,5 @@ public enum AbCode {
     EXPIRED_TOKEN,
     INVALID_SIGNATURE_TOKEN,
 
-    FUTURE_TIME_REQUEST
-    ;
+    FUTURE_TIME_REQUEST;
 }

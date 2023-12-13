@@ -29,6 +29,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
         List<Topic> result = queryFactory
                 .selectFrom(topic)
                 .join(topic.author).fetchJoin()
+                .join(topic.keyword).fetchJoin()
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
                         eqKeyword(request.getKeywordId()),
