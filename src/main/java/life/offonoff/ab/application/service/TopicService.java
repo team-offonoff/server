@@ -124,8 +124,8 @@ public class TopicService {
      * @param pageable
      * @return
      */
-    public Slice<TopicResponse> findAll(final TopicSearchRequest request, final Pageable pageable) {
-        return topicRepository.findAll(request, pageable)
+    public Slice<TopicResponse> findAll(final Long memberId, final TopicSearchRequest request, final Pageable pageable) {
+        return topicRepository.findAll(memberId, request, pageable)
                 .map(TopicResponse::from);
     }
 
