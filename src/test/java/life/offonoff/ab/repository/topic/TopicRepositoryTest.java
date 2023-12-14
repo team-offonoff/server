@@ -43,6 +43,7 @@ class TopicRepositoryTest {
         int size = 5;
 
         Member member = createMember("email", "password");
+        em.persist(member);
 
         Keyword keyword = createKeyword(1);
 
@@ -67,7 +68,7 @@ class TopicRepositoryTest {
                 .build();
 
         // when
-        Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, pageable);
 
         // then
         assertAll(
@@ -86,6 +87,7 @@ class TopicRepositoryTest {
         int size = 5;
 
         Member member = createMember("email", "password");
+        em.persist(member);
 
         Keyword keyword = createKeyword(1);
 
@@ -106,7 +108,7 @@ class TopicRepositoryTest {
                 .keywordId(keyword.getId())
                 .build();
         // when
-        Slice<Topic> topicSlice = topicRepository.findAll(request, pageable);
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, pageable);
 
         // then
         assertAll(

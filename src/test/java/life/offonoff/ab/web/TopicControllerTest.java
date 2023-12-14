@@ -6,12 +6,15 @@ import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteCancelRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.config.WebConfig;
+import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.pagination.PagingUtil;
@@ -19,29 +22,38 @@ import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.topic.TopicResponse;
+import org.hibernate.sql.ast.tree.expression.Collation;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -81,49 +93,37 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     @WithMockUser
-    void getTopicSlice() throws Exception {
-        when(topicService.findAll(any(), any())).thenReturn(createTopicSlice());
+    void getTopicSlice_default() throws Exception {
+
+        Slice<TopicResponse> topicResponseSlice = createDefaultTopicSlice();
+
+        when(topicService.findAll(nullable(Long.class), any(TopicSearchRequest.class), any(Pageable.class)))
+                .thenReturn(topicResponseSlice);
 
         mvc.perform(
-                        get(TopicUri.BASE + TopicUri.OPENED + TopicUri.NOW)
-                                .param("hidden", String.valueOf(true)))
+                        get(TopicUri.RETRIEVE_IN_VOTING)
+                                .header("AUTHORIZATION", "Bearer ACCESS_TOKEN"))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(restDocs.document(queryParameters(
+                        parameterWithName("keyword_id").description("토픽 키워드 ID").optional(),
+                        parameterWithName("page").description("page number - default `0`").optional(),
+                        parameterWithName("size").description("page size - default `10`").optional(),
+                        parameterWithName("sort").description("orderBy - default `voteCount,desc`").optional())));
     }
 
-    private Slice<TopicResponse> createTopicSlice() {
-        PageRequest pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "voteCount");
-        Comparator<Topic> voteCountDesc = (t1, t2) -> t2.getVoteCount() - t1.getVoteCount();
+    @Test
+    @WithMockUser
+    void getTopicSlice_filtered_by_keyword() throws Exception {
+        Slice<TopicResponse> topicSlice = createTopicSliceFilteredByKeyword(1L);
 
-        // create Member
-        Member author = TestMember.builder()
-                .id(1L)
-                .nickname("nicknameA")
-                .build().buildMember();
+        when(topicService.findAll(nullable(Long.class), any(TopicSearchRequest.class), any(Pageable.class)))
+                .thenReturn(topicSlice);
 
-        // create Keyword
-        Keyword keyword = TestKeyword.builder()
-                .id(1L)
-                .name("keywordA")
-                .build().buildKeyword();
-
-        List<Topic> topics = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            Topic topic = TestTopic
-                    .builder()
-                    .id((long) (i + 1))
-                    .title("title" + i)
-                    .author(author)
-                    .keyword(keyword)
-                    .voteCount(i)
-                    .build()
-                    .buildTopic();
-
-            topics.add(topic);
-        }
-        topics.sort(voteCountDesc);
-        return PagingUtil.toSlice(topics, pageable)
-                .map(TopicResponse::from);
+        mvc.perform(
+                        get(TopicUri.RETRIEVE_IN_VOTING)
+                                .header("AUTHORIZATION", "Bearer ACCESS_TOKEN")
+                                .param("keyword_id", String.valueOf(1L)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -252,10 +252,101 @@ public class TopicControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("abCode").value("MEMBER_NOT_VOTE"));
     }
 
+    private Slice<TopicResponse> createDefaultTopicSlice() {
+        // create author
+        Member author = TestMember.builder()
+                .id(1L)
+                .nickname("nicknameA")
+                .build().buildMember();
+
+        // create keyword
+        Keyword keyword1 = TestKeyword.builder()
+                .id(1L)
+                .name("key1")
+                .build().buildKeyword();
+
+        Keyword keyword2 = TestKeyword.builder()
+                .id(2L)
+                .name("key2")
+                .build().buildKeyword();
+
+        // create Topic
+        Topic topic1 = TestTopic.builder()
+                .id(1L)
+                .title("title" + 1L)
+                .side(TopicSide.TOPIC_A)
+                .author(author)
+                .keyword(keyword1)
+                .voteCount(1000)
+                .build().buildTopic();
+
+        Topic topic2 = TestTopic.builder()
+                .id(2L)
+                .title("title" + 2L)
+                .side(TopicSide.TOPIC_A)
+                .author(author)
+                .keyword(keyword2)
+                .voteCount(2000)
+                .build().buildTopic();
+
+        PageRequest pageable = PageRequest.of(0, 2, Sort.Direction.DESC, "voteCount");
+
+        return PagingUtil.toSlice(
+                Stream.of(topic1, topic2)
+                        .sorted((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
+                        .map(TopicResponse::from)
+                        .collect(Collectors.toList()),
+                pageable);
+    }
+
+    private Slice<TopicResponse> createTopicSliceFilteredByKeyword(Long keywordId) {
+        // create author
+        Member author = TestMember.builder()
+                .id(1L)
+                .nickname("nicknameA")
+                .build().buildMember();
+
+        // create keyword
+        Keyword keyword = TestKeyword.builder()
+                .id(keywordId)
+                .name("key")
+                .build().buildKeyword();
+
+        // create Topic
+        Topic topic1 = TestTopic.builder()
+                .id(1L)
+                .title("title" + 1L)
+                .side(TopicSide.TOPIC_A)
+                .author(author)
+                .keyword(keyword)
+                .voteCount(1000)
+                .build().buildTopic();
+
+        Topic topic2 = TestTopic.builder()
+                .id(2L)
+                .title("title" + 2L)
+                .side(TopicSide.TOPIC_A)
+                .author(author)
+                .keyword(keyword)
+                .voteCount(2000)
+                .build().buildTopic();
+
+        PageRequest pageable = PageRequest.of(0, 2, Sort.Direction.DESC, "voteCount");
+
+        return PagingUtil.toSlice(
+                Stream.of(topic1, topic2)
+                        .sorted((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
+                        .map(TopicResponse::from)
+                        .collect(Collectors.toList()),
+                pageable);
+    }
+
+
     private static class TopicUri {
         private static final String BASE = "/topics";
-        private static final String OPENED = "/open";
-        private static final String NOW = "/now";
+        private static final String INFO = "/info";
+        private static final String VOTING = "/voting";
+        private static final String RETRIEVE_IN_VOTING = BASE + INFO + VOTING;
         private static final String REPORT = BASE + "/{topicId}/report";
         private static final String STATUS = BASE + "/{topicId}/status?active={active}";
         private static final String VOTE = BASE + "/{topicId}/vote";

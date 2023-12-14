@@ -11,7 +11,21 @@ POST /topics
 
 operation::topic-controller-test/create-topic[snippets="request-fields,http-request,http-response"]
 
-### 2. 토픽 신고
+### 2. 토픽 조회
+
+[source.html]
+POST /topics/info/voting?keywordId=..&hidden=..
+
+- 헤더에 토큰이 포함돼있다면 해당 멤버가 hide한 토픽은 제외합니다.
+- 모든 `Query Parameter` 는 `optional`
+
+#### OK - 기본 조회 (전체 키워드 & 투표 순)
+operation::topic-controller-test/get-topic-slice_default[snippets="query-parameters,http-request,http-response"]
+
+#### OK - 키워드별 조회 (투표 순)
+operation::topic-controller-test/get-topic-slice_filtered_by_keyword[snippets="http-request,http-response"]
+
+### 3. 토픽 신고
 
 [source.html]
 POST /topics/{topicId}/report
@@ -29,7 +43,7 @@ operation::topic-controller-test/create-topic-report_with-non-existent-topic_-to
 
 operation::topic-controller-test/create-topic-report_already-reported_-topic-report-duplicate-exception[snippets="http-request,http-response"]
 
-### 3. 토픽 활성화/비활성화
+### 4. 토픽 활성화/비활성화
 
 - 신고가 많이 쌓였거나, 운영 등의 이유로 활성화/비활성화
 - TODO: 유저가 자신의 토픽 삭제하는 API는 추가 예정. 전체적인 형태는 비슷할 예정
@@ -47,7 +61,7 @@ operation::topic-controller-test/deactivate-topic[snippets="http-request,http-re
 
 operation::topic-controller-test/deactivate-topic_by-non-author-user_-illegal-topic-status-change-exception[snippets="http-request,http-response"]
 
-### 4, 토픽 삭제 (영구)
+### 5. 토픽 삭제 (영구)
 
 [source.html]
 DELETE /topics/{topicId}
@@ -59,7 +73,7 @@ operation::topic-controller-test/delete-topic[snippets="http-request,http-respon
 
 <<_e2_작성자가_아닌_유저가_상태_변경_시도, 3. 토픽 활성화/비활성화 - E1>>과 응답 동일
 
-### 5. 투표
+### 6. 투표
 [source.html]
 POST /topics/{topicId}/vote
 
@@ -74,7 +88,7 @@ operation::topic-controller-test/vote-for-topic_by-author_throw-exception[snippe
 
 operation::topic-controller-test/vote-for-topic_voted-at-future_throw-exception[snippets="http-request,http-response"]
 
-### 6. 투표 취소
+### 7. 투표 취소
 [source.html]
 DELETE /topics/{topicId}/vote
 
