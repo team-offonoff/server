@@ -29,17 +29,12 @@ public class TopicBooleanExpression {
         return keywordId != null ? topic.keyword.id.eq(keywordId) : null;
     }
 
-    public static BooleanExpression hideOrNot(Long memberId, Boolean hidden) {
-        if (hidden == null) {
+    public static BooleanExpression hideFor(Long memberId) {
+        if (memberId == null) {
             return null;
         }
 
-        JPQLQuery<HiddenTopic> subquery = hiddenBySubquery(memberId);
-
-        if (hidden) {
-            return subquery.exists();
-        }
-        return subquery.notExists();
+        return hiddenBySubquery(memberId).notExists();
     }
 
     private static JPQLQuery<HiddenTopic> hiddenBySubquery(Long memberId) {

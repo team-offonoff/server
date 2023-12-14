@@ -17,9 +17,6 @@ public class TopicSpecificationFactory {
             if (searchRequest.getKeywordId() != null) {
                 spec = spec.and(TopicSpecifications.keyword(searchRequest.getKeywordId()));
             }
-            if (searchRequest.getHidden() != null) {
-                spec = spec.and(TopicSpecifications.hiddenOrNotByMember(searchRequest.getHidden(), searchRequest.getMemberId()));
-            }
             return spec;
         }
         return spec;

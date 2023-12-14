@@ -25,7 +25,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable) {
+    public Slice<Topic> findAll(Long memberId, TopicSearchRequest request, Pageable pageable) {
         List<Topic> result = queryFactory
                 .selectFrom(topic)
                 .join(topic.author).fetchJoin()
@@ -33,7 +33,7 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
                 .where(
                         eqTopicStatus(request.getTopicStatus()),
                         eqKeyword(request.getKeywordId()),
-                        hideOrNot(request.getMemberId(), request.getHidden())
+                        hideFor(memberId)
                 ).orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
