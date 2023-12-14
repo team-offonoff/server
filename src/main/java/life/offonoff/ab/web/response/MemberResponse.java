@@ -10,7 +10,7 @@ public class MemberResponse {
 
     private Long id;
     private String nickname;
-    private String profileImageURl;
+    private String profileImageUrl;
 
     public static MemberResponse from(Member member) {
         return new MemberResponse(member.getId(), member.getNickname(), member.getProfileImageUrl());
