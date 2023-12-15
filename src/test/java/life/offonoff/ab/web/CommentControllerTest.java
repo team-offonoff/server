@@ -4,7 +4,6 @@ import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.config.WebConfig;
 
-import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.exception.AbCode;
 import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.TopicNotFoundException;
@@ -12,7 +11,6 @@ import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.CommentResponse;
-import life.offonoff.ab.web.response.CommentWriterResponse;
 import life.offonoff.ab.web.response.MemberResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.vote.Vote;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +26,8 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member writer;
+    // 조회 성능 향상을 위한 필드
+    private ChoiceOption writersSelectedOption;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_id")
