@@ -14,12 +14,21 @@ operation::comment-controller-test/create-comment_invalid_topic_exception[snippe
 
 ### 2. 댓글 조회
 
+[source.html]
+GET /comments/?topic-id=..
+
+- `topic-id` 는 필수
+- access token 없이도 호출이 가능합니다. (댓글에 대한 like/hate는 다 false로 응답)
+
+
 #### OK - 댓글이 하나 이상 존재
 operation::comment-controller-test/get_comments_of_topic[snippets="query-parameters,http-request,http-response"]
 
 #### OK - 댓글이 하나도 없는 상황
 operation::comment-controller-test/get_comments_of_topic_empty_comments[snippets="http-request,http-response"]
 
+#### E1. 존재하지 않는 토픽
+operation::comment-controller-test/get_comments_exception_topic_not_found[snippets="http-request,http-response"]
 ### 3. 댓글 삭제
 
 #### OK - 멤버 (admin || 댓글 작성자) 에 속할 때

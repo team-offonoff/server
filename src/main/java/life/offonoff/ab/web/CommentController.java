@@ -1,5 +1,6 @@
 package life.offonoff.ab.web;
 
+import jakarta.validation.constraints.NotNull;
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
@@ -30,10 +31,11 @@ public class CommentController {
 
     @GetMapping("") // TODO : 댓글 조회 시에 멤버가 좋아요/싫어요 누른 댓글인지 정보 추가
     public ResponseEntity<PageResponse<CommentResponse>> getComments(
-            @RequestParam("topic-id") Long topicId,
+            @Authorized(nullable = true) Long memberId,
+            @NotNull @RequestParam("topic-id") Long topicId,
             @PageableDefault(page = 0, size = 50, sort = "createdAt", direction = DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(PageResponse.of(commentService.findAll(topicId, pageable)));
+        return ResponseEntity.ok(PageResponse.of(commentService.findAllComments(memberId, topicId, pageable)));
     }
 
     @PostMapping("/{commentId}/like")

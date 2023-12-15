@@ -54,7 +54,7 @@ public class TopicController {
 
     @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
-            @Authorized() Long memberId,
+            @Authorized Long memberId,
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {
