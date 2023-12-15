@@ -127,6 +127,19 @@ public class TopicControllerTest extends RestDocsTest {
     }
 
     @Test
+    @WithMockUser
+    void getTopicSlice_default_for_unauthorized_member() throws Exception {
+
+        Slice<TopicResponse> topicResponseSlice = createDefaultTopicSlice();
+
+        when(topicService.findAll(isNull(Long.class), any(TopicSearchRequest.class), any(Pageable.class)))
+                .thenReturn(topicResponseSlice);
+
+        mvc.perform(get(TopicUri.RETRIEVE_IN_VOTING))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void createTopicReport() throws Exception {
         mvc.perform(post(TopicUri.REPORT, 1).with(csrf().asHeader()))
                 .andExpect(status().isOk());
