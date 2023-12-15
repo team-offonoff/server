@@ -44,7 +44,7 @@ public class TopicController {
      */
     @GetMapping("/info/voting")
     public ResponseEntity<PageResponse<TopicResponse>> getTopicInfos(
-            @Authorized Long memberId,
+            @Authorized(nullable = true) Long memberId,
             TopicSearchRequest request,
             @PageableDefault(page = 0, size = 10, sort = "voteCount", direction = DESC) Pageable pageable
     ) {
@@ -54,7 +54,7 @@ public class TopicController {
 
     @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
-            @Authorized Long memberId,
+            @Authorized() Long memberId,
             @PathVariable("topicId") Long topicId,
             @RequestParam Boolean hide
     ) {
