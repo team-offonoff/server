@@ -10,6 +10,6 @@ import java.util.List;
 public interface TopicRepositoryCustom {
 
 //    Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable);
-    Slice<Topic> findAll(TopicSearchRequest request, Pageable pageable);
+    Slice<Topic> findAll(Long memberId, TopicSearchRequest request, Pageable pageable);
     List<Topic> findAll(TopicSearchCond cond);
 }

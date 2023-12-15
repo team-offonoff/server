@@ -42,16 +42,14 @@ public class TopicController {
      * @param pageable   default 값은 page 0 / size 10 / sort 투표 많은 순(인기 순)
      * @return sliced(paged) Topic 리스트
      */
-    @GetMapping("/open/now")
+    @GetMapping("/info/voting")
     public ResponseEntity<PageResponse<TopicResponse>> getTopicInfos(
             @Authorized Long memberId,
             TopicSearchRequest request,
             @PageableDefault(page = 0, size = 10, sort = "voteCount", direction = DESC) Pageable pageable
     ) {
         request.setTopicStatus(TopicStatus.VOTING);
-        request.setMemberId(memberId);
-
-        return ResponseEntity.ok(PageResponse.of(topicService.findAll(request, pageable)));
+        return ResponseEntity.ok(PageResponse.of(topicService.findAll(memberId, request, pageable)));
     }
 
     @PatchMapping("/{topicId}/hide")
