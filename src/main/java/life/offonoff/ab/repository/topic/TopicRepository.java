@@ -7,4 +7,7 @@ import java.util.Optional;
 
 public interface TopicRepository extends JpaRepository<Topic, Long>, TopicRepositoryCustom {
     Optional<Topic> findByIdAndActiveTrue(Long topicId);
+
+    boolean existsByIdAndActiveTrue(Long topicId);
+
 }

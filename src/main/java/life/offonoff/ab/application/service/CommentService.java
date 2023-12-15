@@ -2,8 +2,6 @@ package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.comment.HatedComment;
-import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.exception.*;
@@ -32,13 +30,42 @@ public class CommentService {
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
-    public Slice<CommentResponse> findAll(Long topicId, Pageable pageable) {
+    public Slice<CommentResponse> findAllComments(Long memberId, Long topicId, Pageable pageable) {
+
+        checkTopicCanBeCommented(topicId);
+
+        if (memberId == null) {
+            return findAll(topicId, pageable);
+        }
+        return findAllForMember(memberId, topicId, pageable);
+    }
+
+    private void checkTopicCanBeCommented(Long topicId) {
+        if (!topicRepository.existsByIdAndActiveTrue(topicId)) {
+            throw new TopicNotFoundException(topicId);
+        }
+    }
+
+    private Slice<CommentResponse> findAll(Long topicId, Pageable pageable) {
+
         return commentRepository.findAll(topicId, pageable)
                 .map(CommentResponse::from);
     }
 
+    private Slice<CommentResponse> findAllForMember(Long memberId, Long topicId, Pageable pageable) {
+
+        Member member = findMemberFetchLikedComments(memberId);
+        return commentRepository.findAll(topicId, pageable)
+                                .map(comment -> CommentResponse.from(comment, member));
+    }
+
     private Member findMember(final Long memberId) {
         return memberRepository.findByIdAndActiveTrue(memberId)
+                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
+    private Member findMemberFetchLikedComments(final Long memberId) {
+        return memberRepository.findByIdFetchLikedComments(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 
