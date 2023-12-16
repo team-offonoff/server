@@ -113,7 +113,7 @@ class CommentServiceTest {
         CommentResponse response = commentService.register(voter.getId(), new CommentRequest(topic.getId(), "content"));
 
         // then
-        assertThat(response.getWritersSelectedOption()).isEqualTo(vote.getSelectedOption());
+        assertThat(response.getWritersVotedOption()).isEqualTo(vote.getSelectedOption());
     }
 
     @Test
@@ -124,7 +124,7 @@ class CommentServiceTest {
         CommentResponse response = commentService.register(author.getId(), new CommentRequest(topic.getId(), "content"));
 
         // then
-        assertThat(response.getWritersSelectedOption()).isEqualTo(null);
+        assertThat(response.getWritersVotedOption()).isEqualTo(null);
     }
 
     @Test
