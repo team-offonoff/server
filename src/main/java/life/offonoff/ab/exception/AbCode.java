@@ -17,6 +17,9 @@ public enum AbCode {
     VOTED_BY_AUTHOR,
     MEMBER_NOT_VOTE,
 
+    // COMMENT
+    UNABLE_TO_VIEW_COMMENTS,
+
     // Mapping
     INVALID_KAKAO_OAUTH_MAPPING,
     ILLEGAL_PASSWORD,

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +57,10 @@ class CommentControllerTest extends RestDocsTest {
                 new MemberResponse(writerId, "writerNickname", "writerProfileImageUrl"),
                 content,
                 0,
-                0
+                0,
+                false,
+                false,
+                LocalDateTime.now()
         );
 
         when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenReturn(response);
@@ -109,14 +113,11 @@ class CommentControllerTest extends RestDocsTest {
         // give
         Long topicId = 1L;
 
-        // comment1
-        CommentResponse response1 = new CommentResponse(1L, topicId, new MemberResponse(1L, "member1", "imageUrl1"), "content1", 0, 0);
-        CommentResponse response2 = new CommentResponse(2L, topicId,  new MemberResponse(2L, "member2", "imageUrl2"), "content2", 0, 0);
-
-        when(commentService.findAll(anyLong(), any(Pageable.class)))
-                .thenReturn(new SliceImpl<>(List.of(response1, response2)));
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
+                .thenReturn(new SliceImpl<>(createCommentResponses(topicId)));
 
         mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
                         .queryParam("topic-id", String.valueOf(topicId))
                         .queryParam("page", String.valueOf(0))
                         .queryParam("size", String.valueOf(50)))
@@ -134,7 +135,7 @@ class CommentControllerTest extends RestDocsTest {
     void get_comments_of_topic_empty_comments() throws Exception {
         Long topicId = 1L;
 
-        when(commentService.findAll(anyLong(), any(Pageable.class)))
+        when(commentService.findAll(isNull(Long.class), anyLong(), any(Pageable.class)))
                 .thenReturn(new SliceImpl<>(Collections.emptyList()));
 
         mvc.perform(get(CommentUri.BASE)
@@ -143,6 +144,57 @@ class CommentControllerTest extends RestDocsTest {
                         .queryParam("page", String.valueOf(0))
                         .queryParam("size", String.valueOf(50)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void get_comments_exception_topic_not_found() throws Exception {
+        Long topicId = 1L;
+
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
+                .thenThrow(new TopicNotFoundException(topicId));
+
+        mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
+                        .queryParam("topic-id", String.valueOf(topicId)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void get_comments_exception_not_voted() throws Exception {
+        Long topicId = 1L;
+
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
+                .thenThrow(new UnableToViewCommentsException(topicId));
+
+        mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
+                        .queryParam("topic-id", String.valueOf(topicId)))
+                .andExpect(status().isBadRequest());
+    }
+
+    private List<CommentResponse> createCommentResponses(Long topicId) {
+        CommentResponse response1 = new CommentResponse(
+                1L,
+                topicId,
+                new MemberResponse(1L, "member1", "imageUrl1"),
+                "content1",
+                0,
+                0,
+                true,
+                false,
+                LocalDateTime.now());
+        CommentResponse response2 = new CommentResponse(
+                2L,
+                topicId,
+                new MemberResponse(2L, "member2", "imageUrl2"),
+                "content2",
+                0,
+                0,
+                true,
+                false,
+                LocalDateTime.now());
+
+        return List.of(response1, response2);
     }
 
     @Test
@@ -208,7 +260,10 @@ class CommentControllerTest extends RestDocsTest {
                 new MemberResponse(1L, "writerNickname", "writerProfileImageUrl"),
                 "new content",
                 0,
-                0
+                0,
+                false,
+                false,
+                LocalDateTime.now()
         );
         when(commentService.modifyMembersCommentContent(any(), any(), any())).thenReturn(response);
 

@@ -31,10 +31,11 @@ public class CommentController {
 
     @GetMapping("") // TODO : 댓글 조회 시에 멤버가 좋아요/싫어요 누른 댓글인지 정보 추가
     public ResponseEntity<PageResponse<CommentResponse>> getComments(
+            @Authorized Long memberId,
             @RequestParam("topic-id") Long topicId,
             @PageableDefault(page = 0, size = 50, sort = "createdAt", direction = DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(PageResponse.of(commentService.findAll(topicId, pageable)));
+        return ResponseEntity.ok(PageResponse.of(commentService.findAll(memberId, topicId, pageable)));
     }
 
     @PostMapping("/{commentId}/like")

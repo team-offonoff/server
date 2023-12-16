@@ -5,7 +5,9 @@ import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
+import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -26,6 +28,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final TopicRepository topicRepository;
+    private final VoteRepository voteRepository;
 
     //== find ==//
     public Comment findById(Long commentId) {
@@ -33,9 +36,29 @@ public class CommentService {
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
-    public Slice<CommentResponse> findAll(Long topicId, Pageable pageable) {
+    public Slice<CommentResponse> findAll(Long memberId, Long topicId, Pageable pageable) {
+
+        checkMemberCanViewComments(memberId, topicId);
+
+        Member member = findMemberFetchLikedComments(memberId);
         return commentRepository.findAll(topicId, pageable)
-                .map(CommentResponse::from);
+                .map(comment -> CommentResponse.from(comment, member));
+    }
+
+    private void checkMemberCanViewComments(Long memberId, Long topicId) {
+        if (!topicRepository.existsByIdAndActiveTrue(topicId)) {
+            throw new TopicNotFoundException(topicId);
+        }
+
+        if (!voteRepository.existsByVoterIdAndTopicId(memberId, topicId)) {
+            throw new UnableToViewCommentsException(topicId);
+        }
+    }
+
+    private void checkTopicCanBeCommented(Long topicId) {
+        if (!topicRepository.existsByIdAndActiveTrue(topicId)) {
+            throw new TopicNotFoundException(topicId);
+        }
     }
 
     private Member findMember(final Long memberId) {
@@ -43,9 +66,19 @@ public class CommentService {
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 
+    private Member findMemberFetchLikedComments(final Long memberId) {
+        return memberRepository.findByIdFetchLikedComments(memberId)
+                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
     private Topic findTopic(Long topicId) {
         return topicRepository.findByIdAndActiveTrue(topicId)
                 .orElseThrow(() -> new TopicNotFoundException(topicId));
+    }
+
+    private Vote findVote(Long memberId, Long topicId) {
+        return voteRepository.findByVoterIdAndTopicId(memberId, topicId)
+                .orElseThrow(() -> new MemberNotVoteException(memberId, topicId));
     }
 
     //== save ==//
@@ -84,12 +117,6 @@ public class CommentService {
 
     private void doLike(Member liker, Comment comment) {
         liker.likeCommentIfNew(comment);
-
-        /* TODO: 두 설계 중에 어느 방법이 더 괜찮아 보이나요??
-                 아래 방식은 객체를 생성하고 내버려 두는 것이 설계상 어색하다 생각합니다.
-                 차라리 위 방식처럼 의미있는 행위를 만드는 것이 좋아보입니다.
-        new LikedComment(liker, comment);
-         */
     }
 
     private void cancelLike(Member liker, Comment comment) {
