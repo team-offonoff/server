@@ -14,4 +14,12 @@ class TextUtilsTest {
                 .isEqualTo(7);
     }
 
+    @Test
+    void lengthOfAnEmoji_equalTo2() {
+        String textWithEmoji = "👩‍👩‍👧‍👦안😁녕!hi";
+
+        assertThat(TextUtils.countGraphemeClustersWithLongerEmoji(textWithEmoji))
+                .isEqualTo(9);
+    }
+
 }
