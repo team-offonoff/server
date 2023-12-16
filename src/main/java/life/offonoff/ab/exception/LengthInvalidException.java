@@ -1,5 +1,6 @@
 package life.offonoff.ab.exception;
 
+import life.offonoff.ab.application.service.common.LengthInfo;
 import org.springframework.http.HttpStatus;
 
 public class LengthInvalidException extends AbException {
@@ -8,6 +9,10 @@ public class LengthInvalidException extends AbException {
     private final String fieldName;
     private final Integer minLength;
     private final Integer maxLength;
+
+    public LengthInvalidException(String fieldName, LengthInfo lengthInfo) {
+        this(fieldName, lengthInfo.getMinLength(), lengthInfo.getMaxLength());
+    }
 
     public LengthInvalidException(String fieldName, Integer minLength, Integer maxLength) {
         super(MESSAGE);

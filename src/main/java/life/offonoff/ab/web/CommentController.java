@@ -2,6 +2,7 @@ package life.offonoff.ab.web;
 
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
+import life.offonoff.ab.application.service.request.CommentUpdateRequest;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentResponse;
@@ -63,5 +64,14 @@ public class CommentController {
         commentService.deleteComment(memberId, commentId);
         return ResponseEntity.ok()
                              .build();
+    }
+
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<CommentResponse> modifyComment(
+            @Authorized Long memberId,
+            @PathVariable Long commentId,
+            @RequestBody CommentUpdateRequest request
+    ) {
+        return ResponseEntity.ok(commentService.modifyMembersCommentContent(memberId, commentId, request.content()));
     }
 }

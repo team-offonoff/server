@@ -1,9 +1,8 @@
 package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.comment.HatedComment;
-import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.exception.*;
@@ -16,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -50,14 +51,22 @@ public class CommentService {
     //== save ==//
     @Transactional
     public CommentResponse register(Long memberId, CommentRequest request) {
-
         Member member = findMember(memberId);
         Topic topic = findTopic(request.getTopicId());
+
+        validateContent(request.getContent());
 
         Comment comment = new Comment(member, topic, request.getContent());
         commentRepository.save(comment);
 
         return CommentResponse.from(comment);
+    }
+
+    private void validateContent(String content) {
+        final int length = TextUtils.countGraphemeClusters(content);
+        if (length > COMMENT_CONTENT.getMaxLength() || length < COMMENT_CONTENT.getMinLength()) {
+            throw new LengthInvalidException("댓글 내용", COMMENT_CONTENT);
+        }
     }
 
     //== like ==//
@@ -122,6 +131,18 @@ public class CommentService {
         // 명시적 삭제
         commentRepository.delete(comment);
         // commentRepository.deleteIfMemberCanTouchComment(memberId, commentId);
+    }
+
+    @Transactional
+    public CommentResponse modifyMembersCommentContent(final Long memberId, final Long commentId, final String content) {
+        Member member = findMember(memberId);
+        Comment comment = findById(commentId);
+
+        validateContent(content);
+        checkMemberCanTouchComment(member, comment);
+
+        comment.setContent(content);
+        return CommentResponse.from(comment);
     }
 
     private void checkMemberCanTouchComment(Member member, Comment comment) {
