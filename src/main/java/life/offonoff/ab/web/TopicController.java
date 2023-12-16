@@ -1,6 +1,7 @@
 package life.offonoff.ab.web;
 
 import jakarta.validation.Valid;
+import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
@@ -9,6 +10,7 @@ import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.web.response.VoteResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.ok;
 
 
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ import static org.springframework.http.ResponseEntity.*;
 public class TopicController {
 
     private final TopicService topicService;
+    private final CommentService commentService;
 
     // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
     @PostMapping
@@ -91,13 +94,14 @@ public class TopicController {
     }
 
     @PostMapping("/{topicId}/vote")
-    public ResponseEntity<Void> voteForTopic(
+    public ResponseEntity<VoteResponse> voteForTopic(
         @Authorized Long memberId,
         @PathVariable("topicId") Long topicId,
         @Valid @RequestBody final VoteRequest request
     ) {
         topicService.voteForTopicByMember(topicId, memberId, request);
-        return ok().build();
+        return ok(VoteResponse.from(
+                commentService.getLatestCommentOfTopic(topicId)));
     }
 
     @DeleteMapping("/{topicId}/vote")

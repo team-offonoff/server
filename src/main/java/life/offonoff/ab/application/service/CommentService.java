@@ -5,7 +5,10 @@ import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.exception.*;
+import life.offonoff.ab.exception.CommentNotFoundException;
+import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
+import life.offonoff.ab.exception.MemberByIdNotFoundException;
+import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
@@ -150,5 +153,13 @@ public class CommentService {
         if (!member.isAdmin() && !comment.isWrittenBy(member)) {
             throw new IllegalCommentStatusChangeException(member.getId(), comment.getId());
         }
+    }
+
+    public CommentResponse getLatestCommentOfTopic(Long topicId) {
+        return CommentResponse.from(
+                commentRepository
+                .findFirstByTopicIdOrderByCreatedAtDesc(topicId)
+                .orElse(null)
+        );
     }
 }
