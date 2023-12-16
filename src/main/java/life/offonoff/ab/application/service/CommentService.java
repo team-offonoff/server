@@ -55,12 +55,6 @@ public class CommentService {
         }
     }
 
-    private void checkTopicCanBeCommented(Long topicId) {
-        if (!topicRepository.existsByIdAndActiveTrue(topicId)) {
-            throw new TopicNotFoundException(topicId);
-        }
-    }
-
     private Member findMember(final Long memberId) {
         return memberRepository.findByIdAndActiveTrue(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
@@ -84,15 +78,26 @@ public class CommentService {
     //== save ==//
     @Transactional
     public CommentResponse register(Long memberId, CommentRequest request) {
-        Member member = findMember(memberId);
-        Topic topic = findTopic(request.getTopicId());
 
-        validateContent(request.getContent());
+        Comment comment = createComment(memberId, request);
 
-        Comment comment = new Comment(member, topic, request.getContent());
         commentRepository.save(comment);
 
         return CommentResponse.from(comment);
+    }
+
+    private Comment createComment(Long memberId, CommentRequest request) {
+        final String content = request.getContent();
+
+        validateContent(content);
+
+        Member writer = findMember(memberId);
+        Topic topic = findTopic(request.getTopicId());
+
+        if (topic.isWrittenBy(writer)) {
+            return Comment.createAuthorsComment(writer, topic, content);
+        }
+        return Comment.createVotersComment(findVote(writer.getId(), topic.getId()), content);
     }
 
     private void validateContent(String content) {

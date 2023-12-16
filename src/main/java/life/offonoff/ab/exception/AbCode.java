@@ -17,6 +17,9 @@ public enum AbCode {
     VOTED_BY_AUTHOR,
     MEMBER_NOT_VOTE,
 
+    // Topic
+    ILLEGAL_AUTHOR,
+
     // COMMENT
     UNABLE_TO_VIEW_COMMENTS,
 
