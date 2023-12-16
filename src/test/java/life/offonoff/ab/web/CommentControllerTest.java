@@ -7,6 +7,7 @@ import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.exception.AbCode;
 import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.TopicNotFoundException;
+import life.offonoff.ab.exception.UnableToViewCommentsException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
@@ -97,7 +98,7 @@ class CommentControllerTest extends RestDocsTest {
         // give
         Long topicId = 1L;
 
-        when(commentService.findAllComments(nullable(Long.class), anyLong(), any(Pageable.class)))
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
                 .thenReturn(new SliceImpl<>(createCommentResponses(topicId)));
 
         mvc.perform(get(CommentUri.BASE)
@@ -119,10 +120,11 @@ class CommentControllerTest extends RestDocsTest {
     void get_comments_of_topic_empty_comments() throws Exception {
         Long topicId = 1L;
 
-        when(commentService.findAllComments(isNull(Long.class), anyLong(), any(Pageable.class)))
+        when(commentService.findAll(isNull(Long.class), anyLong(), any(Pageable.class)))
                 .thenReturn(new SliceImpl<>(Collections.emptyList()));
 
         mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
                         .queryParam("topic-id", String.valueOf(topicId))
                         .queryParam("page", String.valueOf(0))
                         .queryParam("size", String.valueOf(50)))
@@ -133,13 +135,26 @@ class CommentControllerTest extends RestDocsTest {
     void get_comments_exception_topic_not_found() throws Exception {
         Long topicId = 1L;
 
-        when(commentService.findAllComments(nullable(Long.class), anyLong(), any(Pageable.class)))
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
                 .thenThrow(new TopicNotFoundException(topicId));
 
         mvc.perform(get(CommentUri.BASE)
                         .header("Authorization", "Bearer ACCESS_TOKEN")
                         .queryParam("topic-id", String.valueOf(topicId)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void get_comments_exception_not_voted() throws Exception {
+        Long topicId = 1L;
+
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
+                .thenThrow(new UnableToViewCommentsException(topicId));
+
+        mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer ACCESS_TOKEN")
+                        .queryParam("topic-id", String.valueOf(topicId)))
+                .andExpect(status().isBadRequest());
     }
 
     private List<CommentResponse> createCommentResponses(Long topicId) {

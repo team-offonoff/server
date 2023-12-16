@@ -27,6 +27,10 @@ operation::comment-controller-test/get_comments_of_topic_empty_comments[snippets
 
 #### E1. 존재하지 않는 토픽
 operation::comment-controller-test/get_comments_exception_topic_not_found[snippets="http-request,http-response"]
+
+#### E2. 투표하지 않은 토픽
+operation::comment-controller-test/get_comments_exception_not_voted[snippets="http-request,http-response"]
+
 ### 3. 댓글 삭제
 
 #### OK - 멤버 (admin || 댓글 작성자) 에 속할 때
