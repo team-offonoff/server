@@ -18,8 +18,6 @@ operation::comment-controller-test/create-comment_invalid_topic_exception[snippe
 GET /comments/?topic-id=..
 
 - `topic-id` 는 필수
-- access token 없이도 호출이 가능합니다. (댓글에 대한 like/hate는 다 false로 응답)
-
 
 #### OK - 댓글이 하나 이상 존재
 operation::comment-controller-test/get_comments_of_topic[snippets="query-parameters,http-request,http-response"]
