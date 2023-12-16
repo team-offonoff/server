@@ -8,9 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -64,5 +61,9 @@ public class Comment extends BaseEntity {
     public void remove() {
         topic.commentRemoved();
         writer.removeComment(this);
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
     }
 }
