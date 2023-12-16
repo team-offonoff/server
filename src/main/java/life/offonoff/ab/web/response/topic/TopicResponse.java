@@ -9,7 +9,6 @@ import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
 import life.offonoff.ab.web.response.topic.content.TopicContentResponseFactory;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -54,7 +53,7 @@ public record TopicResponse(
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor()),
-                retriever.getSelectedOptionOfTopic(topic) // TODO : topics.size * votes.size 시간 복잡도 개선
+                retriever.getVotedOptionOfTopic(topic) // TODO : topics.size * votes.size 시간 복잡도 개선
         );
     }
 }

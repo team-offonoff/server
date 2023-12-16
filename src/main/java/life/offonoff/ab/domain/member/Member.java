@@ -196,7 +196,7 @@ public class Member extends BaseEntity {
         //== VOTE ==//
     public boolean votedAlready(Topic topic) {
         return votes.stream()
-                .anyMatch(v -> v.has(topic));
+                .anyMatch(v -> v.isFor(topic));
     }
 
     public void readNotification(Notification notification) {
@@ -239,9 +239,9 @@ public class Member extends BaseEntity {
         comments.remove(comment);
     }
 
-    public ChoiceOption getSelectedOptionOfTopic(Topic topic) {
+    public ChoiceOption getVotedOptionOfTopic(Topic topic) {
         return votes.stream()
-                .filter(vote -> vote.has(topic))
+                .filter(vote -> vote.isFor(topic))
                 .map(Vote::getSelectedOption)
                 .findAny()
                 .orElse(null);
