@@ -18,6 +18,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
+
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,7 +59,8 @@ class CommentControllerTest extends RestDocsTest {
                 0,
                 0,
                 false,
-                false
+                false,
+                LocalDateTime.now()
         );
 
         when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenReturn(response);
@@ -178,7 +181,8 @@ class CommentControllerTest extends RestDocsTest {
                 0,
                 0,
                 true,
-                false);
+                false,
+                LocalDateTime.now());
         CommentResponse response2 = new CommentResponse(
                 2L,
                 topicId,
@@ -187,7 +191,8 @@ class CommentControllerTest extends RestDocsTest {
                 0,
                 0,
                 true,
-                false);
+                false,
+                LocalDateTime.now());
 
         return List.of(response1, response2);
     }
@@ -257,7 +262,8 @@ class CommentControllerTest extends RestDocsTest {
                 0,
                 0,
                 false,
-                false
+                false,
+                LocalDateTime.now()
         );
         when(commentService.modifyMembersCommentContent(any(), any(), any())).thenReturn(response);
 

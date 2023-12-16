@@ -5,6 +5,8 @@ import life.offonoff.ab.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @Getter
 public class CommentResponse {
@@ -17,6 +19,7 @@ public class CommentResponse {
     private Integer hateCount;
     private Boolean liked;
     private Boolean hated;
+    private LocalDateTime createdAt;
 
     public static CommentResponse from(Comment comment) {
         if (comment == null) {
@@ -29,7 +32,8 @@ public class CommentResponse {
                 comment.getLikeCount(),
                 comment.getHateCount(),
                 false,
-                false);
+                false,
+                comment.getCreatedAt());
     }
 
     public static CommentResponse from(Comment comment, Member member) {
@@ -40,7 +44,8 @@ public class CommentResponse {
                 comment.getLikeCount(),
                 comment.getHateCount(),
                 member.likeAlready(comment),
-                member.hateAlready(comment));
+                member.hateAlready(comment),
+                comment.getCreatedAt());
     }
 
 }
