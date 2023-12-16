@@ -1,8 +1,10 @@
 package life.offonoff.ab.application.service.common;
 
-import java.text.BreakIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextUtils {
+    private static final Pattern graphemePattern = Pattern.compile("\\X");
 
     /*
      * 이모티콘이 포함된 문자와 같이  2byte가 넘는 문자가 있을 경우 String의 길이는 우리가 인식하는 글자 단위보다 길어진다.
@@ -11,26 +13,21 @@ public class TextUtils {
      * Grapheme Cluster: 우리가 인식하는 글자 단위
      */
     public static int countGraphemeClusters(String text) {
-        BreakIterator it = BreakIterator.getCharacterInstance();
-        it.setText(text);
-        int count = 0;
-        while (it.next() != BreakIterator.DONE) {
-            count++;
+        if (text == null) {
+            return 0;
         }
-        return count;
+        final Matcher graphemeMatcher = graphemePattern.matcher(text);
+        return (int) graphemeMatcher.results().count();
     }
 
     public static int countEmojis(String text) {
-        BreakIterator it = BreakIterator.getCharacterInstance();
-        it.setText(text);
-        int count = 0;
-        while (it.current() < text.length()) {
-            if (Character.isEmoji(text.codePointAt(it.current()))) {
-                count += 1;
-            }
-            it.next();
+        if (text == null) {
+            return 0;
         }
-        return count;
+        final Matcher graphemeMatcher = graphemePattern.matcher(text);
+        return (int) graphemeMatcher.results()
+                .filter(result -> result.group().length() > 1)
+                .count();
     }
 
     /*
