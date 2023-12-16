@@ -16,6 +16,9 @@ public class CommentResponse {
     private Integer hates;
 
     public static CommentResponse from(Comment comment) {
+        if (comment == null) {
+            return null;
+        }
         return new CommentResponse(comment.getId(),
                 comment.getTopic().getId(),
                 MemberResponse.from(comment.getWriter()),
