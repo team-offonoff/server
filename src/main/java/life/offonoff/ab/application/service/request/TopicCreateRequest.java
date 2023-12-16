@@ -23,7 +23,7 @@ public record TopicCreateRequest(
     private static final int TOPIC_TITLE_MAX_LENGTH = 25;
 
     public TopicCreateRequest {
-        if (TextUtils.getLengthOfEmojiContainableText(title) > TOPIC_TITLE_MAX_LENGTH) {
+        if (TextUtils.countGraphemeClustersWithLongerEmoji(title) > TOPIC_TITLE_MAX_LENGTH) {
             throw new LengthInvalidException("토픽 제목", 1, TOPIC_TITLE_MAX_LENGTH);
         }
     }

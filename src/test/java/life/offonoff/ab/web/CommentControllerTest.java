@@ -2,12 +2,9 @@ package life.offonoff.ab.web;
 
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
+import life.offonoff.ab.application.service.request.CommentUpdateRequest;
 import life.offonoff.ab.config.WebConfig;
-
-import life.offonoff.ab.exception.AbCode;
-import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
-import life.offonoff.ab.exception.TopicNotFoundException;
-import life.offonoff.ab.exception.UnableToViewCommentsException;
+import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
@@ -18,17 +15,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.request.RequestDocumentation;
-
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
+import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
+import static life.offonoff.ab.exception.AbCode.INVALID_LENGTH_OF_FIELD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -91,6 +87,22 @@ class CommentControllerTest extends RestDocsTest {
                         .content(om.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.abCode").value(AbCode.TOPIC_NOT_FOUND.name()));
+    }
+
+    @Test
+    void createComment_withLongContent_error() throws Exception {
+        doThrow(new LengthInvalidException("댓글 내용", COMMENT_CONTENT.getMinLength(), COMMENT_CONTENT.getMaxLength()))
+                .when(commentService).register(any(), any());
+
+        CommentRequest request =
+                new CommentRequest(2L, "c".repeat(COMMENT_CONTENT.getMaxLength() + 1));
+        mvc.perform(post(CommentUri.BASE)
+                            .header("Authorization", "Bearer ACCESS_TOKEN")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(om.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value(INVALID_LENGTH_OF_FIELD.name()))
+                .andDo(print());
     }
 
     @Test
@@ -190,6 +202,15 @@ class CommentControllerTest extends RestDocsTest {
     }
 
     @Test
+    void deleteComment_withInvalidCommentId_error() throws Exception {
+        doThrow(new CommentNotFoundException(1L))
+                .when(commentService).deleteComment(any(), any());
+
+        mvc.perform(delete(CommentUri.DELETE, 1L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void delete_comment_member_cannot_touch() throws Exception {
         Long commentId = 1L;
         Long accessMemberId = 1L;
@@ -226,11 +247,34 @@ class CommentControllerTest extends RestDocsTest {
                 ));
     }
 
+    @Test
+    void modifyComment() throws Exception {
+        CommentResponse response = new CommentResponse(
+                1L,
+                2L,
+                new MemberResponse(1L, "writerNickname", "writerProfileImageUrl"),
+                "new content",
+                0,
+                0,
+                false,
+                false
+        );
+        when(commentService.modifyMembersCommentContent(any(), any(), any())).thenReturn(response);
+
+        CommentUpdateRequest request = new CommentUpdateRequest("new content");
+
+        mvc.perform(patch(CommentUri.COMMENT, 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(om.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content").value("new content"));
+    }
+
     private static class CommentUri {
         private static final String BASE = "/comments";
-        private static final String COMMENT_ID = "/{commentId}";
-        private static final String DELETE = BASE + COMMENT_ID;
-        private static final String LIKE = BASE + COMMENT_ID + "/like";
-        private static final String HATE = BASE + COMMENT_ID + "/hate";
+        private static final String COMMENT = BASE + "/{commentId}";
+        private static final String DELETE = COMMENT;
+        private static final String LIKE = COMMENT + "/like";
+        private static final String HATE = COMMENT + "/hate";
     }
 }

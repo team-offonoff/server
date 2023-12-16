@@ -22,6 +22,10 @@ import java.time.LocalDateTime;
 public class TestEntityUtil {
 
     //== Member ==//
+    public static Member createRandomMember() {
+        return createCompletelyJoinedMember("email", "pass", "nickname");
+    }
+
     public static Member createMember(String email, String password) {
         return new Member(email, password, Provider.NONE);
     }
@@ -38,6 +42,10 @@ public class TestEntityUtil {
     }
 
     //== Topic ==//
+    public static Topic createRandomTopic() {
+        return createTopic(1, TopicSide.TOPIC_A);
+    }
+
     public static Topic createTopic(int seq, TopicSide side) {
         String topicTitle = "TITLE_" + seq;
         return new Topic(topicTitle, side);

@@ -1,13 +1,18 @@
 package life.offonoff.ab.application.service;
 
 import jakarta.persistence.EntityManager;
+import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.exception.CommentNotFoundException;
+import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
+import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.web.response.CommentResponse;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest
@@ -42,6 +48,22 @@ class CommentServiceTest {
 
         // then
         assertThat(response.getTopicId()).isEqualTo(topic.getId());
+    }
+
+    @Test
+    void register_withLongContent_throwsException() {
+        Long memberId = createRandomMember();
+        Long topicId = createRandomTopic();
+
+        ThrowingCallable code = () -> commentService.register(
+                memberId,
+                new CommentRequest(
+                        topicId,
+                        "c".repeat(LengthInfo.COMMENT_CONTENT.getMaxLength() + 1))
+        );
+
+        assertThatThrownBy(code)
+                .isInstanceOf(LengthInvalidException.class);
     }
 
     @Test
@@ -109,26 +131,85 @@ class CommentServiceTest {
         assertThat(topic.getCommentCount()).isEqualTo(0);
     }
 
-    /*
     @Test
-    @DisplayName("토픽 작성자에 의한 댓글 삭제")
-    void delete_comment_by_topic_author() {
-        // given
-        Member topicAuthor = createCompletelyJoinedMember("author", "pwd", "author");
-        Member writer = createCompletelyJoinedMember("writer", "pwd", "writer");
-        Topic topic = TestTopicUtil.createTopicWithAuthor(TopicSide.TOPIC_A, topicAuthor);
+    void modifyComment() {
+        Long memberId = createRandomMember();
+        Long topicId = createRandomTopic();
+        Long commentId = commentService.register(
+                memberId,
+                new CommentRequest(topicId, "content")
+        ).getCommentId();
 
-        Comment comment = new Comment(writer, topic, "content");
+        commentService.modifyMembersCommentContent(
+                memberId, commentId,
+                "new content");
 
-        em.persist(writer);
-        em.persist(topic);
-        em.persist(comment);
-
-        // when
-        commentService.deleteComment(topicAuthor.getId(), comment.getId());
-
-        // then
-        assertThat(topic.getCommentCount()).isEqualTo(0);
+        Comment comment = em.find(Comment.class, commentId);
+        assertThat(comment.getContent()).isEqualTo("new content");
     }
-     */
+
+    @Test
+    void modifyComment_withInvalidCommentId_throwsException() {
+        Long memberId = createRandomMember();
+        Long topicId = createRandomTopic();
+        Long commentId = commentService.register(
+                memberId,
+                new CommentRequest(topicId, "content")
+        ).getCommentId();
+
+        ThrowingCallable code = () -> commentService.modifyMembersCommentContent(
+                memberId,
+                commentId + 1,
+                "new content");
+
+        assertThatThrownBy(code)
+                .isInstanceOf(CommentNotFoundException.class);
+    }
+
+    @Test
+    void modifyComment_withLongContent_throwsException() {
+        Long memberId = createRandomMember();
+        Long topicId = createRandomTopic();
+        Long commentId = commentService.register(
+                memberId,
+                new CommentRequest(topicId, "content")
+        ).getCommentId();
+
+        ThrowingCallable code = () -> commentService.modifyMembersCommentContent(
+                memberId, commentId,
+                "c".repeat(LengthInfo.COMMENT_CONTENT.getMaxLength() + 1));
+
+        assertThatThrownBy(code)
+                .isInstanceOf(LengthInvalidException.class);
+    }
+
+    @Test
+    void modifyComment_withNonAuthor_throwsException() {
+        Long memberId = createRandomMember();
+        Long topicId = createRandomTopic();
+        Long commentId = commentService.register(
+                memberId,
+                new CommentRequest(topicId, "content")
+        ).getCommentId();
+        Long otherMemberId = createRandomMember();
+
+        ThrowingCallable code = () -> commentService.modifyMembersCommentContent(
+                otherMemberId,
+                commentId, "new content");
+
+        assertThatThrownBy(code)
+                .isInstanceOf(IllegalCommentStatusChangeException.class);
+    }
+
+    private Long createRandomMember() {
+        Member member =  createCompletelyJoinedMember("email", "password", "nickname");
+        em.persist(member);
+        return member.getId();
+    }
+
+    private Long createRandomTopic() {
+        Topic topic = createTopic(0, TopicSide.TOPIC_A);
+        em.persist(topic);
+        return topic.getId();
+    }
 }

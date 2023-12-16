@@ -2,6 +2,7 @@ package life.offonoff.ab.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
@@ -10,7 +11,7 @@ import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteCancelRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.config.WebConfig;
-import life.offonoff.ab.domain.TestEntityUtil;
+import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -21,10 +22,9 @@ import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
-import org.hibernate.sql.ast.tree.expression.Collation;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,26 +34,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -70,6 +64,9 @@ public class TopicControllerTest extends RestDocsTest {
 
     @MockBean
     TopicService topicService;
+
+    @MockBean
+    CommentService commentService;
 
     @Test
     void createTopic() throws Exception {
@@ -195,6 +192,14 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void voteForTopic_byNonAuthor_success() throws Exception {
+        when(commentService.getLatestCommentOfTopic(any()))
+                .thenReturn(CommentResponse.from(
+                        new Comment(
+                        createRandomMember(),
+                        createRandomTopic(),
+                        "content"
+                )));
+
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
 
@@ -202,7 +207,8 @@ public class TopicControllerTest extends RestDocsTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                              .writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.comment.content").value("content"));
     }
 
     @Test
