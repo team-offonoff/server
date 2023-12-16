@@ -2,21 +2,19 @@ package life.offonoff.ab.repository.topic;
 
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.configuration.TestConfig;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.repository.TestQueryDslConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,8 +24,8 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
-@SpringBootTest
+@Import(TestConfig.class)
+@DataJpaTest
 class TopicRepositoryTest {
 
     @Autowired
