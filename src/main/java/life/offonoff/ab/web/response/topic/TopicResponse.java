@@ -1,7 +1,9 @@
 package life.offonoff.ab.web.response.topic;
 
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.MemberResponse;
 import life.offonoff.ab.web.response.KeywordResponse;
@@ -23,8 +25,8 @@ public record TopicResponse(
         TopicContentResponse topicContent,
         KeywordResponse keyword,
         List<ChoiceResponse> choices,
-        MemberResponse author
-//        CommentResponse lastComment
+        MemberResponse author,
+        ChoiceOption selectedOption
 ) {
     public static TopicResponse from(Topic topic) {
         return new TopicResponse(
@@ -36,10 +38,23 @@ public record TopicResponse(
                 TopicContentResponseFactory.create(topic.getContent()),
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
-                MemberResponse.from(topic.getAuthor())
-//                topic.getLastComment().isPresent() ? CommentResponse.from(topic.getLastComment().get()) : null
+                MemberResponse.from(topic.getAuthor()),
+                null
         );
     }
 
-
+    public static TopicResponse from(Topic topic, Member retrieveMember) {
+        return new TopicResponse(
+                topic.getId(),
+                topic.getSide(),
+                topic.getTitle(),
+                topic.getDeadlineSecond(),
+                topic.getVoteCount(),
+                TopicContentResponseFactory.create(topic.getContent()),
+                KeywordResponse.from(topic.getKeyword()),
+                topic.getChoices().stream().map(ChoiceResponse::from).toList(),
+                MemberResponse.from(topic.getAuthor()),
+                retrieveMember.getSelectedOptionOfTopic(topic) // TODO : topics.size * votes.size 시간 복잡도 개선
+        );
+    }
 }

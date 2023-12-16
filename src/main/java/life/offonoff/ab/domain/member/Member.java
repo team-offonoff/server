@@ -7,6 +7,7 @@ import life.offonoff.ab.domain.comment.HatedComment;
 import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.IllegalJoinStatusException;
@@ -236,5 +237,13 @@ public class Member extends BaseEntity {
 
     public void removeComment(Comment comment) {
         comments.remove(comment);
+    }
+
+    public ChoiceOption getSelectedOptionOfTopic(Topic topic) {
+        return votes.stream()
+                .filter(vote -> vote.has(topic))
+                .map(Vote::getSelectedOption)
+                .findAny()
+                .orElse(null);
     }
 }

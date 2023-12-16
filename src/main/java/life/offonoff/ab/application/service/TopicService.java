@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -96,6 +97,11 @@ public class TopicService {
                                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 
+    private Member findMemberFetchVotes(final Long memberId) {
+        return memberRepository.findByIdFetchVotes(memberId)
+                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
     private Keyword findOrCreateKeyword(String keyword, TopicSide side) {
         return keywordRepository.findByNameAndSide(keyword, side)
                 .orElseGet(() -> new Keyword(keyword, side));
@@ -120,13 +126,20 @@ public class TopicService {
 
     /**
      * 토픽 검색 서비스
-     * @param request Specification을 이용해 검색 조건 추상화
+     *
+     * @param request  Specification을 이용해 검색 조건 추상화
      * @param pageable
      * @return
      */
     public Slice<TopicResponse> findAll(final Long memberId, final TopicSearchRequest request, final Pageable pageable) {
-        return topicRepository.findAll(memberId, request, pageable)
-                .map(TopicResponse::from);
+
+        Slice<Topic> topics = topicRepository.findAll(memberId, request, pageable);
+        Member member = findMemberFetchVotes(memberId);
+        /* fetch join 없이 batch_size로도 성능 해결 가능
+        Member member = findMember(memberId);
+         */
+
+        return topics.map(topic -> TopicResponse.from(topic, member));
     }
 
     //== Hide ==//
