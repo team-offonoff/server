@@ -4,12 +4,12 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
-import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.MemberResponse;
 import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
 import life.offonoff.ab.web.response.topic.content.TopicContentResponseFactory;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -39,11 +39,11 @@ public record TopicResponse(
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor()),
-                null
+                null // 선택 option이 없을 경우 null 처리
         );
     }
 
-    public static TopicResponse from(Topic topic, Member retrieveMember) {
+    public static TopicResponse from(Topic topic, Member retriever) {
         return new TopicResponse(
                 topic.getId(),
                 topic.getSide(),
@@ -54,7 +54,7 @@ public record TopicResponse(
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor()),
-                retrieveMember.getSelectedOptionOfTopic(topic) // TODO : topics.size * votes.size 시간 복잡도 개선
+                retriever.getSelectedOptionOfTopic(topic) // TODO : topics.size * votes.size 시간 복잡도 개선
         );
     }
 }

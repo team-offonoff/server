@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.LengthInvalidException;
@@ -19,6 +20,7 @@ import life.offonoff.ab.web.response.topic.choice.content.ImageTextChoiceContent
 import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.Builder;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +42,10 @@ import java.util.Optional;
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static life.offonoff.ab.domain.TestEntityUtil.TestKeyword;
 import static life.offonoff.ab.domain.TestEntityUtil.TestMember;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -161,6 +166,116 @@ public class TopicServiceTest {
             // then
             verify(eventPublisher, never()).publishEvent(any(TopicCreateEvent.class));
         }
+    }
+
+    @Test
+    @DisplayName("투표한 토픽은 선택 옵션 표시")
+    void find_topics_with_selected_option() {
+        // given
+          // member
+        Member author = TestMember.builder()
+                .id(1L)
+                .nickname("author")
+                .build().buildMember();
+
+        Member retriever = TestMember.builder()
+                .id(2L)
+                .nickname("retriever")
+                .build().buildMember();
+
+          // keyword
+        Keyword keyword = TestKeyword.builder()
+                .id(1L)
+                .name("key")
+                .build().buildKeyword();
+
+          // topic
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .title("topic1")
+                .author(author)
+                .keyword(keyword)
+                .voteCount(100)
+                .build().buildTopic();
+
+          // vote
+        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        vote.associate(retriever, topic);
+
+          // search params
+        TopicSearchRequest request = new TopicSearchRequest(TopicStatus.VOTING, null);
+        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "voteCount");
+
+        Slice<Topic> topics = new SliceImpl<>(List.of(topic), pageable, false);
+
+        when(memberRepository.findByIdFetchVotes(anyLong()))
+                .thenReturn(Optional.of(retriever));
+        when(topicRepository.findAll(anyLong(), any(TopicSearchRequest.class), any(Pageable.class)))
+                .thenReturn(topics);
+
+        // when
+        Slice<TopicResponse> responses = topicService.findAll(retriever.getId(), request, pageable);
+
+        // then
+        assertAll(
+                () -> assertThat(responses.getSize()).isEqualTo(topics.getSize()),
+                () -> assertThat(responses.getContent()
+                                          .get(0)
+                                          .selectedOption()).isEqualTo(vote.getSelectedOption())
+        );
+    }
+
+    @Test
+    @DisplayName("투표하지 않은 토픽은 선택 옵션 null 표시")
+    void find_topics_with_selected_option_null() {
+        // given
+        // member
+        Member author = TestMember.builder()
+                .id(1L)
+                .nickname("author")
+                .build().buildMember();
+
+        Member retriever = TestMember.builder()
+                .id(2L)
+                .nickname("retriever")
+                .build().buildMember();
+
+        // keyword
+        Keyword keyword = TestKeyword.builder()
+                .id(1L)
+                .name("key")
+                .build().buildKeyword();
+
+        // topic
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .title("topic1")
+                .author(author)
+                .keyword(keyword)
+                .voteCount(100)
+                .build().buildTopic();
+
+        // search params
+        TopicSearchRequest request = new TopicSearchRequest(TopicStatus.VOTING, null);
+        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "voteCount");
+
+        Slice<Topic> topics = new SliceImpl<>(List.of(topic), pageable, false);
+
+        when(memberRepository.findByIdFetchVotes(anyLong()))
+                .thenReturn(Optional.of(retriever));
+        when(topicRepository.findAll(anyLong(), any(TopicSearchRequest.class), any(Pageable.class)))
+                .thenReturn(topics);
+
+        // when
+        Slice<TopicResponse> responses = topicService.findAll(retriever.getId(), request, pageable);
+
+        // then
+        assertAll(
+                () -> assertThat(responses.getSize()).isEqualTo(topics.getSize()),
+                () -> assertThat(responses.getContent()
+                        .get(0)
+                        .selectedOption()).isEqualTo(null)
+        );
     }
 
     private void setEventPublisher(TopicService topicService, ApplicationEventPublisher eventPublisher) {
