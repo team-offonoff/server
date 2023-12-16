@@ -23,7 +23,8 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member writer;
-    // 조회 성능 향상을 위한 필드
+
+    @Enumerated(EnumType.STRING)
     private ChoiceOption writersVotedOption;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
