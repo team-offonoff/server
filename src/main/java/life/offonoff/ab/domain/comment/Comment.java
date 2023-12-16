@@ -24,7 +24,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member writer;
     // 조회 성능 향상을 위한 필드
-    private ChoiceOption writersSelectedOption;
+    private ChoiceOption writersVotedOption;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_id")
@@ -45,7 +45,7 @@ public class Comment extends BaseEntity {
 
     public Comment(Member member, Topic topic, ChoiceOption selectedOption, String content) {
         associate(member, topic);
-        this.writersSelectedOption = selectedOption;
+        this.writersVotedOption = selectedOption;
         this.content = content;
     }
 
