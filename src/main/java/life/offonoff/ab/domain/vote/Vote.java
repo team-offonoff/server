@@ -52,7 +52,7 @@ public class Vote extends BaseEntity {
         topic.getVotes().remove(this);
     }
 
-    public boolean has(Topic topic) {
-        return this.topic == topic;
+    public boolean isFor(Topic topic) {
+        return this.topic.getId().equals(topic.getId());
     }
 }
