@@ -141,7 +141,7 @@ public class CommentService {
         validateContent(content);
         checkMemberCanTouchComment(member, comment);
 
-        comment.setContent(content);
+        comment.changeContent(content);
         return CommentResponse.from(comment);
     }
 

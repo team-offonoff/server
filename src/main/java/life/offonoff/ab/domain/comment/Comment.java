@@ -63,7 +63,7 @@ public class Comment extends BaseEntity {
         writer.removeComment(this);
     }
 
-    public void setContent(String content) {
+    public void changeContent(String content) {
         this.content = content;
     }
 }
