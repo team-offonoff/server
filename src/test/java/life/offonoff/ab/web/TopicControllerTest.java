@@ -24,20 +24,19 @@ import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
+import life.offonoff.ab.web.response.topic.content.TopicContentResponseFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -278,6 +277,12 @@ public class TopicControllerTest extends RestDocsTest {
                 .nickname("nicknameA")
                 .build().buildMember();
 
+        // create retrieve member
+        Member retrieveMember = TestMember.builder()
+                .id(1L)
+                .nickname("retrieveMember")
+                .build().buildMember();
+
         // create keyword
         Keyword keyword1 = TestKeyword.builder()
                 .id(1L)
@@ -313,7 +318,7 @@ public class TopicControllerTest extends RestDocsTest {
         return PagingUtil.toSlice(
                 Stream.of(topic1, topic2)
                         .sorted((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
-                        .map(TopicResponse::from)
+                        .map(t -> TopicResponse.from(t, retrieveMember))
                         .collect(Collectors.toList()),
                 pageable);
     }
@@ -323,6 +328,12 @@ public class TopicControllerTest extends RestDocsTest {
         Member author = TestMember.builder()
                 .id(1L)
                 .nickname("nicknameA")
+                .build().buildMember();
+
+        // create retrieve member
+        Member retrieveMember = TestMember.builder()
+                .id(1L)
+                .nickname("retrieveMember")
                 .build().buildMember();
 
         // create keyword
@@ -355,7 +366,7 @@ public class TopicControllerTest extends RestDocsTest {
         return PagingUtil.toSlice(
                 Stream.of(topic1, topic2)
                         .sorted((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
-                        .map(TopicResponse::from)
+                        .map(t -> TopicResponse.from(t, retrieveMember))
                         .collect(Collectors.toList()),
                 pageable);
     }
