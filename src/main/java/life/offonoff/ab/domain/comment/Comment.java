@@ -23,8 +23,9 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member writer;
-    // 조회 성능 향상을 위한 필드
-    private ChoiceOption writersSelectedOption;
+
+    @Enumerated(EnumType.STRING)
+    private ChoiceOption writersVotedOption;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "topic_id")
@@ -38,18 +39,41 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public Comment(Member member, Topic topic, String content) {
+    private Comment(Member member, Topic topic, String content) {
         associate(member, topic);
         this.content = content;
     }
 
-    public void associate(Member member, Topic topic) {
+    public Comment(Member member, Topic topic, ChoiceOption selectedOption, String content) {
+        associate(member, topic);
+        this.writersVotedOption = selectedOption;
+        this.content = content;
+    }
+
+
+    private void associate(Member member, Topic topic) {
         this.writer = member;
         member.addComment(this);
 
         this.topic = topic;
         topic.commented();
     }
+
+    public static Comment createAuthorsComment(Member author, Topic topic, String content) {
+        if (!topic.isWrittenBy(author)) {
+            throw new IllegalAuthorException(author.getId(), topic.getId());
+        }
+
+        return new Comment(author, topic, content);
+    }
+
+    public static Comment createVotersComment(Vote vote, String content) {
+        return new Comment(vote.getVoter(),
+                           vote.getTopic(),
+                           vote.getSelectedOption(),
+                           content);
+    }
+
     public void increaseLikeCount() {
         likeCount++;
     }

@@ -196,7 +196,8 @@ public class TopicControllerTest extends RestDocsTest {
                         new Comment(
                         createRandomMember(),
                         createRandomTopic(),
-                        "content"
+                        ChoiceOption.CHOICE_A,
+                "content"
                 )));
 
         VoteRequest request = new VoteRequest(

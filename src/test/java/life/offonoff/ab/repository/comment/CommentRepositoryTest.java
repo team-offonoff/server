@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.Test;
@@ -37,9 +38,9 @@ public class CommentRepositoryTest {
         Member member = memberRepository.save(new Member("email", "pass", Provider.NONE));
         Topic topic = topicRepository.save(new Topic("topic", TopicSide.TOPIC_A));
 
-        commentRepository.save(new Comment(member, topic, "content1"));
-        commentRepository.save(new Comment(member, topic, "content2"));
-        Comment lastComment = commentRepository.save(new Comment(member, topic, "content3"));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content1"));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content2"));
+        Comment lastComment = commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content3"));
 
         // when
         Optional<Comment> found = commentRepository.findFirstByTopicIdOrderByCreatedAtDesc(topic.getId());

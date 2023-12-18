@@ -150,10 +150,11 @@ public class TestEntityUtil {
         private Long id;
         private Member writer;
         private Topic topic;
+        private ChoiceOption selected;
         private String content;
 
         public Comment buildComment() {
-            Comment comment = new Comment(writer, topic, content);
+            Comment comment = new Comment(writer, topic, selected, content);
             ReflectionTestUtils.setField(comment, "id", id);
             return comment;
         }
