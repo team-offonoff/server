@@ -208,7 +208,7 @@ public class TopicServiceTest {
 
         Slice<Topic> topics = new SliceImpl<>(List.of(topic), pageable, false);
 
-        when(memberRepository.findByIdFetchVotes(anyLong()))
+        when(memberRepository.findByIdAndActiveTrue(anyLong()))
                 .thenReturn(Optional.of(retriever));
         when(topicRepository.findAll(anyLong(), any(TopicSearchRequest.class), any(Pageable.class)))
                 .thenReturn(topics);
@@ -261,7 +261,7 @@ public class TopicServiceTest {
 
         Slice<Topic> topics = new SliceImpl<>(List.of(topic), pageable, false);
 
-        when(memberRepository.findByIdFetchVotes(anyLong()))
+        when(memberRepository.findByIdAndActiveTrue(anyLong()))
                 .thenReturn(Optional.of(retriever));
         when(topicRepository.findAll(anyLong(), any(TopicSearchRequest.class), any(Pageable.class)))
                 .thenReturn(topics);

@@ -134,12 +134,12 @@ public class TopicService {
     public Slice<TopicResponse> findAll(final Long memberId, final TopicSearchRequest request, final Pageable pageable) {
 
         Slice<Topic> topics = topicRepository.findAll(memberId, request, pageable);
-        Member member = findMemberFetchVotes(memberId);
-        /* fetch join 없이 batch_size로도 성능 해결 가능
-        Member member = findMember(memberId);
-         */
 
-        return topics.map(topic -> TopicResponse.from(topic, member));
+        if (memberId == null) {
+            return topics.map(TopicResponse::from);
+        }
+
+        return topics.map(topic -> TopicResponse.from(topic, findMember(memberId)));
     }
 
     //== Hide ==//
