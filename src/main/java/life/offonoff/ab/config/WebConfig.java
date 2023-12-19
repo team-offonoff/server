@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     //== OAUTH CORS ==//
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/oauth/**")
+        registry.addMapping("/**")
                 .allowedOrigins("http://localhost:5173")
                 .allowCredentials(true)
                 // OPTION 요청은 preflight
