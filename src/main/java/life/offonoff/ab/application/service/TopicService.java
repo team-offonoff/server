@@ -16,6 +16,7 @@ import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
+import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
@@ -37,11 +38,13 @@ import java.util.List;
 @Transactional(readOnly = true)
 @Service
 public class TopicService {
+
     private final KeywordRepository keywordRepository;
     private final ChoiceRepository choiceRepository;
     private final TopicRepository topicRepository;
     private final MemberRepository memberRepository;
     private final VoteRepository voteRepository;
+    private final CommentRepository commentRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -210,6 +213,13 @@ public class TopicService {
     private void deleteVote(Vote vote) {
         vote.removeAssociations();
         voteRepository.delete(vote);
+
+        deleteVotersComments(vote.getVoter(), vote.getTopic());
+    }
+
+    private void deleteVotersComments(Member voter, Topic topic) {
+        int deleted = commentRepository.deleteAllByWriterIdAndTopicId(voter.getId(), topic.getId());
+        topic.commentRemoved(deleted);
     }
 
     private Vote findVoteByMemberIdAndTopicId(Long memberId, Long topicId) {

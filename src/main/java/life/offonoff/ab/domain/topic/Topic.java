@@ -154,8 +154,12 @@ public class Topic extends BaseEntity {
         this.commentCount++;
     }
 
+    public void commentRemoved(int amount) {
+        this.commentCount -= amount;
+    }
+
     public void commentRemoved() {
-        this.commentCount--;
+        commentRemoved(1);
     }
 
     public boolean isWrittenBy(Member member) {
