@@ -2,6 +2,7 @@ package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
 import life.offonoff.ab.application.service.request.*;
+import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -10,9 +11,10 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.LengthInvalidException;
-import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.ChoiceRepository;
+import life.offonoff.ab.repository.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
+import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
@@ -20,7 +22,6 @@ import life.offonoff.ab.web.response.topic.choice.content.ImageTextChoiceContent
 import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.Builder;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,6 +61,8 @@ public class TopicServiceTest {
     KeywordRepository keywordRepository;
     @Mock
     ChoiceRepository choiceRepository;
+    @Mock
+    CommentRepository commentRepository;
     @Mock
     TopicRepository topicRepository;
     @Mock
@@ -348,6 +351,48 @@ public class TopicServiceTest {
         // then
         assertThat(author.votedAlready(topic)).isFalse();
     }
+
+    @Test
+    @DisplayName("투표 취소하면 투표자 댓글 모두 삭제")
+    void cancel_vote_then_delete_voters_comments() {
+        // given
+        Long topicId = 1L;
+        LocalDateTime deadline = LocalDateTime.now().plusHours(1);
+
+        Member author = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        Member voter = TestMember.builder()
+                .id(2L)
+                .build().buildMember();
+
+        Topic topic = TestTopic.builder()
+                .id(topicId)
+                .deadline(deadline)
+                .author(author)
+                .build().buildTopic();
+
+        // Vote 생성
+        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        vote.associate(voter, topic);
+
+        // Comment 생성
+        Comment comment1 = Comment.createVotersComment(vote, "content1");
+        Comment comment2 = Comment.createVotersComment(vote, "content2");
+
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
+        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
+        when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
+        when(commentRepository.deleteAllByWriterIdAndTopicId(anyLong(), anyLong())).thenReturn(2);
+
+        // when
+        topicService.cancelVoteForTopicByMember(topicId, 2L, new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
+
+        // then
+        assertThat(topic.getCommentCount()).isZero();
+    }
+
 
     @Builder
     public static class TopicTestDtoHelper {

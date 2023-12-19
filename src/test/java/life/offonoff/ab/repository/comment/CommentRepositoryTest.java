@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -47,5 +48,23 @@ public class CommentRepositoryTest {
         // then
         assertThat(found).isNotEmpty();
         assertThat(found.get().getId()).isEqualTo(lastComment.getId());
+    }
+
+    @Test
+    @DisplayName("writer id & topic id인 댓글 전부 삭제")
+    void delete_writers_comments() {
+        // given
+        Member member = memberRepository.save(new Member("email", "pass", Provider.NONE));
+        Topic topic = topicRepository.save(new Topic("topic", TopicSide.TOPIC_A));
+
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content1"));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content2"));
+
+        // when
+        commentRepository.deleteAllByWriterIdAndTopicId(member.getId(), topic.getId());
+
+        // then
+        assertThat(commentRepository.countAllByWriterIdAndTopicId(member.getId(), topic.getId()))
+                .isEqualTo(0);
     }
 }
