@@ -1,6 +1,6 @@
 package life.offonoff.ab.exception;
 
-public class UnableToViewCommentsException extends IllegalArgumentException {
+public class UnableToViewCommentsException extends UnableToProcessException {
     private static final String MESSAGE = "해당 토픽의 댓글을 볼 수 없습니다.";
     private static final AbCode AB_CODE = AbCode.UNABLE_TO_VIEW_COMMENTS;
     private final Long topicId;
