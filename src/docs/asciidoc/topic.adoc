@@ -110,3 +110,11 @@ operation::topic-controller-test/cancel-vote-for-topic_existing-vote_success[sni
 정상 로직에선 볼 일 없을 듯하므로 메시지는 임의로 작성함.
 
 operation::topic-controller-test/cancel-vote-for-topic_non-existing-vote_throw-exception[snippets="http-request,http-response"]
+
+### 8. 투표 수정
+
+#### OK
+operation::topic-controller-test/modify-vote-for-topic_not_duplicated_option[snippets="http-request,http-response"]
+
+#### E1. 동일 선택지로의 수정 요청
+operation::topic-controller-test/modify-vote-for-topic_exception_duplicated_option[snippets="http-request,http-response"]

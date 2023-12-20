@@ -1,15 +1,13 @@
 package life.offonoff.ab.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.application.service.request.VoteCancelRequest;
-import life.offonoff.ab.application.service.request.VoteRequest;
+import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
@@ -208,7 +206,7 @@ public class TopicControllerTest extends RestDocsTest {
                             .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                              .writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.comment.content").value("content"));
+                .andExpect(jsonPath("$.latestComment.content").value("content"));
     }
 
     @Test
@@ -269,6 +267,44 @@ public class TopicControllerTest extends RestDocsTest {
                                              .writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("abCode").value("MEMBER_NOT_VOTE"));
+    }
+    
+    @Test
+    void modifyVoteForTopic_not_duplicated_option() throws Exception {
+
+        VoteModifyRequest request = new VoteModifyRequest(
+                ChoiceOption.CHOICE_B, getEpochSecond(LocalDateTime.now().plusMinutes(30))
+        );
+
+        mvc.perform(patch(TopicUri.VOTE, 1).with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                .writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void modifyVoteForTopic_exception_duplicated_option() throws Exception {
+
+        Long topicId = 1L;
+        ChoiceOption modifiedOption = ChoiceOption.CHOICE_A;
+
+        VoteModifyRequest request = new VoteModifyRequest(
+                modifiedOption, getEpochSecond(LocalDateTime.now().plusMinutes(30))
+        );
+
+        doThrow(new DuplicateVoteException(topicId, modifiedOption))
+                .when(topicService).modifyVoteForTopicByMember(any(), any(), any());
+
+        mvc.perform(patch(TopicUri.VOTE, topicId).with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                .writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest(),
+                        jsonPath("$.abCode").value(AbCode.DUPLICATE_VOTE.name())
+                );
     }
 
     private Slice<TopicResponse> createDefaultTopicSlice() {
