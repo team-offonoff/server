@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final AuthorizedArgumentResolver authorizedArgumentResolver;
 
-    //== OAUTH CORS ==//
+    //== CORS ==//
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
