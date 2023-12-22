@@ -219,6 +219,7 @@ public class Member extends BaseEntity {
 
     public void cancelHateIfExists(Comment comment) {
         hatedComments.removeIf(h -> h.has(comment));
+        comment.decreaseHateCount();
     }
 
         //== LIKE ==//
@@ -229,6 +230,7 @@ public class Member extends BaseEntity {
 
     public void cancelLikeIfExists(Comment comment) {
         likedComments.removeIf(l -> l.has(comment));
+        comment.decreaseLikeCount();
     }
 
     public boolean isAuthorOf(Topic topic) {

@@ -78,10 +78,17 @@ public class Comment extends BaseEntity {
         likeCount++;
     }
 
+    public void decreaseLikeCount() {
+        likeCount--;
+    }
+
     public void increaseHateCount() {
         hateCount++;
     }
 
+    public void decreaseHateCount() {
+        hateCount--;
+    }
     public boolean isWrittenBy(Member member) {
         return this.writer == member;
     }
