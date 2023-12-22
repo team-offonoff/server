@@ -18,6 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class TestEntityUtil {
 
@@ -74,9 +75,13 @@ public class TestEntityUtil {
         return new Choice(topic, option, content);
     }
     //== Pageable ==//
-
     public static Pageable createPageableDesc(int page, int size, String property) {
         return PageRequest.of(page, size, Sort.Direction.DESC, property);
+    }
+
+    //== Epoch Second ==//
+    public static Long getEpochSecond(LocalDateTime from) {
+        return from.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     //== Reflection + Builder 패턴으로 엔티티 생성 ==//

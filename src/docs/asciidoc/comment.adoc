@@ -50,6 +50,10 @@ operation::comment-controller-test/delete-comment_with-invalid-comment-id_error[
 
 ### 4. 댓글 좋아요
 
+1. 한 댓글에 대한 반응은 둘(`좋아요`/`싫어요`) 중 하나만 존재 가능.
+  - `좋아요` 요청 시에 `싫어요` 요청이 존재하면 `싫어요` 취소
+
+
 #### OK
 
 operation::comment-controller-test/like_comment[snippets="query-parameters,http-request,http-response"]
