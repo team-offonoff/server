@@ -8,6 +8,7 @@ import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.MemberResponse;
 import org.junit.jupiter.api.Test;
@@ -57,10 +58,7 @@ class CommentControllerTest extends RestDocsTest {
                 new MemberResponse(writerId, "writerNickname", "writerProfileImageUrl"),
                 null,
                 content,
-                0,
-                0,
-                false,
-                false,
+                new CommentReactionResponse(0, 0, false, false),
                 LocalDateTime.now()
         );
 
@@ -180,10 +178,7 @@ class CommentControllerTest extends RestDocsTest {
                 new MemberResponse(1L, "member1", "imageUrl1"),
                 null,
                 "content1",
-                0,
-                0,
-                true,
-                false,
+                new CommentReactionResponse(0, 0, true, false),
                 LocalDateTime.now());
         CommentResponse response2 = new CommentResponse(
                 2L,
@@ -191,10 +186,7 @@ class CommentControllerTest extends RestDocsTest {
                 new MemberResponse(2L, "member2", "imageUrl2"),
                 null,
                 "content2",
-                0,
-                0,
-                true,
-                false,
+                new CommentReactionResponse(1, 0, true, false),
                 LocalDateTime.now());
 
         return List.of(response1, response2);
@@ -263,10 +255,7 @@ class CommentControllerTest extends RestDocsTest {
                 new MemberResponse(1L, "writerNickname", "writerProfileImageUrl"),
                 null,
                 "new content",
-                0,
-                0,
-                false,
-                false,
+                new CommentReactionResponse(0, 0, false, false),
                 LocalDateTime.now()
         );
         when(commentService.modifyMembersCommentContent(any(), any(), any())).thenReturn(response);

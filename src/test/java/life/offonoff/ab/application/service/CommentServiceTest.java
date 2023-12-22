@@ -16,6 +16,7 @@ import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.web.response.CommentResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -223,6 +225,56 @@ class CommentServiceTest {
 
         assertThatThrownBy(code)
                 .isInstanceOf(IllegalCommentStatusChangeException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 Like 시에 Hate가 있다면 Hate 취소 후 좋아요")
+    void like_with_cancel_hate() {
+        // given
+        Comment comment = Comment.createVotersComment(vote, "content");
+        em.persist(comment);
+
+        Member liker = TestMember.builder()
+                .build().buildMember();
+        em.persist(liker);
+
+        liker.hateCommentIfNew(comment);
+
+        // when
+        commentService.likeCommentForMember(liker.getId(), comment.getId(), true);
+
+        // then
+        assertAll(
+                () -> assertThat(liker.hateAlready(comment)).isFalse(),
+                () -> assertThat(liker.likeAlready(comment)).isTrue(),
+                () -> assertThat(comment.getHateCount()).isZero(),
+                () -> assertThat(comment.getLikeCount()).isOne()
+        );
+    }
+
+    @Test
+    @DisplayName("댓글 Hate 시에 Like가 있다면 Like 취소 후 Hate")
+    void hate_with_cancel_like() {
+        // given
+        Comment comment = Comment.createVotersComment(vote, "content");
+        em.persist(comment);
+
+        Member hater = TestMember.builder()
+                .build().buildMember();
+        em.persist(hater);
+
+        hater.likeCommentIfNew(comment);
+
+        // when
+        commentService.hateCommentForMember(hater.getId(), comment.getId(), true);
+
+        // then
+        assertAll(
+                () -> assertThat(hater.likeAlready(comment)).isFalse(),
+                () -> assertThat(hater.hateAlready(comment)).isTrue(),
+                () -> assertThat(comment.getLikeCount()).isZero(),
+                () -> assertThat(comment.getHateCount()).isOne()
+        );
     }
 
     private Long createRandomMember() {

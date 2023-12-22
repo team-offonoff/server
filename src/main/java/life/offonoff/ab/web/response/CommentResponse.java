@@ -17,10 +17,7 @@ public class CommentResponse {
     private MemberResponse writer;
     private ChoiceOption writersVotedOption;
     private String content;
-    private Integer likeCount;
-    private Integer hateCount;
-    private Boolean liked;
-    private Boolean hated;
+    private CommentReactionResponse commentReaction;
     private LocalDateTime createdAt;
 
     public static CommentResponse from(Comment comment) {
@@ -32,10 +29,7 @@ public class CommentResponse {
                 MemberResponse.from(comment.getWriter()),
                 comment.getWritersVotedOption(),
                 comment.getContent(),
-                comment.getLikeCount(),
-                comment.getHateCount(),
-                false,
-                false,
+                CommentReactionResponse.from(comment),
                 comment.getCreatedAt());
     }
 
@@ -45,10 +39,7 @@ public class CommentResponse {
                 MemberResponse.from(comment.getWriter()),
                 comment.getWritersVotedOption(),
                 comment.getContent(),
-                comment.getLikeCount(),
-                comment.getHateCount(),
-                member.likeAlready(comment),
-                member.hateAlready(comment),
+                CommentReactionResponse.from(comment, member),
                 comment.getCreatedAt());
     }
 
