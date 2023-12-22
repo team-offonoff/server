@@ -18,7 +18,7 @@ public class CommentResponse {
     private ChoiceOption writersVotedOption;
     private String content;
     private CommentReactionResponse commentReaction;
-    private LocalDateTime createdAt;
+    private Long createdAt;
 
     public static CommentResponse from(Comment comment) {
         if (comment == null) {
@@ -30,7 +30,7 @@ public class CommentResponse {
                 comment.getWritersVotedOption(),
                 comment.getContent(),
                 CommentReactionResponse.from(comment),
-                comment.getCreatedAt());
+                comment.getCreatedSecond());
     }
 
     public static CommentResponse from(Comment comment, Member member) {
@@ -40,7 +40,7 @@ public class CommentResponse {
                 comment.getWritersVotedOption(),
                 comment.getContent(),
                 CommentReactionResponse.from(comment, member),
-                comment.getCreatedAt());
+                comment.getCreatedSecond());
     }
 
 }

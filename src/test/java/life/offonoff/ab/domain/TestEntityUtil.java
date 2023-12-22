@@ -75,7 +75,6 @@ public class TestEntityUtil {
         return new Choice(topic, option, content);
     }
     //== Pageable ==//
-
     public static Pageable createPageableDesc(int page, int size, String property) {
         return PageRequest.of(page, size, Sort.Direction.DESC, property);
     }

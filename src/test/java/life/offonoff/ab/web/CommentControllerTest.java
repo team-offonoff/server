@@ -4,6 +4,7 @@ import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.application.service.request.CommentUpdateRequest;
 import life.offonoff.ab.config.WebConfig;
+import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
+import static life.offonoff.ab.domain.TestEntityUtil.getEpochSecond;
 import static life.offonoff.ab.exception.AbCode.INVALID_LENGTH_OF_FIELD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -59,7 +61,7 @@ class CommentControllerTest extends RestDocsTest {
                 null,
                 content,
                 new CommentReactionResponse(0, 0, false, false),
-                LocalDateTime.now()
+                getEpochSecond(LocalDateTime.now())
         );
 
         when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenReturn(response);
@@ -179,7 +181,8 @@ class CommentControllerTest extends RestDocsTest {
                 null,
                 "content1",
                 new CommentReactionResponse(0, 0, true, false),
-                LocalDateTime.now());
+                getEpochSecond(LocalDateTime.now()));
+
         CommentResponse response2 = new CommentResponse(
                 2L,
                 topicId,
@@ -187,7 +190,7 @@ class CommentControllerTest extends RestDocsTest {
                 null,
                 "content2",
                 new CommentReactionResponse(1, 0, true, false),
-                LocalDateTime.now());
+                getEpochSecond(LocalDateTime.now()));
 
         return List.of(response1, response2);
     }
@@ -256,7 +259,7 @@ class CommentControllerTest extends RestDocsTest {
                 null,
                 "new content",
                 new CommentReactionResponse(0, 0, false, false),
-                LocalDateTime.now()
+                getEpochSecond(LocalDateTime.now())
         );
         when(commentService.modifyMembersCommentContent(any(), any(), any())).thenReturn(response);
 
