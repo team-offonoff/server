@@ -1,77 +1,77 @@
-== 댓글 API
-### 1. 댓글 등록
+== 5. 댓글 API
+### 5.1. 댓글 등록
 
 [source.html]
 POST /comments
 
-#### OK
+OK
 
 operation::comment-controller-test/create-comment[snippets="http-request,http-response"]
 
-#### E1 존재하지 않는 토픽 ID
+E1 존재하지 않는 토픽 ID
 
 operation::comment-controller-test/create-comment_invalid_topic_exception[snippets="http-request,http-response"]
 
-#### E2 댓글 content 길이가 너무 짧거나 김
+E2 댓글 content 길이가 너무 짧거나 김
 
 * 댓글 길이 요구사항에 따라 값 조절 예정
 
 operation::comment-controller-test/create-comment_with-long-content_error[snippets="http-request,http-response"]
 
-### 2. 댓글 조회
+### 5. 2. 댓글 조회
 
 [source.html]
 GET /comments/?topic-id=..
 
 - `topic-id` 는 필수
 
-#### OK - 댓글이 하나 이상 존재
+OK - 댓글이 하나 이상 존재
 operation::comment-controller-test/get_comments_of_topic[snippets="query-parameters,http-request,http-response"]
 
-#### OK - 댓글이 하나도 없는 상황
+OK - 댓글이 하나도 없는 상황
 operation::comment-controller-test/get_comments_of_topic_empty_comments[snippets="http-request,http-response"]
 
-#### E1. 존재하지 않는 토픽
+E1. 존재하지 않는 토픽
 operation::comment-controller-test/get_comments_exception_topic_not_found[snippets="http-request,http-response"]
 
-#### E2. 투표하지 않은 토픽
+E2. 투표하지 않은 토픽
 operation::comment-controller-test/get_comments_exception_not_voted[snippets="http-request,http-response"]
 
-### 3. 댓글 삭제
+### 5.3. 댓글 삭제
 
-#### OK - 멤버 (admin || 댓글 작성자) 에 속할 때
+OK - 멤버 (admin || 댓글 작성자) 에 속할 때
 operation::comment-controller-test/delete_comment[snippets="http-request,http-response"]
 
-#### E1 삭제 자격이 없을 때
+E1 삭제 자격이 없을 때
 operation::comment-controller-test/delete_comment_member_cannot_touch[snippets="http-request,http-response"]
 
-#### E2 존재하지 않는 댓글 id
+E2 존재하지 않는 댓글 id
 operation::comment-controller-test/delete-comment_with-invalid-comment-id_error[snippets="http-request,http-response"]
 
-### 4. 댓글 좋아요
+### 5.4. 댓글 좋아요
 
 1. 한 댓글에 대한 반응은 둘(`좋아요`/`싫어요`) 중 하나만 존재 가능.
   - `좋아요` 요청 시에 `싫어요` 요청이 존재하면 `싫어요` 취소
 
 
-#### OK
+OK
 
 operation::comment-controller-test/like_comment[snippets="query-parameters,http-request,http-response"]
 
-### 5. 댓글 싫어요
+### 5.5. 댓글 싫어요
 
-#### OK
+OK
 operation::comment-controller-test/hatee_comment[snippets="query-parameters,http-request,http-response"]
 
-### 6. 댓글 수정
+### 5.6. 댓글 수정
 
 [source.html]
 PATCH /comments/{commentId}
 
-#### OK
+OK
 operation::comment-controller-test/modify-comment[snippets="http-request,http-response"]
 
-#### Errors
+Errors
 
 1. 존재하지 않는 댓글 id: <<_e2_존재하지_않는_댓글_id>>와 동일
 2. 댓글 content 길이가 너무 짧거나 김: <<_e2_댓글_content_길이가_너무_짧거나_김>>와 동일
