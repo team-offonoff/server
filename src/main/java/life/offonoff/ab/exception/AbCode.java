@@ -20,6 +20,9 @@ public enum AbCode {
     // Topic
     ILLEGAL_AUTHOR,
 
+    // Vote
+    DUPLICATE_VOTE,
+
     // COMMENT
     UNABLE_TO_VIEW_COMMENTS,
 

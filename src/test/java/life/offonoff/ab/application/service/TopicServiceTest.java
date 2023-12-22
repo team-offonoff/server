@@ -10,6 +10,7 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
+import life.offonoff.ab.exception.DuplicateVoteException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.KeywordRepository;
@@ -305,7 +306,7 @@ public class TopicServiceTest {
                 .author(author)
                 .build().buildTopic();
 
-        VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A, getEpochSecond(deadline.minusHours(1)));
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
         when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
@@ -346,7 +347,7 @@ public class TopicServiceTest {
         when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
 
         // when
-        topicService.cancelVoteForTopicByMember(topicId, 2L, new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
+        topicService.cancelVoteForTopicByMember(topicId, 2L, new VoteCancelRequest(getEpochSecond(deadline.minusHours(1))));
 
         // then
         assertThat(author.votedAlready(topic)).isFalse();
@@ -387,10 +388,94 @@ public class TopicServiceTest {
         when(commentRepository.deleteAllByWriterIdAndTopicId(anyLong(), anyLong())).thenReturn(2);
 
         // when
-        topicService.cancelVoteForTopicByMember(topicId, 2L, new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
+        topicService.cancelVoteForTopicByMember(topicId, 2L, new VoteCancelRequest(getEpochSecond(deadline.minusHours(1))));
 
         // then
         assertThat(topic.getCommentCount()).isZero();
+    }
+
+    @Test
+    @DisplayName("투표를 수정하면 기존 댓글 삭제")
+    void modify_vote() {
+        // given
+        Long topicId = 1L;
+        LocalDateTime deadline = LocalDateTime.now().plusHours(1);
+
+        Member author = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        Member voter = TestMember.builder()
+                .id(2L)
+                .build().buildMember();
+
+        Topic topic = TestTopic.builder()
+                .id(topicId)
+                .deadline(deadline)
+                .author(author)
+                .build().buildTopic();
+
+        // Vote 생성
+        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        vote.associate(voter, topic);
+
+        // Comment 생성
+        Comment comment1 = Comment.createVotersComment(vote, "content1");
+        Comment comment2 = Comment.createVotersComment(vote, "content2");
+
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
+        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
+        when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
+        when(commentRepository.deleteAllByWriterIdAndTopicId(anyLong(), anyLong())).thenReturn(2);
+
+        // when
+        topicService.modifyVoteForTopicByMember(topicId, voter.getId(), new VoteModifyRequest(ChoiceOption.CHOICE_B, getEpochSecond(deadline.minusHours(1))));
+
+        // then
+        assertAll(
+                () -> assertThat(vote.isVotedForOption(ChoiceOption.CHOICE_B)).isTrue(),
+                () -> assertThat(topic.getCommentCount()).isZero()
+        );
+
+    }
+
+    @Test
+    @DisplayName("동일한 선택지로의 투표 수정은 예외")
+    void modify_vote_duplicate_exception() {
+        // given
+        Long topicId = 1L;
+        LocalDateTime deadline = LocalDateTime.now().plusHours(1);
+
+        Member author = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        Member voter = TestMember.builder()
+                .id(2L)
+                .build().buildMember();
+
+        Topic topic = TestTopic.builder()
+                .id(topicId)
+                .deadline(deadline)
+                .author(author)
+                .build().buildTopic();
+
+        // Vote 생성
+        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        vote.associate(voter, topic);
+
+        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
+        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
+        when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
+
+        // when
+        assertThatThrownBy(
+                () -> topicService.modifyVoteForTopicByMember(
+                        topicId,
+                        voter.getId(),
+                        new VoteModifyRequest(vote.getSelectedOption(), getEpochSecond(deadline.minusHours(1))))
+        ).isInstanceOf(DuplicateVoteException.class);
+
     }
 
 
@@ -416,7 +501,7 @@ public class TopicServiceTest {
         );
 
         @Builder.Default
-        private Long deadline = LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toEpochSecond();
+        private Long deadline = getEpochSecond(LocalDateTime.now().plusHours(1));
 
         public TopicCreateRequest createRequest() {
             return TopicCreateRequest.builder()

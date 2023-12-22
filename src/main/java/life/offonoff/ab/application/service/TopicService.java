@@ -10,7 +10,6 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
-import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.ChoiceRepository;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -98,11 +96,6 @@ public class TopicService {
     private Member findMember(final Long memberId) {
         return memberRepository.findByIdAndActiveTrue(memberId)
                                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
-    }
-
-    private Member findMemberFetchVotes(final Long memberId) {
-        return memberRepository.findByIdFetchVotes(memberId)
-                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 
     private Keyword findOrCreateKeyword(String keyword, TopicSide side) {
@@ -215,6 +208,37 @@ public class TopicService {
         voteRepository.delete(vote);
 
         deleteVotersComments(vote.getVoter(), vote.getTopic());
+    }
+
+    @Transactional
+    public void modifyVoteForTopicByMember(final Long topicId, final Long memberId, final VoteModifyRequest request) {
+
+        final LocalDateTime modifiedAt = convertUnixTime(request.getModifiedAt());
+        final ChoiceOption modifiedOption = request.getModifiedOption();
+
+        Member member = findMember(memberId);
+        Topic topic = findTopic(topicId);
+        Vote vote = findVoteByMemberIdAndTopicId(memberId, topicId);
+
+        checkVoteModifiable(vote, modifiedOption, modifiedAt);
+
+        modifyVote(vote, modifiedOption, modifiedAt);
+    }
+
+    private void checkVoteModifiable(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+
+        checkTopicVotable(vote.getTopic(), vote.getVoter(), modifiedAt);
+
+        if (vote.isVotedForOption(modifiedOption)) {
+            throw new DuplicateVoteException(vote.getTopic().getId(), modifiedOption);
+        }
+    }
+
+    private void modifyVote(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+
+        deleteVotersComments(vote.getVoter(), vote.getTopic());
+
+        vote.changeOption(modifiedOption, modifiedAt);
     }
 
     private void deleteVotersComments(Member voter, Topic topic) {
