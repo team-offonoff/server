@@ -71,6 +71,7 @@ operation::topic-controller-test/deactivate-topic_by-non-author-user_-illegal-to
 DELETE /topics/{topicId}
 
 OK
+
 operation::topic-controller-test/delete-topic[snippets="http-request,http-response"]
 
 E2. 작성자가 아닌 유저가 상태 변경 시도
@@ -82,12 +83,15 @@ E2. 작성자가 아닌 유저가 상태 변경 시도
 POST /topics/{topicId}/vote
 
 OK
+
 operation::topic-controller-test/vote-for-topic_by-non-author_success[snippets="http-request,http-response"]
 
 E1. 토픽 작성자가 투표
+
 operation::topic-controller-test/vote-for-topic_by-author_throw-exception[snippets="http-request,http-response"]
 
 E2. 투표 시간을 미래 시간으로 요청
+
 이건 이상한 데이터 요청 막기 위한 예외처리. 정상 로직에선 볼 일 없을 듯하므로 메시지는 임의로 작성함.
 
 operation::topic-controller-test/vote-for-topic_voted-at-future_throw-exception[snippets="http-request,http-response"]
@@ -101,12 +105,15 @@ OK
 operation::topic-controller-test/cancel-vote-for-topic_existing-vote_success[snippets="http-request,http-response"]
 
 E1. 토픽 작성자가 취소
+
 <<_e1_토픽_작성자가_투표, 5. 투표 - E1>>과 동일
 
 E2. 취소 시간을 미래 시간으로 요청
+
 <<_e2_투표_시간을_미래_시간으로_요청, 5. 투표 - E2>>와 동일
 
 E3. 투표하지 않은 멤버가 취소 요청
+
 정상 로직에선 볼 일 없을 듯하므로 메시지는 임의로 작성함.
 
 operation::topic-controller-test/cancel-vote-for-topic_non-existing-vote_throw-exception[snippets="http-request,http-response"]
@@ -114,7 +121,9 @@ operation::topic-controller-test/cancel-vote-for-topic_non-existing-vote_throw-e
 ### 1.8. 투표 수정
 
 OK
+
 operation::topic-controller-test/modify-vote-for-topic_not_duplicated_option[snippets="http-request,http-response"]
 
 E1. 동일 선택지로의 수정 요청
+
 operation::topic-controller-test/modify-vote-for-topic_exception_duplicated_option[snippets="http-request,http-response"]
