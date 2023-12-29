@@ -1,16 +1,17 @@
 package life.offonoff.ab.config;
 
-import life.offonoff.ab.util.token.JwtProvider;
+import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
-import life.offonoff.ab.web.common.auth.AuthorizationTokenResolver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
+
+import static life.offonoff.ab.application.service.common.LengthInfo.PAGEABLE_SIZE;
 
 @RequiredArgsConstructor
 @Configuration
@@ -28,8 +29,15 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "OPTION");
     }
 
+
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        // processing @Authorized
         resolvers.add(authorizedArgumentResolver);
+
+        // pageable
+        PageableHandlerMethodArgumentResolver pageableResolver = new PageableHandlerMethodArgumentResolver();
+        pageableResolver.setMaxPageSize(PAGEABLE_SIZE.getMaxLength());
+        resolvers.add(pageableResolver);
     }
 }
