@@ -101,7 +101,7 @@ public class TopicControllerTest extends RestDocsTest {
                 .andDo(restDocs.document(queryParameters(
                         parameterWithName("keyword_id").description("토픽 키워드 ID").optional(),
                         parameterWithName("page").description("page number - default `0`").optional(),
-                        parameterWithName("size").description("page size - default `10`").optional(),
+                        parameterWithName("size").description("page size - default `10` [min, max] [0, 100]").optional(),
                         parameterWithName("sort").description("orderBy - default `voteCount,desc`").optional())));
     }
 
