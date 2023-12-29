@@ -10,15 +10,20 @@
 
 ### 3.1. 개인 정보 등록
 OK
+
 operation::auth-controller-test/signup_profile[snippets="http-request,http-response"]
 E1. 개인 정보 중복 예외
+
 operation::auth-controller-test/signup_profile_exception[snippets="http-request,http-response"]
 
 ### 3.2. 약관 동의
 
 OK
+
 operation::auth-controller-test/enable_terms[snippets="http-request,http-response"]
+
 E1. 약관 동의 중복 예외
+
 operation::auth-controller-test/enable_terms_exception[snippets="http-request,http-response"]
 
 ## 4. (개발용) 인증 API
@@ -26,21 +31,26 @@ operation::auth-controller-test/enable_terms_exception[snippets="http-request,ht
 ### 4.1. 회원가입
 
 OK
+
 operation::auth-controller-test/sign-up[snippets="response-fields,http-request,http-response"]
 
 E1. 중복 이메일
+
 operation::auth-controller-test/sign-up_exception_duplicate_email[snippets="http-request,http-response"]
 
 
 ### 4.3. 로그인
 
 OK
+
 operation::auth-controller-test/sign-in[snippets="http-request,http-response"]
 
 E1. 비밀번호 오류
+
 operation::auth-controller-test/sign-in_exception_wrong_password[snippets="http-request,http-response"]
 
 E2. 이메일 오류
+
 operation::auth-controller-test/sign-in_exception_email_not_found[snippets="http-request,http-response"]
 
 E3. 회원가입 완료 전 로그인 요청
