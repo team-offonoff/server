@@ -7,12 +7,14 @@ import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
+import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
@@ -60,13 +62,12 @@ class TopicRepositoryTest {
 
         List<Topic> topics1 = topicRepository.findAll();
 
-        PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
         TopicSearchRequest request = TopicSearchRequest.builder()
                 .topicStatus(TopicStatus.VOTING)
                 .build();
 
         // when
-        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, pageable);
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, createVoteCountDescPageable(0, size));
 
         // then
         assertAll(
@@ -101,12 +102,11 @@ class TopicRepositoryTest {
         }
         topicRepository.saveAll(topics);
 
-        PageRequest pageable = PageRequest.of(0, size, Sort.Direction.DESC, "voteCount");
         TopicSearchRequest request = TopicSearchRequest.builder()
                 .keywordId(keyword.getId())
                 .build();
         // when
-        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, pageable);
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, createVoteCountDescPageable(0, size));
 
         // then
         assertAll(
@@ -140,5 +140,58 @@ class TopicRepositoryTest {
 
         // then
         assertThat(topics).containsExactly(topic);
+    }
+
+    @Test
+    @DisplayName("member가 조회 시에 hide한 토픽은 제외")
+    void find_except_hidden() {
+        // given
+
+          // create Member
+        Member author = createMember("author", "author");
+        em.persist(author);
+
+        Member member = createMember("email", "password");
+        em.persist(member);
+
+          // create Keyword
+        Keyword keyword = createKeyword(1);
+        em.persist(keyword);
+
+          // create Topic
+        LocalDateTime deadline = LocalDateTime.now();
+
+        Topic topic = TestTopic.builder()
+                .deadline(deadline)
+                .author(author)
+                .keyword(keyword)
+                .status(TopicStatus.VOTING)
+                .build().buildTopic();
+        em.persist(topic);
+
+        Topic topicHided = TestTopic.builder()
+                .deadline(deadline)
+                .author(author)
+                .keyword(keyword)
+                .status(TopicStatus.VOTING)
+                .build().buildTopic();
+        em.persist(topicHided);
+
+          // hide
+        HiddenTopic hiddenTopic = new HiddenTopic();
+        hiddenTopic.associate(member, topicHided);
+        em.persist(hiddenTopic);
+
+        // when
+        Slice<Topic> topics = topicRepository.findAll(member.getId(),
+                                                      new TopicSearchRequest(null, null),
+                                                      createVoteCountDescPageable(0, 2));
+
+        // then
+        assertThat(topics.getContent()).containsExactly(topic);
+    }
+
+    Pageable createVoteCountDescPageable(int page, int size) {
+        return PageRequest.of(page, size, Sort.Direction.DESC, "voteCount");
     }
 }
