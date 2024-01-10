@@ -35,18 +35,19 @@ class KeywordRepositoryTest {
     void keyword_slice_sort_by_id_desc() {
         // given
         TopicSide side = TopicSide.TOPIC_A;
-        Pageable pageable = createPageableDesc(0, 2, "id");
+        Pageable pageable = createPageableAsc(0, 2, "id");
 
         Keyword keyword1 = new Keyword("key1", side);
         Keyword keyword2 = new Keyword("key2", side);
+        List<Keyword> keywords = List.of(keyword1, keyword2);
 
-        keywordRepository.saveAll(List.of(keyword1, keyword2));
+        keywordRepository.saveAll(keywords);
 
         // when
         Slice<Keyword> keywordSlice = keywordRepository.findAllByTopicSide(side, pageable);
 
         // then
-        assertThat(keywordSlice.getContent()).containsExactlyElementsOf(List.of(keyword2, keyword1));
+        assertThat(keywordSlice.getContent()).containsExactlyElementsOf(keywords);
     }
 
 }

@@ -79,6 +79,10 @@ public class TestEntityUtil {
         return PageRequest.of(page, size, Sort.Direction.DESC, property);
     }
 
+    public static Pageable createPageableAsc(int page, int size, String property) {
+        return PageRequest.of(page, size, Sort.Direction.ASC, property);
+    }
+
     //== Epoch Second ==//
     public static Long getEpochSecond(LocalDateTime from) {
         return from.atZone(ZoneId.systemDefault()).toEpochSecond();
@@ -116,10 +120,12 @@ public class TestEntityUtil {
         private Long id;
 
         @Builder.Default
+        private TopicSide side = TopicSide.TOPIC_A;
+        @Builder.Default
         private String name = "key";
 
         public Keyword buildKeyword() {
-            Keyword keyword = new Keyword(name, TopicSide.TOPIC_A);
+            Keyword keyword = new Keyword(name, side);
             ReflectionTestUtils.setField(keyword, "id", id);
             return keyword;
         }
