@@ -1,0 +1,10 @@
+== 7. 키워드 API
+### 7.1. 키워드 조회
+
+[source.html]
+GET /keywords?side=###
+
+
+OK . id 오름차순 정렬 (추후 정렬 기준 추가)
+
+operation::keyword-controller-test/get-keyword-slice_by_side[snippets="query-parameters,http-request,http-response"]

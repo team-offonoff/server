@@ -38,4 +38,9 @@ public class Keyword {
     public void addTopic(Topic topic) {
         this.topics.add(topic);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return id.equals(((Keyword) obj).getId());
+    }
 }
