@@ -13,7 +13,7 @@ import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.ChoiceRepository;
-import life.offonoff.ab.repository.KeywordRepository;
+import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;

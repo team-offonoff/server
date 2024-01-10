@@ -14,7 +14,7 @@ import life.offonoff.ab.exception.FutureTimeRequestException;
 import life.offonoff.ab.exception.MemberNotVoteException;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.exception.VoteByAuthorException;
-import life.offonoff.ab.repository.KeywordRepository;
+import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
