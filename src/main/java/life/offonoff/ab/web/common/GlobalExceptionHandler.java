@@ -11,6 +11,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.stream.Collectors;
 
+import static life.offonoff.ab.exception.AbCode.INTERNAL_SERVER_ERROR;
 import static life.offonoff.ab.exception.AbCode.INVALID_FIELD;
 
 @Slf4j
@@ -18,7 +19,7 @@ import static life.offonoff.ab.exception.AbCode.INVALID_FIELD;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(AbException.class)
-    public ResponseEntity<ErrorWrapper> handleAbException(final AbException abException) {
+    private ResponseEntity<ErrorWrapper> handleAbException(final AbException abException) {
         log.warn("AbException = ", abException);
 
         final ErrorWrapper error = new ErrorWrapper(
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorWrapper> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+    private ResponseEntity<ErrorWrapper> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.warn("MethodArgumentNotValidException = ", e);
 
         final String errorFields = e.getBindingResult().getFieldErrors()
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorWrapper> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+    private ResponseEntity<ErrorWrapper> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException = ", e);
 
         final String message = "잘못된 타입의 요청입니다. | 인자 이름: " + e.getName() + " 필요한 타입: " + e.getRequiredType();
@@ -59,6 +60,19 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(errorWrapper);
+    }
+
+    @ExceptionHandler(Exception.class)
+    private ResponseEntity<ErrorWrapper> handleException(final Exception exception) {
+        log.warn("! Unfiltered Exception = ", exception);
+
+        final ErrorWrapper errorWrapper = new ErrorWrapper(
+                INTERNAL_SERVER_ERROR,
+                ErrorContent.of(exception.getMessage(), HttpStatus.BAD_REQUEST.value())
+        );
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorWrapper);
     }
 
