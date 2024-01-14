@@ -18,7 +18,7 @@ E2 댓글 content 길이가 너무 짧거나 김
 
 operation::comment-controller-test/create-comment_with-long-content_error[snippets="http-request,http-response"]
 
-### 5. 2. 댓글 조회
+### 5.2. 댓글 조회
 
 [source.html]
 GET /comments/?topic-id=..
