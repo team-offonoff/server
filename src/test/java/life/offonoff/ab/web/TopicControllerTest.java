@@ -1,6 +1,5 @@
 package life.offonoff.ab.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.CommentService;
@@ -22,19 +21,20 @@ import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
-import life.offonoff.ab.web.response.topic.content.TopicContentResponseFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -306,6 +306,22 @@ public class TopicControllerTest extends RestDocsTest {
                         jsonPath("$.abCode").value(AbCode.DUPLICATE_VOTE.name())
                 );
     }
+    
+    @Test
+    void getTopCommentOfTopic() throws Exception {
+        when(commentService.getLatestCommentOfTopic(any()))
+                .thenReturn(CommentResponse.from(
+                        new Comment(
+                                createRandomMember(),
+                                createRandomTopic(),
+                                ChoiceOption.CHOICE_A,
+                                "content"
+                        )));
+
+        mvc.perform(get(TopicUri.TOPIC_COMMENT, 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.latestComment.content").value("content"));
+    }
 
     private Slice<TopicResponse> createDefaultTopicSlice() {
         // create author
@@ -418,5 +434,6 @@ public class TopicControllerTest extends RestDocsTest {
         private static final String STATUS = BASE + "/{topicId}/status?active={active}";
         private static final String VOTE = BASE + "/{topicId}/vote";
         private static final String DELETE = BASE + "/{topicId}";
+        private static final String TOPIC_COMMENT = BASE + "/{topicId}/comment";
     }
 }

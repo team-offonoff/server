@@ -122,4 +122,13 @@ public class TopicController {
         topicService.cancelVoteForTopicByMember(topicId, memberId, request);
         return ok().build();
     }
+
+    @GetMapping("/{topicId}/comment")
+    public ResponseEntity<VoteResponse> getTopCommentOfTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId
+    ) {
+        return ok(VoteResponse.from(
+                commentService.getLatestCommentOfTopic(topicId)));
+    }
 }

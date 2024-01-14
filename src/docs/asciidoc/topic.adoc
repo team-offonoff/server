@@ -132,3 +132,13 @@ operation::topic-controller-test/modify-vote-for-topic_not_duplicated_option[sni
 E1. 동일 선택지로의 수정 요청
 
 operation::topic-controller-test/modify-vote-for-topic_exception_duplicated_option[snippets="http-request,http-response"]
+
+### 1.9. 토픽의 댓글 하나 조회
+
+댓글 하나 미리보기용
+
+OK
+
+투표 완료 후 응답과 형식 동일
+
+operation::topic-controller-test/get-top-comment-of-topic[snippets="http-request,http-response"]
