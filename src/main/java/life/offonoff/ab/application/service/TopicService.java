@@ -192,25 +192,6 @@ public class TopicService {
     }
 
     @Transactional
-    public void cancelVoteForTopicByMember(final Long topicId, final Long memberId, final VoteCancelRequest request) {
-        Member member = findMember(memberId);
-        Topic topic = findTopic(topicId);
-        final LocalDateTime votedAt = convertUnixTime(request.canceledAt());
-
-        checkTopicVotable(topic, member, votedAt);
-
-        Vote vote = findVoteByMemberIdAndTopicId(memberId, topicId);
-        deleteVote(vote);
-    }
-
-    private void deleteVote(Vote vote) {
-        vote.removeAssociations();
-        voteRepository.delete(vote);
-
-        deleteVotersComments(vote.getVoter(), vote.getTopic());
-    }
-
-    @Transactional
     public void modifyVoteForTopicByMember(final Long topicId, final Long memberId, final VoteModifyRequest request) {
 
         final LocalDateTime modifiedAt = convertUnixTime(request.getModifiedAt());

@@ -112,14 +112,4 @@ public class TopicController {
                 commentService.getLatestCommentOfTopic(topicId)));
     }
 
-
-    @DeleteMapping("/{topicId}/vote")
-    public ResponseEntity<Void> cancelVoteForTopic(
-            @Authorized Long memberId,
-            @PathVariable("topicId") Long topicId,
-            @Valid @RequestBody final VoteCancelRequest request
-    ) {
-        topicService.cancelVoteForTopicByMember(topicId, memberId, request);
-        return ok().build();
-    }
 }
