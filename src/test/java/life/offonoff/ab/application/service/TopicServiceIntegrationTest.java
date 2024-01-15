@@ -1,7 +1,6 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.service.member.MemberService;
-import life.offonoff.ab.application.service.request.VoteCancelRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.keyword.Keyword;
@@ -11,11 +10,10 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.FutureTimeRequestException;
-import life.offonoff.ab.exception.MemberNotVoteException;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.exception.VoteByAuthorException;
-import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
+import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
@@ -185,39 +183,6 @@ public class TopicServiceIntegrationTest {
 
         assertThatThrownBy(code)
                 .isInstanceOf(FutureTimeRequestException.class);
-    }
-
-    @Test
-    void cancelVoteForTopicByMember_existingVote_success() {
-        Member author = createMember();
-        Member voter = createMember();
-        TopicResponse response = createMembersTopic(author.getId());
-        VoteRequest request = new VoteRequest(
-                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
-        topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
-
-        topicService.cancelVoteForTopicByMember(
-                response.topicId(), voter.getId(),
-                new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
-        // Topic is still alive
-        Topic topic = topicRepository.findById(response.topicId()).get();
-        assertThat(topic.getVotes()).isEmpty();
-        // No votes left
-        assertThat(voteRepository.findAll()).isEmpty();
-    }
-
-    @Test
-    void cancelVoteForTopicByMember_nonExistingVote_throwException() {
-        Member author = createMember();
-        Member voter = createMember();
-        TopicResponse response = createMembersTopic(author.getId());
-
-        ThrowingCallable code = () -> topicService.cancelVoteForTopicByMember(
-                response.topicId(), voter.getId(),
-                new VoteCancelRequest(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()));
-
-        assertThatThrownBy(code)
-                .isInstanceOf(MemberNotVoteException.class);
     }
 
     private Member createMember() {

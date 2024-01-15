@@ -243,33 +243,6 @@ public class TopicControllerTest extends RestDocsTest {
     }
 
     @Test
-    void cancelVoteForTopic_existingVote_success() throws Exception {
-        VoteCancelRequest request = new VoteCancelRequest(
-                LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond()
-        );
-        mvc.perform(delete(TopicUri.VOTE, 1).with(csrf().asHeader())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
-                                             .writeValueAsString(request)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void cancelVoteForTopic_nonExistingVote_throwException() throws Exception {
-        doThrow(new MemberNotVoteException(2L, 1L))
-                .when(topicService).cancelVoteForTopicByMember(any(), any(), any());
-        VoteCancelRequest request = new VoteCancelRequest(
-                LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond()
-        );
-        mvc.perform(delete(TopicUri.VOTE, 1).with(csrf().asHeader())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
-                                             .writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("abCode").value("MEMBER_NOT_VOTE"));
-    }
-    
-    @Test
     void modifyVoteForTopic_not_duplicated_option() throws Exception {
 
         VoteModifyRequest request = new VoteModifyRequest(
