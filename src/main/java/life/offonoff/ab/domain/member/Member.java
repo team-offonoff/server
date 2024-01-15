@@ -218,8 +218,10 @@ public class Member extends BaseEntity {
     }
 
     public void cancelHateIfExists(Comment comment) {
-        hatedComments.removeIf(h -> h.has(comment));
-        comment.decreaseHateCount();
+        boolean removed = hatedComments.removeIf(h -> h.has(comment));
+        if (removed) {
+            comment.decreaseHateCount();
+        }
     }
 
         //== LIKE ==//
@@ -229,8 +231,10 @@ public class Member extends BaseEntity {
     }
 
     public void cancelLikeIfExists(Comment comment) {
-        likedComments.removeIf(l -> l.has(comment));
-        comment.decreaseLikeCount();
+        boolean removed = likedComments.removeIf(l -> l.has(comment));
+        if (removed) {
+            comment.decreaseLikeCount();
+        }
     }
 
     public boolean isAuthorOf(Topic topic) {
