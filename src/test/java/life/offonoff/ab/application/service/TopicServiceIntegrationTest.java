@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
+import life.offonoff.ab.exception.AlreadyVotedException;
 import life.offonoff.ab.exception.FutureTimeRequestException;
 import life.offonoff.ab.exception.TopicReportDuplicateException;
 import life.offonoff.ab.exception.VoteByAuthorException;
@@ -183,6 +184,22 @@ public class TopicServiceIntegrationTest {
 
         assertThatThrownBy(code)
                 .isInstanceOf(FutureTimeRequestException.class);
+    }
+
+    @Test
+    void voteForTopicByMember_duplicateVote_throwException() {
+        Member author = createMember();
+        Member voter = createMember();
+        TopicResponse response = createMembersTopic(author.getId());
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+
+        ThrowingCallable code = () ->
+                topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+
+        assertThatThrownBy(code)
+                .isInstanceOf(AlreadyVotedException.class);
     }
 
     private Member createMember() {

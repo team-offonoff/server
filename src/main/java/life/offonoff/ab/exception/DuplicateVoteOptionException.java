@@ -2,14 +2,14 @@ package life.offonoff.ab.exception;
 
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 
-public class DuplicateVoteException extends DuplicateException {
+public class DuplicateVoteOptionException extends DuplicateException {
 
-    private static final String MESSAGE = "중복된 투표입니다.";
+    private static final String MESSAGE = "중복된 투표 선택지입니다.";
 
     private final Long topicId;
     private final ChoiceOption votedOption;
 
-    public DuplicateVoteException(Long topicId, ChoiceOption votedOption) {
+    public DuplicateVoteOptionException(Long topicId, ChoiceOption votedOption) {
         super(MESSAGE);
         this.topicId = topicId;
         this.votedOption = votedOption;
@@ -22,6 +22,11 @@ public class DuplicateVoteException extends DuplicateException {
 
     @Override
     public AbCode getAbCode() {
-        return AbCode.DUPLICATE_VOTE;
+        return AbCode.DUPLICATE_VOTE_OPTION;
+    }
+
+    @Override
+    public Object getPayload() {
+        return votedOption;
     }
 }

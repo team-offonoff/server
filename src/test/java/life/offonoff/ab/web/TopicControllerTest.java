@@ -1,13 +1,15 @@
 package life.offonoff.ab.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
-import life.offonoff.ab.application.service.request.*;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.VoteModifyRequest;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
@@ -22,19 +24,20 @@ import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
-import life.offonoff.ab.web.response.topic.content.TopicContentResponseFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -243,6 +246,24 @@ public class TopicControllerTest extends RestDocsTest {
     }
 
     @Test
+    void voteForTopic_duplicateVote_throwException() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime votedAt = now.plusMinutes(30);
+
+        doThrow(new AlreadyVotedException(1L, ChoiceOption.CHOICE_B))
+                .when(topicService).voteForTopicByMember(any(), any(), any());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, votedAt.atZone(ZoneId.systemDefault()).toEpochSecond());
+        mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                             .writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value(AbCode.ALREADY_VOTED.name()));
+    }
+
+    @Test
     void modifyVoteForTopic_not_duplicated_option() throws Exception {
 
         VoteModifyRequest request = new VoteModifyRequest(
@@ -267,7 +288,7 @@ public class TopicControllerTest extends RestDocsTest {
                 modifiedOption, getEpochSecond(LocalDateTime.now().plusMinutes(30))
         );
 
-        doThrow(new DuplicateVoteException(topicId, modifiedOption))
+        doThrow(new DuplicateVoteOptionException(topicId, modifiedOption))
                 .when(topicService).modifyVoteForTopicByMember(any(), any(), any());
 
         mvc.perform(patch(TopicUri.VOTE, topicId).with(csrf().asHeader())
@@ -276,7 +297,7 @@ public class TopicControllerTest extends RestDocsTest {
                                 .writeValueAsString(request)))
                 .andExpectAll(
                         status().isBadRequest(),
-                        jsonPath("$.abCode").value(AbCode.DUPLICATE_VOTE.name())
+                        jsonPath("$.abCode").value(AbCode.DUPLICATE_VOTE_OPTION.name())
                 );
     }
 
