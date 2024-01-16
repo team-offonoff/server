@@ -21,7 +21,8 @@ public enum AbCode {
     ILLEGAL_AUTHOR,
 
     // Vote
-    DUPLICATE_VOTE,
+    DUPLICATE_VOTE_OPTION,
+    ALREADY_VOTED,
 
     // COMMENT
     UNABLE_TO_VIEW_COMMENTS,

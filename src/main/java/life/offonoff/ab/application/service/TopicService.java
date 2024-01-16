@@ -166,23 +166,31 @@ public class TopicService {
         Topic topic = findTopic(topicId);
         final LocalDateTime votedAt = convertUnixTime(request.votedAt());
 
-        checkTopicVotable(topic, member, votedAt);
-
-        doVote(member, topic, votedAt, request.choiceOption());
+        voteForTopic(member, topic, votedAt, request.choiceOption());
     }
 
-    private void doVote(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
+    private void voteForTopic(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
+        checkMemberVotableForTopic(member, topic, votedAt);
+
         Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
         voteRepository.save(vote);
     }
 
-    private static void checkTopicVotable(final Topic topic, final Member member, final LocalDateTime votedAt) {
-        if (!topic.isBeforeDeadline(votedAt)) {
-            throw new UnableToVoteException(votedAt);
-        }
+    private void checkMemberVotableForTopic(final Member member, final Topic topic, final LocalDateTime votedAt) {
+        checkTopicVotable(topic, votedAt);
         if (topic.isWrittenBy(member)) {
             throw new VoteByAuthorException(topic.getId(), member.getId());
+        }
+        if (member.votedAlready(topic)) {
+            // 이미 투표했으면 또 투표 불가. 투표 다시하기 필요
+            throw new AlreadyVotedException(topic.getId(), member.getVotedOptionOfTopic(topic));
+        }
+    }
+
+    private void checkTopicVotable(final Topic topic, final LocalDateTime votedAt) {
+        if (!topic.isBeforeDeadline(votedAt)) {
+            throw new UnableToVoteException(votedAt);
         }
         final LocalDateTime now = LocalDateTime.now();
         boolean votedAtFuture = votedAt.isAfter(now);
@@ -193,33 +201,29 @@ public class TopicService {
 
     @Transactional
     public void modifyVoteForTopicByMember(final Long topicId, final Long memberId, final VoteModifyRequest request) {
-
         final LocalDateTime modifiedAt = convertUnixTime(request.getModifiedAt());
         final ChoiceOption modifiedOption = request.getModifiedOption();
 
-        Member member = findMember(memberId);
-        Topic topic = findTopic(topicId);
         Vote vote = findVoteByMemberIdAndTopicId(memberId, topicId);
-
-        checkVoteModifiable(vote, modifiedOption, modifiedAt);
 
         modifyVote(vote, modifiedOption, modifiedAt);
     }
 
-    private void checkVoteModifiable(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
-
-        checkTopicVotable(vote.getTopic(), vote.getVoter(), modifiedAt);
-
-        if (vote.isVotedForOption(modifiedOption)) {
-            throw new DuplicateVoteException(vote.getTopic().getId(), modifiedOption);
-        }
-    }
-
     private void modifyVote(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+        checkVoteModifiable(vote, modifiedOption, modifiedAt);
 
         deleteVotersComments(vote.getVoter(), vote.getTopic());
 
         vote.changeOption(modifiedOption, modifiedAt);
+    }
+
+    private void checkVoteModifiable(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+        checkTopicVotable(vote.getTopic(), modifiedAt);
+
+        boolean optionVotedAlready = vote.isVotedForOption(modifiedOption);
+        if (optionVotedAlready) {
+            throw new DuplicateVoteOptionException(vote.getTopic().getId(), modifiedOption);
+        }
     }
 
     private void deleteVotersComments(Member voter, Topic topic) {

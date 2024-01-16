@@ -101,6 +101,10 @@ E2. 투표 시간을 미래 시간으로 요청
 
 operation::topic-controller-test/vote-for-topic_voted-at-future_throw-exception[snippets="http-request,http-response"]
 
+E3. 이미 투표한 토픽에 대해 투표
+
+operation::topic-controller-test/vote-for-topic_duplicate-vote_throw-exception[snippets="http-request,http-response"]
+
 ### 1.8. 투표 수정
 
 OK

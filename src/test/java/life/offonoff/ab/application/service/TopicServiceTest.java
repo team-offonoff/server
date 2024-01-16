@@ -10,7 +10,7 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
-import life.offonoff.ab.exception.DuplicateVoteException;
+import life.offonoff.ab.exception.DuplicateVoteOptionException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.repository.ChoiceRepository;
 import life.offonoff.ab.repository.keyword.KeywordRepository;
@@ -345,8 +345,6 @@ public class TopicServiceTest {
         Comment comment1 = Comment.createVotersComment(vote, "content1");
         Comment comment2 = Comment.createVotersComment(vote, "content2");
 
-        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
-        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
         when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
         when(commentRepository.deleteAllByWriterIdAndTopicId(anyLong(), anyLong())).thenReturn(2);
 
@@ -386,8 +384,6 @@ public class TopicServiceTest {
         Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
         vote.associate(voter, topic);
 
-        when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
-        when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
         when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));
 
         // when
@@ -396,7 +392,7 @@ public class TopicServiceTest {
                         topicId,
                         voter.getId(),
                         new VoteModifyRequest(vote.getSelectedOption(), getEpochSecond(deadline.minusHours(1))))
-        ).isInstanceOf(DuplicateVoteException.class);
+        ).isInstanceOf(DuplicateVoteOptionException.class);
 
     }
 
