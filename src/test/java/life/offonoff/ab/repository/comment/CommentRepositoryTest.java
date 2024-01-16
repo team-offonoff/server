@@ -56,15 +56,21 @@ public class CommentRepositoryTest {
         // given
         Member member = memberRepository.save(new Member("email", "pass", Provider.NONE));
         Topic topic = topicRepository.save(new Topic("topic", TopicSide.TOPIC_A));
-
         commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content1"));
         commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content2"));
 
+        Member member2 = memberRepository.save(new Member("email2", "pass", Provider.NONE));
+        commentRepository.save(new Comment(member2, topic, ChoiceOption.CHOICE_A, "content3"));
+
         // when
-        commentRepository.deleteAllByWriterIdAndTopicId(member.getId(), topic.getId());
+        int removed = commentRepository.deleteAllByWriterIdAndTopicId(member.getId(), topic.getId());
 
         // then
         assertThat(commentRepository.countAllByWriterIdAndTopicId(member.getId(), topic.getId()))
                 .isEqualTo(0);
+        assertThat(commentRepository.countAllByWriterIdAndTopicId(member2.getId(), topic.getId()))
+                .isEqualTo(1);
+        assertThat(removed).isEqualTo(2);
+        assertThat(memberRepository.count()).isEqualTo(2L);
     }
 }
