@@ -43,6 +43,7 @@ OK
 operation::topic-controller-test/create-topic-report[snippets="http-request,http-response"]
 
 E1. 존재하지 않는 토픽일때
+
 #존재하지 않는 토픽일때, 토픽 사용하는 모든 API에서 응답 형식은 동일#
 
 operation::topic-controller-test/create-topic-report_with-non-existent-topic_-topic-not-found-exception[snippets="http-request,http-response"]
@@ -82,7 +83,7 @@ E2. 작성자가 아닌 유저가 상태 변경 시도
 
 <<_e2_작성자가_아닌_유저가_상태_변경_시도, 3. 토픽 활성화/비활성화 - E1>>과 응답 동일
 
-### 6. 투표
+### 1.6. 투표
 [source.html]
 POST /topics/{topicId}/vote
 
@@ -109,3 +110,13 @@ operation::topic-controller-test/modify-vote-for-topic_not_duplicated_option[sni
 E1. 동일 선택지로의 수정 요청
 
 operation::topic-controller-test/modify-vote-for-topic_exception_duplicated_option[snippets="http-request,http-response"]
+
+### 1.9. 토픽의 댓글 하나 조회
+
+댓글 하나 미리보기용
+
+OK
+
+투표 완료 후 응답과 형식 동일
+
+operation::topic-controller-test/get-top-comment-of-topic[snippets="http-request,http-response"]

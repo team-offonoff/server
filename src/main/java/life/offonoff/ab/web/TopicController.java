@@ -112,4 +112,12 @@ public class TopicController {
                 commentService.getLatestCommentOfTopic(topicId)));
     }
 
+    @GetMapping("/{topicId}/comment")
+    public ResponseEntity<VoteResponse> getTopCommentOfTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId
+    ) {
+        return ok(VoteResponse.from(
+                commentService.getLatestCommentOfTopic(topicId)));
+    }
 }
