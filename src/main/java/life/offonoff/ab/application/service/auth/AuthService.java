@@ -46,7 +46,7 @@ public class AuthService {
 
         String email = request.getEmail();
 
-        if (memberService.exists(email)) {
+        if (memberService.existsByEmail(email)) {
             throw new DuplicateEmailException(email);
         }
 
@@ -64,10 +64,20 @@ public class AuthService {
     @Transactional
     public JoinStatusResponse registerProfile(ProfileRegisterRequest request) {
 
+        beforeRegisterProfile(request);
+
         Member member = memberService.findById(request.getMemberId());
         member.registerPersonalInfo(request.toPersonalInfo());
 
         return new ProfileRegisterResponse(member.getId(), member.getJoinStatus());
+    }
+
+    private void beforeRegisterProfile(ProfileRegisterRequest request) {
+        final String nickname = request.getNickname();
+
+        if (memberService.existsByEmail(nickname)) {
+            throw new DuplicateNicknameException(nickname);
+        }
     }
 
     @Transactional
@@ -99,7 +109,7 @@ public class AuthService {
         Member member = memberService.findByEmail(email);
 
         // email existence
-        if (!memberService.exists(email)) {
+        if (!memberService.existsByEmail(email)) {
             throw new MemberByEmailNotFoundException(email);
         }
 

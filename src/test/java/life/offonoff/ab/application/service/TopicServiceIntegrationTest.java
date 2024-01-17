@@ -3,6 +3,7 @@ package life.offonoff.ab.application.service;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
+import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
@@ -19,6 +20,7 @@ import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,7 +51,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void createTopicWithNewKeyword_saveKeyword() {
         // given
-        Member member = createMember();
+        Member member = createMemberByEmailAndNickname("email", "nickname");
 
         // when
         Long topicId = topicService.createMembersTopic(
@@ -68,7 +70,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void reportTopicByMember_createTopicReport() {
         // given
-        Member member = createMember();
+        Member member = createMemberByEmailAndNickname("email", "nickname");
 
         TopicResponse response = createMembersTopic(member.getId());
 
@@ -85,7 +87,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void reportTopicByMember_reportTwice_doNotCreateReportAgain_throwException() {
         // given
-        Member member = createMember();
+        Member member = createMemberByEmailAndNickname("email", "nickname");
 
         TopicResponse response = createMembersTopic(member.getId());
 
@@ -100,7 +102,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void activateMembersTopic_deactivateTopic() {
         // given
-        Member member = createMember();
+        Member member = createMemberByEmailAndNickname("email", "nickname");
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -113,7 +115,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void deleteMembersTopic_doesntAffectMember() {
         // given
-        Member member = createMember();
+        Member member = createMemberByEmailAndNickname("email", "nickname");
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -127,7 +129,7 @@ public class TopicServiceIntegrationTest {
     @Test
     void deleteMembersTopic_doesntAffectKeyword() {
         // given
-        Member member = createMember();
+        Member member = createMemberByEmailAndNickname("email", "nickname");
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
@@ -142,8 +144,8 @@ public class TopicServiceIntegrationTest {
 
     @Test
     void voteForTopicByMember_byNonAuthor_success() {
-        Member author = createMember();
-        Member voter = createMember();
+        Member author = createMemberByEmailAndNickname("author_email", "author");
+        Member voter = createMemberByEmailAndNickname("voter_email", "voter");
         TopicResponse response = createMembersTopic(author.getId());
 
         VoteRequest request = new VoteRequest(
@@ -159,7 +161,7 @@ public class TopicServiceIntegrationTest {
 
     @Test
     void voteForTopicByMember_byAuthor_throwException() {
-        Member author = createMember();
+        Member author = createMemberByEmailAndNickname("email", "nickname");
         TopicResponse response = createMembersTopic(author.getId());
 
         VoteRequest request = new VoteRequest(
@@ -173,8 +175,8 @@ public class TopicServiceIntegrationTest {
 
     @Test
     void voteForTopicByMember_votedAtFuture_throwException() {
-        Member author = createMember();
-        Member voter = createMember();
+        Member author = createMemberByEmailAndNickname("author_email", "author");
+        Member voter = createMemberByEmailAndNickname("voter_email", "voter");
         TopicResponse response = createMembersTopic(author.getId());
 
         VoteRequest request = new VoteRequest(
@@ -188,8 +190,8 @@ public class TopicServiceIntegrationTest {
 
     @Test
     void voteForTopicByMember_duplicateVote_throwException() {
-        Member author = createMember();
-        Member voter = createMember();
+        Member author = createMemberByEmailAndNickname("author_email", "author");
+        Member voter = createMemberByEmailAndNickname("voter_email", "voter");
         TopicResponse response = createMembersTopic(author.getId());
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
@@ -202,9 +204,9 @@ public class TopicServiceIntegrationTest {
                 .isInstanceOf(AlreadyVotedException.class);
     }
 
-    private Member createMember() {
-        Member member = memberService.join(new SignUpRequest("email", "password", Provider.NONE));
-        member.registerPersonalInfo(new PersonalInfo("nickname", LocalDate.now(), Gender.MALE, "job"));
+    private Member createMemberByEmailAndNickname(String email, String nickname) {
+        Member member = memberService.join(new SignUpRequest(email, "password", Provider.NONE));
+        member.registerPersonalInfo(new PersonalInfo(nickname, LocalDate.now(), Gender.MALE, "job"));
         member.agreeTerms(new TermsEnabled(true));
 
         return member;
