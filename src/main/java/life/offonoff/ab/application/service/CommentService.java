@@ -11,6 +11,7 @@ import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +38,19 @@ public class CommentService {
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
-    public Slice<CommentResponse> findAll(Long memberId, Long topicId, Pageable pageable) {
+    public PageResponse<CommentResponse> findAll(Long memberId, Long topicId, Pageable pageable) {
 
         checkMemberCanViewComments(memberId, topicId);
 
-        Member member = findMemberFetchLikedComments(memberId);
-        return commentRepository.findAll(topicId, pageable)
-                .map(comment -> CommentResponse.from(comment, member));
+        Member member = findMemberWithLikedComments(memberId);
+
+        final int commentCount = topicRepository.findCommentCountById(topicId);
+
+        final Slice<CommentResponse> commentResponseSlice =
+                commentRepository.findAll(topicId, pageable)
+                                 .map(comment -> CommentResponse.from(comment, member));
+
+        return PageResponse.of(commentCount, commentResponseSlice);
     }
 
     private void checkMemberCanViewComments(Long memberId, Long topicId) {
@@ -61,8 +68,8 @@ public class CommentService {
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 
-    private Member findMemberFetchLikedComments(final Long memberId) {
-        return memberRepository.findByIdFetchLikedComments(memberId)
+    private Member findMemberWithLikedComments(final Long memberId) {
+        return memberRepository.findByIdWithLikedComments(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
     }
 

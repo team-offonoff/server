@@ -9,6 +9,7 @@ import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.MemberResponse;
@@ -115,7 +116,7 @@ class CommentControllerTest extends RestDocsTest {
         Long topicId = 1L;
 
         when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
-                .thenReturn(new SliceImpl<>(createCommentResponses(topicId)));
+                .thenReturn(PageResponse.of(2, new SliceImpl<>(createTwoCommentResponses(topicId))));
 
         mvc.perform(get(CommentUri.BASE)
                         .header("Authorization", "Bearer ACCESS_TOKEN")
@@ -137,7 +138,7 @@ class CommentControllerTest extends RestDocsTest {
         Long topicId = 1L;
 
         when(commentService.findAll(isNull(Long.class), anyLong(), any(Pageable.class)))
-                .thenReturn(new SliceImpl<>(Collections.emptyList()));
+                .thenReturn(PageResponse.of(0, new SliceImpl<>(Collections.emptyList())));
 
         mvc.perform(get(CommentUri.BASE)
                         .header("Authorization", "Bearer ACCESS_TOKEN")
@@ -173,7 +174,7 @@ class CommentControllerTest extends RestDocsTest {
                 .andExpect(status().isBadRequest());
     }
 
-    private List<CommentResponse> createCommentResponses(Long topicId) {
+    private List<CommentResponse> createTwoCommentResponses(Long topicId) {
         CommentResponse response1 = new CommentResponse(
                 1L,
                 topicId,
