@@ -5,6 +5,7 @@ import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.application.service.request.CommentUpdateRequest;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -39,25 +40,22 @@ public class CommentController {
     }
 
     @PostMapping("/{commentId}/like")
-    public ResponseEntity<Void> likeComment(
+    public ResponseEntity<CommentReactionResponse> likeComment(
             @Authorized Long memberId,
             @PathVariable Long commentId,
             @RequestParam Boolean enable
     ) {
-        commentService.likeCommentForMember(memberId, commentId, enable);
-        return ResponseEntity.ok()
-                             .build();
+        return ResponseEntity.ok(commentService.likeCommentForMember(memberId, commentId, enable));
     }
 
     @PostMapping("/{commentId}/hate")
-    public ResponseEntity<Void> hateComment(
+    public ResponseEntity<CommentReactionResponse> hateComment(
             @Authorized Long memberId,
             @PathVariable Long commentId,
             @RequestParam Boolean enable
     ) {
-        commentService.hateCommentForMember(memberId, commentId, enable);
-        return ResponseEntity.ok()
-                             .build();
+        ;
+        return ResponseEntity.ok(commentService.hateCommentForMember(memberId, commentId, enable));
     }
 
     @DeleteMapping("/{commentId}")

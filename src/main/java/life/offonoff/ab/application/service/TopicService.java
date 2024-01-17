@@ -10,12 +10,12 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
-import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.ChoiceRepository;
-import life.offonoff.ab.repository.KeywordRepository;
+import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
+import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
@@ -36,11 +36,13 @@ import java.time.ZoneId;
 @Transactional(readOnly = true)
 @Service
 public class TopicService {
+
     private final KeywordRepository keywordRepository;
     private final ChoiceRepository choiceRepository;
     private final TopicRepository topicRepository;
     private final MemberRepository memberRepository;
     private final VoteRepository voteRepository;
+    private final CommentRepository commentRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -120,13 +122,20 @@ public class TopicService {
 
     /**
      * 토픽 검색 서비스
-     * @param request Specification을 이용해 검색 조건 추상화
+     *
+     * @param request  Specification을 이용해 검색 조건 추상화
      * @param pageable
      * @return
      */
     public Slice<TopicResponse> findAll(final Long memberId, final TopicSearchRequest request, final Pageable pageable) {
-        return topicRepository.findAll(memberId, request, pageable)
-                .map(TopicResponse::from);
+
+        Slice<Topic> topics = topicRepository.findAll(memberId, request, pageable);
+
+        if (memberId == null) {
+            return topics.map(TopicResponse::from);
+        }
+
+        return topics.map(topic -> TopicResponse.from(topic, findMember(memberId)));
     }
 
     //== Hide ==//
@@ -157,23 +166,31 @@ public class TopicService {
         Topic topic = findTopic(topicId);
         final LocalDateTime votedAt = convertUnixTime(request.votedAt());
 
-        checkTopicVotable(topic, member, votedAt);
-
-        doVote(member, topic, votedAt, request.choiceOption());
+        voteForTopic(member, topic, votedAt, request.choiceOption());
     }
 
-    private void doVote(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
+    private void voteForTopic(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
+        checkMemberVotableForTopic(member, topic, votedAt);
+
         Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
         voteRepository.save(vote);
     }
 
-    private static void checkTopicVotable(final Topic topic, final Member member, final LocalDateTime votedAt) {
-        if (!topic.isBeforeDeadline(votedAt)) {
-            throw new UnableToVoteException(votedAt);
-        }
+    private void checkMemberVotableForTopic(final Member member, final Topic topic, final LocalDateTime votedAt) {
+        checkTopicVotable(topic, votedAt);
         if (topic.isWrittenBy(member)) {
             throw new VoteByAuthorException(topic.getId(), member.getId());
+        }
+        if (member.votedAlready(topic)) {
+            // 이미 투표했으면 또 투표 불가. 투표 다시하기 필요
+            throw new AlreadyVotedException(topic.getId(), member.getVotedOptionOfTopic(topic));
+        }
+    }
+
+    private void checkTopicVotable(final Topic topic, final LocalDateTime votedAt) {
+        if (!topic.isBeforeDeadline(votedAt)) {
+            throw new UnableToVoteException(votedAt);
         }
         final LocalDateTime now = LocalDateTime.now();
         boolean votedAtFuture = votedAt.isAfter(now);
@@ -183,20 +200,35 @@ public class TopicService {
     }
 
     @Transactional
-    public void cancelVoteForTopicByMember(final Long topicId, final Long memberId, final VoteCancelRequest request) {
-        Member member = findMember(memberId);
-        Topic topic = findTopic(topicId);
-        final LocalDateTime votedAt = convertUnixTime(request.canceledAt());
-
-        checkTopicVotable(topic, member, votedAt);
+    public void modifyVoteForTopicByMember(final Long topicId, final Long memberId, final VoteModifyRequest request) {
+        final LocalDateTime modifiedAt = convertUnixTime(request.getModifiedAt());
+        final ChoiceOption modifiedOption = request.getModifiedOption();
 
         Vote vote = findVoteByMemberIdAndTopicId(memberId, topicId);
-        deleteVote(vote);
+
+        modifyVote(vote, modifiedOption, modifiedAt);
     }
 
-    private void deleteVote(Vote vote) {
-        vote.removeAssociations();
-        voteRepository.delete(vote);
+    private void modifyVote(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+        checkVoteModifiable(vote, modifiedOption, modifiedAt);
+
+        deleteVotersComments(vote.getVoter(), vote.getTopic());
+
+        vote.changeOption(modifiedOption, modifiedAt);
+    }
+
+    private void checkVoteModifiable(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+        checkTopicVotable(vote.getTopic(), modifiedAt);
+
+        boolean optionVotedAlready = vote.isVotedForOption(modifiedOption);
+        if (optionVotedAlready) {
+            throw new DuplicateVoteOptionException(vote.getTopic().getId(), modifiedOption);
+        }
+    }
+
+    private void deleteVotersComments(Member voter, Topic topic) {
+        int deleted = commentRepository.deleteAllByWriterIdAndTopicId(voter.getId(), topic.getId());
+        topic.commentRemoved(deleted);
     }
 
     private Vote findVoteByMemberIdAndTopicId(Long memberId, Long topicId) {

@@ -4,11 +4,13 @@ import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.application.service.request.CommentUpdateRequest;
 import life.offonoff.ab.config.WebConfig;
+import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.MemberResponse;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
+import static life.offonoff.ab.domain.TestEntityUtil.getEpochSecond;
 import static life.offonoff.ab.exception.AbCode.INVALID_LENGTH_OF_FIELD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -56,12 +59,10 @@ class CommentControllerTest extends RestDocsTest {
                 1L,
                 topicId,
                 new MemberResponse(writerId, "writerNickname", "writerProfileImageUrl"),
+                null,
                 content,
-                0,
-                0,
-                false,
-                false,
-                LocalDateTime.now()
+                new CommentReactionResponse(0, 0, false, false),
+                getEpochSecond(LocalDateTime.now())
         );
 
         when(commentService.register(nullable(Long.class), any(CommentRequest.class))).thenReturn(response);
@@ -178,22 +179,19 @@ class CommentControllerTest extends RestDocsTest {
                 1L,
                 topicId,
                 new MemberResponse(1L, "member1", "imageUrl1"),
+                null,
                 "content1",
-                0,
-                0,
-                true,
-                false,
-                LocalDateTime.now());
+                new CommentReactionResponse(0, 0, true, false),
+                getEpochSecond(LocalDateTime.now()));
+
         CommentResponse response2 = new CommentResponse(
                 2L,
                 topicId,
                 new MemberResponse(2L, "member2", "imageUrl2"),
+                null,
                 "content2",
-                0,
-                0,
-                true,
-                false,
-                LocalDateTime.now());
+                new CommentReactionResponse(1, 0, true, false),
+                getEpochSecond(LocalDateTime.now()));
 
         return List.of(response1, response2);
     }
@@ -259,12 +257,10 @@ class CommentControllerTest extends RestDocsTest {
                 1L,
                 2L,
                 new MemberResponse(1L, "writerNickname", "writerProfileImageUrl"),
+                null,
                 "new content",
-                0,
-                0,
-                false,
-                false,
-                LocalDateTime.now()
+                new CommentReactionResponse(0, 0, false, false),
+                getEpochSecond(LocalDateTime.now())
         );
         when(commentService.modifyMembersCommentContent(any(), any(), any())).thenReturn(response);
 

@@ -52,7 +52,16 @@ public class Vote extends BaseEntity {
         topic.getVotes().remove(this);
     }
 
-    public boolean has(Topic topic) {
-        return this.topic == topic;
+    public boolean isFor(Topic topic) {
+        return this.topic.getId().equals(topic.getId());
+    }
+
+    public boolean isVotedForOption(ChoiceOption modifiedOption) {
+        return this.selectedOption.equals(modifiedOption);
+    }
+
+    public void changeOption(ChoiceOption choiceOption, LocalDateTime modifiedAt) {
+        this.selectedOption = choiceOption;
+        this.votedAt = modifiedAt;
     }
 }

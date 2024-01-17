@@ -2,6 +2,7 @@ package life.offonoff.ab.web.response;
 
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,12 +15,10 @@ public class CommentResponse {
     private Long commentId;
     private Long topicId;
     private MemberResponse writer;
+    private ChoiceOption writersVotedOption;
     private String content;
-    private Integer likeCount;
-    private Integer hateCount;
-    private Boolean liked;
-    private Boolean hated;
-    private LocalDateTime createdAt;
+    private CommentReactionResponse commentReaction;
+    private Long createdAt;
 
     public static CommentResponse from(Comment comment) {
         if (comment == null) {
@@ -28,24 +27,20 @@ public class CommentResponse {
         return new CommentResponse(comment.getId(),
                 comment.getTopic().getId(),
                 MemberResponse.from(comment.getWriter()),
+                comment.getWritersVotedOption(),
                 comment.getContent(),
-                comment.getLikeCount(),
-                comment.getHateCount(),
-                false,
-                false,
-                comment.getCreatedAt());
+                CommentReactionResponse.from(comment),
+                comment.getCreatedSecond());
     }
 
     public static CommentResponse from(Comment comment, Member member) {
         return new CommentResponse(comment.getId(),
                 comment.getTopic().getId(),
                 MemberResponse.from(comment.getWriter()),
+                comment.getWritersVotedOption(),
                 comment.getContent(),
-                comment.getLikeCount(),
-                comment.getHateCount(),
-                member.likeAlready(comment),
-                member.hateAlready(comment),
-                comment.getCreatedAt());
+                CommentReactionResponse.from(comment, member),
+                comment.getCreatedSecond());
     }
 
 }

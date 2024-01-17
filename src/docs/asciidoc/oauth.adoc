@@ -1,4 +1,4 @@
-## OAuth 인증 API
+## 2. OAuth 인증 API
 - `회원가입` / `로그인` 둘 다 처리
 
     신규 회원 -> 회원 가입
@@ -9,16 +9,22 @@
     1. `BY_CODE` : authorize_code + redirect_uri를 통한 인가
     2. `BY_IDTOKEN` : id_token을 통한 인가
 
-### 1. authorize_code & redirect_uri
+### 2.1. authorize_code & redirect_uri
 
-#### OK. 신규 회원
+OK. 신규 회원
+
 operation::o-auth-controller-test/oauth_kakao_new_member_by_code[snippets="request-fields,response-fields,http-request,http-response"]
-#### OK. 기존 회원
+
+OK. 기존 회원
+
 operation::o-auth-controller-test/oauth_kakao_existing_member_by_code[snippets="http-request,http-response"]
 
-### 2. id_token
+### 2.2. id_token
 
-#### OK. 신규 회원
+OK. 신규 회원
+
 operation::o-auth-controller-test/oauth_kakao_new_member_by_id-token[snippets="http-request,http-response"]
-#### OK. 기존 회원
+
+OK. 기존 회원
+
 operation::o-auth-controller-test/oauth_kakao_existing_member_by_id-token[snippets="http-request,http-response"]

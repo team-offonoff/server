@@ -15,4 +15,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     @Query("select m from Member m left join fetch m.likedComments where m.id = :id")
     Optional<Member> findByIdWithLikedComments(@Param("id") Long memberId);
+
+    @Query("select m from Member m join fetch m.votes where m.id = :id")
+    Optional<Member> findByIdFetchVotes(@Param("id") Long memberId);
 }

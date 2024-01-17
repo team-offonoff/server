@@ -20,13 +20,14 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member writer;
-    // 조회 성능 향상을 위한 필드
-    private ChoiceOption writersSelectedOption;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Enumerated(EnumType.STRING)
+    private ChoiceOption writersVotedOption;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
@@ -38,26 +39,56 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public Comment(Member member, Topic topic, String content) {
+    private Comment(Member member, Topic topic, String content) {
         associate(member, topic);
         this.content = content;
     }
 
-    public void associate(Member member, Topic topic) {
+    public Comment(Member member, Topic topic, ChoiceOption selectedOption, String content) {
+        associate(member, topic);
+        this.writersVotedOption = selectedOption;
+        this.content = content;
+    }
+
+
+    private void associate(Member member, Topic topic) {
         this.writer = member;
         member.addComment(this);
 
         this.topic = topic;
         topic.commented();
     }
+
+    public static Comment createAuthorsComment(Member author, Topic topic, String content) {
+        if (!topic.isWrittenBy(author)) {
+            throw new IllegalAuthorException(author.getId(), topic.getId());
+        }
+
+        return new Comment(author, topic, content);
+    }
+
+    public static Comment createVotersComment(Vote vote, String content) {
+        return new Comment(vote.getVoter(),
+                           vote.getTopic(),
+                           vote.getSelectedOption(),
+                           content);
+    }
+
     public void increaseLikeCount() {
         likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        likeCount--;
     }
 
     public void increaseHateCount() {
         hateCount++;
     }
 
+    public void decreaseHateCount() {
+        hateCount--;
+    }
     public boolean isWrittenBy(Member member) {
         return this.writer == member;
     }

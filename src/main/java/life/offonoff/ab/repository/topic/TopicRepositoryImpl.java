@@ -3,9 +3,11 @@ package life.offonoff.ab.repository.topic;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.hide.QHiddenTopic;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static life.offonoff.ab.domain.topic.QTopic.topic;
+import static life.offonoff.ab.domain.topic.hide.QHiddenTopic.hiddenTopic;
 import static life.offonoff.ab.repository.topic.booleanexpression.TopicBooleanExpression.*;
 
 @RequiredArgsConstructor
@@ -26,20 +29,28 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
 
     @Override
     public Slice<Topic> findAll(Long memberId, TopicSearchRequest request, Pageable pageable) {
-        List<Topic> result = queryFactory
-                .selectFrom(topic)
-                .join(topic.author).fetchJoin()
-                .join(topic.keyword).fetchJoin()
-                .where(
-                        eqTopicStatus(request.getTopicStatus()),
-                        eqKeyword(request.getKeywordId()),
-                        hideFor(memberId)
-                ).orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
+
+        JPAQuery<Topic> baseQuery = queryFactory.selectFrom(topic)
+                                                .join(topic.author).fetchJoin()
+                                                .join(topic.keyword).fetchJoin()
+                                                .where(eqTopicStatus(request.getTopicStatus()),
+                                                        eqKeyword(request.getKeywordId()))
+                                                .orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
+                                                .offset(pageable.getOffset())
+                                                .limit(pageable.getPageSize() + 1);
+        hideForMember(memberId, baseQuery);
+
+        List<Topic> result = baseQuery.fetch();
 
         return PagingUtil.toSlice(result, pageable);
+    }
+
+    private void hideForMember(Long memberId, JPAQuery<Topic> query) {
+        if (memberId != null) {
+            query = query.leftJoin(hiddenTopic).on(hiddenTopic.topic.id.eq(topic.id),
+                                                   hiddenTopic.member.id.eq(memberId))
+                         .where(hiddenTopic.member.id.isNull());
+        }
     }
 
     @Override

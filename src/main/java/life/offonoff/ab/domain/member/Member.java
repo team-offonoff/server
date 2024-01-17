@@ -7,6 +7,7 @@ import life.offonoff.ab.domain.comment.HatedComment;
 import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.notice.Notification;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.IllegalJoinStatusException;
@@ -195,7 +196,7 @@ public class Member extends BaseEntity {
         //== VOTE ==//
     public boolean votedAlready(Topic topic) {
         return votes.stream()
-                .anyMatch(v -> v.has(topic));
+                .anyMatch(v -> v.isFor(topic));
     }
 
     public void readNotification(Notification notification) {
@@ -217,7 +218,10 @@ public class Member extends BaseEntity {
     }
 
     public void cancelHateIfExists(Comment comment) {
-        hatedComments.removeIf(h -> h.has(comment));
+        boolean removed = hatedComments.removeIf(h -> h.has(comment));
+        if (removed) {
+            comment.decreaseHateCount();
+        }
     }
 
         //== LIKE ==//
@@ -227,7 +231,10 @@ public class Member extends BaseEntity {
     }
 
     public void cancelLikeIfExists(Comment comment) {
-        likedComments.removeIf(l -> l.has(comment));
+        boolean removed = likedComments.removeIf(l -> l.has(comment));
+        if (removed) {
+            comment.decreaseLikeCount();
+        }
     }
 
     public boolean isAuthorOf(Topic topic) {
@@ -236,5 +243,13 @@ public class Member extends BaseEntity {
 
     public void removeComment(Comment comment) {
         comments.remove(comment);
+    }
+
+    public ChoiceOption getVotedOptionOfTopic(Topic topic) {
+        return votes.stream()
+                .filter(vote -> vote.isFor(topic))
+                .map(Vote::getSelectedOption)
+                .findAny()
+                .orElse(null);
     }
 }

@@ -1,20 +1,20 @@
-== 이미지 Presigned URL API
+== 6. 이미지 Presigned URL API
 - 올릴 이미지 파일 이름 포함하여 API 요청
 - API 응답으로 온 URL에 PUT요청으로 이미지 보내기
 ** 이 URL의 유효기간은 10분
 ** 200 OK로 성공하면 URL에서 쿼리 스트링 뺀 URL을 이미지 URL로 사용
 
 
-### 1. 프로필 이미지 URL
+### 6.1. 프로필 이미지 URL
 
 [source.html]
 POST /images/profile
 
-#### OK
+OK
 
 operation::image-controller-test/create-profile-image-url[snippets="http-request,http-response"]
 
-#### E1. 지원되지 않는 형식의 파일 확장자
+E1. 지원되지 않는 형식의 파일 확장자
 
 지원되는 형식: ``jpg, jpeg, png, gif, bmp``
 
@@ -22,15 +22,15 @@ operation::image-controller-test/create-profile-image-url[snippets="http-request
 
 operation::image-controller-test/create-profile-image-url_with-unsupported-file-extension[snippets="http-request,http-response"]
 
-### 2. 토픽 이미지 URL
+### 6.2. 토픽 이미지 URL
 
 [source.html]
 POST /images/topic
 
-#### OK
+OK
 
 operation::image-controller-test/create-topic-image-url[snippets="http-request,http-response"]
 
-#### E1. 지원되지 않는 형식의 파일 확장자
+E1. 지원되지 않는 형식의 파일 확장자
 
 <<_e1_지원되지_않는_형식의_파일_확장자, 1. 프로필 이미지 URL - E1>>과 동일

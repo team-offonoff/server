@@ -8,7 +8,7 @@ import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
 import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
 import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.application.service.request.VoteCancelRequest;
+import life.offonoff.ab.application.service.request.VoteModifyRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.comment.Comment;
@@ -104,7 +104,7 @@ public class TopicControllerTest extends RestDocsTest {
                 .andDo(restDocs.document(queryParameters(
                         parameterWithName("keyword_id").description("토픽 키워드 ID").optional(),
                         parameterWithName("page").description("page number - default `0`").optional(),
-                        parameterWithName("size").description("page size - default `10`").optional(),
+                        parameterWithName("size").description("page size - default `10` [min, max] [0, 100]").optional(),
                         parameterWithName("sort").description("orderBy - default `voteCount,desc`").optional())));
     }
 
@@ -197,7 +197,8 @@ public class TopicControllerTest extends RestDocsTest {
                         new Comment(
                         createRandomMember(),
                         createRandomTopic(),
-                        "content"
+                        ChoiceOption.CHOICE_A,
+                "content"
                 )));
 
         VoteRequest request = new VoteRequest(
@@ -208,7 +209,7 @@ public class TopicControllerTest extends RestDocsTest {
                             .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                              .writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.comment.content").value("content"));
+                .andExpect(jsonPath("$.latestComment.content").value("content"));
     }
 
     @Test
@@ -245,30 +246,75 @@ public class TopicControllerTest extends RestDocsTest {
     }
 
     @Test
-    void cancelVoteForTopic_existingVote_success() throws Exception {
-        VoteCancelRequest request = new VoteCancelRequest(
-                LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond()
-        );
-        mvc.perform(delete(TopicUri.VOTE, 1).with(csrf().asHeader())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
-                                             .writeValueAsString(request)))
-                .andExpect(status().isOk());
-    }
+    void voteForTopic_duplicateVote_throwException() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime votedAt = now.plusMinutes(30);
 
-    @Test
-    void cancelVoteForTopic_nonExistingVote_throwException() throws Exception {
-        doThrow(new MemberNotVoteException(2L, 1L))
-                .when(topicService).cancelVoteForTopicByMember(any(), any(), any());
-        VoteCancelRequest request = new VoteCancelRequest(
-                LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond()
-        );
-        mvc.perform(delete(TopicUri.VOTE, 1).with(csrf().asHeader())
+        doThrow(new AlreadyVotedException(1L, ChoiceOption.CHOICE_B))
+                .when(topicService).voteForTopicByMember(any(), any(), any());
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, votedAt.atZone(ZoneId.systemDefault()).toEpochSecond());
+        mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                              .writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("abCode").value("MEMBER_NOT_VOTE"));
+                .andExpect(jsonPath("abCode").value(AbCode.ALREADY_VOTED.name()));
+    }
+
+    @Test
+    void modifyVoteForTopic_not_duplicated_option() throws Exception {
+
+        VoteModifyRequest request = new VoteModifyRequest(
+                ChoiceOption.CHOICE_B, getEpochSecond(LocalDateTime.now().plusMinutes(30))
+        );
+
+        mvc.perform(patch(TopicUri.VOTE, 1).with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                .writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void modifyVoteForTopic_exception_duplicated_option() throws Exception {
+
+        Long topicId = 1L;
+        ChoiceOption modifiedOption = ChoiceOption.CHOICE_A;
+
+        VoteModifyRequest request = new VoteModifyRequest(
+                modifiedOption, getEpochSecond(LocalDateTime.now().plusMinutes(30))
+        );
+
+        doThrow(new DuplicateVoteOptionException(topicId, modifiedOption))
+                .when(topicService).modifyVoteForTopicByMember(any(), any(), any());
+
+        mvc.perform(patch(TopicUri.VOTE, topicId).with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                .writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest(),
+                        jsonPath("$.abCode").value(AbCode.DUPLICATE_VOTE_OPTION.name())
+                );
+    }
+    
+    @Test
+    void getTopCommentOfTopic() throws Exception {
+        when(commentService.getLatestCommentOfTopic(any()))
+                .thenReturn(CommentResponse.from(
+                        new Comment(
+                                createRandomMember(),
+                                createRandomTopic(),
+                                ChoiceOption.CHOICE_A,
+                                "content"
+                        )));
+
+        mvc.perform(get(TopicUri.TOPIC_COMMENT, 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.latestComment.content").value("content"));
     }
 
     private Slice<TopicResponse> createDefaultTopicSlice() {
@@ -276,6 +322,12 @@ public class TopicControllerTest extends RestDocsTest {
         Member author = TestMember.builder()
                 .id(1L)
                 .nickname("nicknameA")
+                .build().buildMember();
+
+        // create retrieve member
+        Member retrieveMember = TestMember.builder()
+                .id(1L)
+                .nickname("retrieveMember")
                 .build().buildMember();
 
         // create keyword
@@ -313,7 +365,7 @@ public class TopicControllerTest extends RestDocsTest {
         return PagingUtil.toSlice(
                 Stream.of(topic1, topic2)
                         .sorted((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
-                        .map(TopicResponse::from)
+                        .map(t -> TopicResponse.from(t, retrieveMember))
                         .collect(Collectors.toList()),
                 pageable);
     }
@@ -323,6 +375,12 @@ public class TopicControllerTest extends RestDocsTest {
         Member author = TestMember.builder()
                 .id(1L)
                 .nickname("nicknameA")
+                .build().buildMember();
+
+        // create retrieve member
+        Member retrieveMember = TestMember.builder()
+                .id(1L)
+                .nickname("retrieveMember")
                 .build().buildMember();
 
         // create keyword
@@ -355,7 +413,7 @@ public class TopicControllerTest extends RestDocsTest {
         return PagingUtil.toSlice(
                 Stream.of(topic1, topic2)
                         .sorted((t1, t2) -> t2.getVoteCount() - t1.getVoteCount())
-                        .map(TopicResponse::from)
+                        .map(t -> TopicResponse.from(t, retrieveMember))
                         .collect(Collectors.toList()),
                 pageable);
     }
@@ -370,5 +428,6 @@ public class TopicControllerTest extends RestDocsTest {
         private static final String STATUS = BASE + "/{topicId}/status?active={active}";
         private static final String VOTE = BASE + "/{topicId}/vote";
         private static final String DELETE = BASE + "/{topicId}";
+        private static final String TOPIC_COMMENT = BASE + "/{topicId}/comment";
     }
 }

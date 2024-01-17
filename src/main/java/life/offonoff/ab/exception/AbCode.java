@@ -1,6 +1,7 @@
 package life.offonoff.ab.exception;
 
 public enum AbCode {
+    INTERNAL_SERVER_ERROR,
     INVALID_FIELD,
     INVALID_LENGTH_OF_FIELD,
 
@@ -16,6 +17,13 @@ public enum AbCode {
     UNABLE_TO_VOTE,
     VOTED_BY_AUTHOR,
     MEMBER_NOT_VOTE,
+
+    // Topic
+    ILLEGAL_AUTHOR,
+
+    // Vote
+    DUPLICATE_VOTE_OPTION,
+    ALREADY_VOTED,
 
     // COMMENT
     UNABLE_TO_VIEW_COMMENTS,

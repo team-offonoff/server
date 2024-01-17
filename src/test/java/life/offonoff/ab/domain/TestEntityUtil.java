@@ -18,6 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class TestEntityUtil {
 
@@ -74,9 +75,17 @@ public class TestEntityUtil {
         return new Choice(topic, option, content);
     }
     //== Pageable ==//
-
     public static Pageable createPageableDesc(int page, int size, String property) {
         return PageRequest.of(page, size, Sort.Direction.DESC, property);
+    }
+
+    public static Pageable createPageableAsc(int page, int size, String property) {
+        return PageRequest.of(page, size, Sort.Direction.ASC, property);
+    }
+
+    //== Epoch Second ==//
+    public static Long getEpochSecond(LocalDateTime from) {
+        return from.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     //== Reflection + Builder 패턴으로 엔티티 생성 ==//
@@ -111,10 +120,12 @@ public class TestEntityUtil {
         private Long id;
 
         @Builder.Default
+        private TopicSide side = TopicSide.TOPIC_A;
+        @Builder.Default
         private String name = "key";
 
         public Keyword buildKeyword() {
-            Keyword keyword = new Keyword(name, TopicSide.TOPIC_A);
+            Keyword keyword = new Keyword(name, side);
             ReflectionTestUtils.setField(keyword, "id", id);
             return keyword;
         }
@@ -150,10 +161,11 @@ public class TestEntityUtil {
         private Long id;
         private Member writer;
         private Topic topic;
+        private ChoiceOption selected;
         private String content;
 
         public Comment buildComment() {
-            Comment comment = new Comment(writer, topic, content);
+            Comment comment = new Comment(writer, topic, selected, content);
             ReflectionTestUtils.setField(comment, "id", id);
             return comment;
         }

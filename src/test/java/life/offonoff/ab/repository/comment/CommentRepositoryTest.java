@@ -6,8 +6,10 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -37,14 +39,38 @@ public class CommentRepositoryTest {
         Member member = memberRepository.save(new Member("email", "pass", Provider.NONE));
         Topic topic = topicRepository.save(new Topic("topic", TopicSide.TOPIC_A));
 
-        commentRepository.save(new Comment(member, topic, "content1"));
-        commentRepository.save(new Comment(member, topic, "content2"));
-        Comment lastComment = commentRepository.save(new Comment(member, topic, "content3"));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content1"));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content2"));
+        Comment lastComment = commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content3"));
 
         // when
         Optional<Comment> found = commentRepository.findFirstByTopicIdOrderByCreatedAtDesc(topic.getId());
         // then
         assertThat(found).isNotEmpty();
         assertThat(found.get().getId()).isEqualTo(lastComment.getId());
+    }
+
+    @Test
+    @DisplayName("writer id & topic id인 댓글 전부 삭제")
+    void delete_writers_comments() {
+        // given
+        Member member = memberRepository.save(new Member("email", "pass", Provider.NONE));
+        Topic topic = topicRepository.save(new Topic("topic", TopicSide.TOPIC_A));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content1"));
+        commentRepository.save(new Comment(member, topic, ChoiceOption.CHOICE_A, "content2"));
+
+        Member member2 = memberRepository.save(new Member("email2", "pass", Provider.NONE));
+        commentRepository.save(new Comment(member2, topic, ChoiceOption.CHOICE_A, "content3"));
+
+        // when
+        int removed = commentRepository.deleteAllByWriterIdAndTopicId(member.getId(), topic.getId());
+
+        // then
+        assertThat(commentRepository.countAllByWriterIdAndTopicId(member.getId(), topic.getId()))
+                .isEqualTo(0);
+        assertThat(commentRepository.countAllByWriterIdAndTopicId(member2.getId(), topic.getId()))
+                .isEqualTo(1);
+        assertThat(removed).isEqualTo(2);
+        assertThat(memberRepository.count()).isEqualTo(2L);
     }
 }

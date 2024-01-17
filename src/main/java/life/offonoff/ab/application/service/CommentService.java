@@ -12,6 +12,7 @@ import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -62,12 +63,6 @@ public class CommentService {
         }
     }
 
-    private void checkTopicCanBeCommented(Long topicId) {
-        if (!topicRepository.existsByIdAndActiveTrue(topicId)) {
-            throw new TopicNotFoundException(topicId);
-        }
-    }
-
     private Member findMember(final Long memberId) {
         return memberRepository.findByIdAndActiveTrue(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
@@ -91,15 +86,26 @@ public class CommentService {
     //== save ==//
     @Transactional
     public CommentResponse register(Long memberId, CommentRequest request) {
-        Member member = findMember(memberId);
-        Topic topic = findTopic(request.getTopicId());
 
-        validateContent(request.getContent());
+        Comment comment = createComment(memberId, request);
 
-        Comment comment = new Comment(member, topic, request.getContent());
         commentRepository.save(comment);
 
         return CommentResponse.from(comment);
+    }
+
+    private Comment createComment(Long memberId, CommentRequest request) {
+        final String content = request.getContent();
+
+        validateContent(content);
+
+        Member writer = findMember(memberId);
+        Topic topic = findTopic(request.getTopicId());
+
+        if (topic.isWrittenBy(writer)) {
+            return Comment.createAuthorsComment(writer, topic, content);
+        }
+        return Comment.createVotersComment(findVote(writer.getId(), topic.getId()), content);
     }
 
     private void validateContent(String content) {
@@ -111,46 +117,51 @@ public class CommentService {
 
     //== like ==//
     @Transactional
-    public void likeCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
+    public CommentReactionResponse likeCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
         Member liker = findMember(memberId);
         Comment comment = findById(commentId);
 
         if (enable) {
-            doLike(liker, comment);
-            return;
+            return doLike(liker, comment);
         }
-        cancelLike(liker, comment);
+        return cancelLike(liker, comment);
     }
 
-    private void doLike(Member liker, Comment comment) {
+    private CommentReactionResponse doLike(Member liker, Comment comment) {
+
+        liker.cancelHateIfExists(comment);
         liker.likeCommentIfNew(comment);
+        return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), true, false);
     }
 
-    private void cancelLike(Member liker, Comment comment) {
+    private CommentReactionResponse cancelLike(Member liker, Comment comment) {
+
         liker.cancelLikeIfExists(comment);
+        return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), false, false);
     }
 
     //== hate ==//
     @Transactional
-    public void hateCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
+    public CommentReactionResponse hateCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
         Member hater = findMember(memberId);
         Comment comment = findById(commentId);
 
         if (enable) {
-            doHate(hater, comment);
-            return;
+            return doHate(hater, comment);
         }
-        cancelHate(hater, comment);
+        return cancelHate(hater, comment);
     }
 
-    private void doHate(Member hater, Comment comment) {
+    private CommentReactionResponse doHate(Member hater, Comment comment) {
+        hater.cancelLikeIfExists(comment);
         hater.hateCommentIfNew(comment);
+        return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), false, true);
     }
 
-    private void cancelHate(Member hater, Comment comment) {
+    private CommentReactionResponse cancelHate(Member hater, Comment comment) {
         hater.cancelHateIfExists(comment);
+        return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), false, false);
     }
-
 
     //== delete ==//
     @Transactional

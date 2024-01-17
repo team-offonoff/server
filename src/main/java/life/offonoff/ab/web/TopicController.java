@@ -3,10 +3,7 @@ package life.offonoff.ab.web;
 import jakarta.validation.Valid;
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.TopicService;
-import life.offonoff.ab.application.service.request.TopicCreateRequest;
-import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.application.service.request.VoteCancelRequest;
-import life.offonoff.ab.application.service.request.VoteRequest;
+import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
@@ -104,13 +101,23 @@ public class TopicController {
                 commentService.getLatestCommentOfTopic(topicId)));
     }
 
-    @DeleteMapping("/{topicId}/vote")
-    public ResponseEntity<Void> cancelVoteForTopic(
+    @PatchMapping("/{topicId}/vote")
+    public ResponseEntity<VoteResponse> modifyVoteForTopic(
             @Authorized Long memberId,
             @PathVariable("topicId") Long topicId,
-            @Valid @RequestBody final VoteCancelRequest request
+            @Valid @RequestBody final VoteModifyRequest request
     ) {
-        topicService.cancelVoteForTopicByMember(topicId, memberId, request);
-        return ok().build();
+        topicService.modifyVoteForTopicByMember(topicId, memberId, request);
+        return ok(VoteResponse.from(
+                commentService.getLatestCommentOfTopic(topicId)));
+    }
+
+    @GetMapping("/{topicId}/comment")
+    public ResponseEntity<VoteResponse> getTopCommentOfTopic(
+            @Authorized Long memberId,
+            @PathVariable("topicId") Long topicId
+    ) {
+        return ok(VoteResponse.from(
+                commentService.getLatestCommentOfTopic(topicId)));
     }
 }

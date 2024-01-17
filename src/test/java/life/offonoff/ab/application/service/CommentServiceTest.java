@@ -4,24 +4,32 @@ import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.CommentNotFoundException;
 import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.web.response.CommentResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -31,20 +39,42 @@ class CommentServiceTest {
 
     @Autowired CommentService commentService;
 
+    Member author;
+    Member voter;
+    Vote vote;
+    Keyword keyword;
+    Topic topic;
+
+    @BeforeEach
+    void beforeEach() {
+        author = TestMember.builder()
+                .build().buildMember(); em.persist(author);
+
+        keyword = TestKeyword.builder()
+                .name("key")
+                .build().buildKeyword(); em.persist(keyword);
+
+        topic = TestTopic.builder()
+                .author(author)
+                .keyword(keyword)
+                .build().buildTopic(); em.persist(topic);
+
+        voter = TestMember.builder()
+                .role(Role.USER)
+                .build().buildMember(); em.persist(voter);
+
+        vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        vote.associate(voter, topic); em.persist(vote);
+    }
+
     @Test
     @DisplayName("댓글 저장")
     void save_comment() {
         // given
-        Member member = createCompletelyJoinedMember("email", "password", "nickname");
-        Topic topic = createTopic(0, TopicSide.TOPIC_A);
-
-        em.persist(member);
-        em.persist(topic);
-
         CommentRequest request = new CommentRequest(topic.getId(), "content");
 
         // when
-        CommentResponse response = commentService.register(member.getId(), request);
+        CommentResponse response = commentService.register(voter.getId(), request);
 
         // then
         assertThat(response.getTopicId()).isEqualTo(topic.getId());
@@ -52,13 +82,10 @@ class CommentServiceTest {
 
     @Test
     void register_withLongContent_throwsException() {
-        Long memberId = createRandomMember();
-        Long topicId = createRandomTopic();
-
         ThrowingCallable code = () -> commentService.register(
-                memberId,
+                voter.getId(),
                 new CommentRequest(
-                        topicId,
+                        topic.getId(),
                         "c".repeat(LengthInfo.COMMENT_CONTENT.getMaxLength() + 1))
         );
 
@@ -70,20 +97,36 @@ class CommentServiceTest {
     @DisplayName("댓글 저장후 토픽 댓글 수 증가")
     void save_comment_topic_comment_count() {
         // given
-        Member member = createCompletelyJoinedMember("email", "password", "nickname");
-        Topic topic = createTopic(0, TopicSide.TOPIC_A);
-
-        em.persist(member);
-        em.persist(topic);
-
         int beforeCount = topic.getCommentCount();
         CommentRequest request = new CommentRequest(topic.getId(), "content");
 
         // when
-        CommentResponse response = commentService.register(member.getId(), request);
+        CommentResponse response = commentService.register(voter.getId(), request);
 
         // then
         assertThat(topic.getCommentCount()).isEqualTo(beforeCount + 1);
+    }
+
+    @Test
+    @DisplayName("토픽 투표자의 댓글에 selectedOption 반영")
+    void create_comment_by_voter() {
+
+        // when
+        CommentResponse response = commentService.register(voter.getId(), new CommentRequest(topic.getId(), "content"));
+
+        // then
+        assertThat(response.getWritersVotedOption()).isEqualTo(vote.getSelectedOption());
+    }
+
+    @Test
+    @DisplayName("토픽 작성자의 댓글은 selectedOption 이 null")
+    void create_comment_by_author() {
+
+        // when
+        CommentResponse response = commentService.register(author.getId(), new CommentRequest(topic.getId(), "content"));
+
+        // then
+        assertThat(response.getWritersVotedOption()).isEqualTo(null);
     }
 
     @Test
@@ -92,16 +135,9 @@ class CommentServiceTest {
         // given
         Member adminMember = TestMember.builder()
                 .role(Role.ADMIN)
-                .build().buildMember();
-        System.out.println(adminMember.isAdmin());
-        Member writer = createCompletelyJoinedMember("writer", "pwd", "writer");
-        Topic topic = createTopic(0, TopicSide.TOPIC_A);
+                .build().buildMember(); em.persist(adminMember);
 
-        Comment comment = new Comment(writer, topic, "content");
-
-        em.persist(adminMember);
-        em.persist(writer);
-        em.persist(topic);
+        Comment comment = new Comment(voter, topic, ChoiceOption.CHOICE_A,"content");
         em.persist(comment);
 
         // when
@@ -115,17 +151,11 @@ class CommentServiceTest {
     @DisplayName("댓글 작성자에 의한 댓글 삭제")
     void delete_comment_by_comment_writer() {
         // given
-        Member writer = createCompletelyJoinedMember("writer", "pwd", "writer");
-        Topic topic = createTopic(0, TopicSide.TOPIC_A);
-
-        Comment comment = new Comment(writer, topic, "content");
-
-        em.persist(writer);
-        em.persist(topic);
+        Comment comment = new Comment(voter, topic, ChoiceOption.CHOICE_A, "content");
         em.persist(comment);
 
         // when
-        commentService.deleteComment(writer.getId(), comment.getId());
+        commentService.deleteComment(voter.getId(), comment.getId());
 
         // then
         assertThat(topic.getCommentCount()).isEqualTo(0);
@@ -133,15 +163,13 @@ class CommentServiceTest {
 
     @Test
     void modifyComment() {
-        Long memberId = createRandomMember();
-        Long topicId = createRandomTopic();
         Long commentId = commentService.register(
-                memberId,
-                new CommentRequest(topicId, "content")
+                voter.getId(),
+                new CommentRequest(topic.getId(), "content")
         ).getCommentId();
 
         commentService.modifyMembersCommentContent(
-                memberId, commentId,
+                voter.getId(), commentId,
                 "new content");
 
         Comment comment = em.find(Comment.class, commentId);
@@ -150,15 +178,14 @@ class CommentServiceTest {
 
     @Test
     void modifyComment_withInvalidCommentId_throwsException() {
-        Long memberId = createRandomMember();
-        Long topicId = createRandomTopic();
+
         Long commentId = commentService.register(
-                memberId,
-                new CommentRequest(topicId, "content")
+                voter.getId(),
+                new CommentRequest(topic.getId(), "content")
         ).getCommentId();
 
         ThrowingCallable code = () -> commentService.modifyMembersCommentContent(
-                memberId,
+                voter.getId(),
                 commentId + 1,
                 "new content");
 
@@ -168,15 +195,14 @@ class CommentServiceTest {
 
     @Test
     void modifyComment_withLongContent_throwsException() {
-        Long memberId = createRandomMember();
-        Long topicId = createRandomTopic();
+
         Long commentId = commentService.register(
-                memberId,
-                new CommentRequest(topicId, "content")
+                voter.getId(),
+                new CommentRequest(topic.getId(), "content")
         ).getCommentId();
 
         ThrowingCallable code = () -> commentService.modifyMembersCommentContent(
-                memberId, commentId,
+                voter.getId(), commentId,
                 "c".repeat(LengthInfo.COMMENT_CONTENT.getMaxLength() + 1));
 
         assertThatThrownBy(code)
@@ -185,12 +211,12 @@ class CommentServiceTest {
 
     @Test
     void modifyComment_withNonAuthor_throwsException() {
-        Long memberId = createRandomMember();
-        Long topicId = createRandomTopic();
+
         Long commentId = commentService.register(
-                memberId,
-                new CommentRequest(topicId, "content")
+                voter.getId(),
+                new CommentRequest(topic.getId(), "content")
         ).getCommentId();
+
         Long otherMemberId = createRandomMember();
 
         ThrowingCallable code = () -> commentService.modifyMembersCommentContent(
@@ -199,6 +225,56 @@ class CommentServiceTest {
 
         assertThatThrownBy(code)
                 .isInstanceOf(IllegalCommentStatusChangeException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 Like 시에 Hate가 있다면 Hate 취소 후 좋아요")
+    void like_with_cancel_hate() {
+        // given
+        Comment comment = Comment.createVotersComment(vote, "content");
+        em.persist(comment);
+
+        Member liker = TestMember.builder()
+                .build().buildMember();
+        em.persist(liker);
+
+        liker.hateCommentIfNew(comment);
+
+        // when
+        commentService.likeCommentForMember(liker.getId(), comment.getId(), true);
+
+        // then
+        assertAll(
+                () -> assertThat(liker.hateAlready(comment)).isFalse(),
+                () -> assertThat(liker.likeAlready(comment)).isTrue(),
+                () -> assertThat(comment.getHateCount()).isZero(),
+                () -> assertThat(comment.getLikeCount()).isOne()
+        );
+    }
+
+    @Test
+    @DisplayName("댓글 Hate 시에 Like가 있다면 Like 취소 후 Hate")
+    void hate_with_cancel_like() {
+        // given
+        Comment comment = Comment.createVotersComment(vote, "content");
+        em.persist(comment);
+
+        Member hater = TestMember.builder()
+                .build().buildMember();
+        em.persist(hater);
+
+        hater.likeCommentIfNew(comment);
+
+        // when
+        commentService.hateCommentForMember(hater.getId(), comment.getId(), true);
+
+        // then
+        assertAll(
+                () -> assertThat(hater.likeAlready(comment)).isFalse(),
+                () -> assertThat(hater.hateAlready(comment)).isTrue(),
+                () -> assertThat(comment.getLikeCount()).isZero(),
+                () -> assertThat(comment.getHateCount()).isOne()
+        );
     }
 
     private Long createRandomMember() {
