@@ -1,10 +1,12 @@
 package life.offonoff.ab.application.service.auth;
 
 import life.offonoff.ab.application.service.member.MemberService;
+import life.offonoff.ab.application.service.request.auth.ProfileRegisterRequest;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.exception.DuplicateException;
+import life.offonoff.ab.exception.DuplicateNicknameException;
 import life.offonoff.ab.exception.MemberNotFoundException;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
@@ -15,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.*;
@@ -42,7 +46,7 @@ class AuthServiceTest {
 
         SignInRequest request = new SignInRequest(email, password);
 
-        when(memberService.exists(anyString())).thenReturn(true);
+        when(memberService.existsByEmail(anyString())).thenReturn(true);
         when(passwordEncoder.isMatch(anyString(), anyString())).thenReturn(true);
         when(memberService.findByEmail(anyString())).thenReturn(member);
         when(jwtProvider.generateToken(nullable(Long.class))).thenReturn("access_token");
@@ -63,7 +67,7 @@ class AuthServiceTest {
 
         SignInRequest request = new SignInRequest(email, password);
 
-        when(memberService.exists(anyString())).thenReturn(false);
+        when(memberService.existsByEmail(anyString())).thenReturn(false);
 
         // when
         assertThatThrownBy(() -> authService.signIn(request)).isInstanceOf(MemberNotFoundException.class);
@@ -84,7 +88,7 @@ class AuthServiceTest {
         SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
 
         when(memberService.join(any())).thenReturn(member);
-        when(memberService.exists(anyString())).thenReturn(false);
+        when(memberService.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(password);
 
         // when
@@ -107,9 +111,29 @@ class AuthServiceTest {
 
         SignUpRequest request = new SignUpRequest(email, password, Provider.NONE);
 
-        when(memberService.exists(anyString())).thenReturn(true);
+        when(memberService.existsByEmail(anyString())).thenReturn(true);
 
         // when
         assertThatThrownBy(() -> authService.signUp(request)).isInstanceOf(DuplicateException.class);
+    }
+
+    @Test
+    @DisplayName("중복 닉네임을 등록하게 되면 예외")
+    void singup_personalInfo_exception_duplicate_nickname() {
+        // given
+        ProfileRegisterRequest registerRequest = new ProfileRegisterRequest(
+                1L,
+                "dup_nickname",
+                LocalDate.now(),
+                Gender.ETC,
+                "job"
+        );
+
+        when(memberService.existsByEmail(anyString())).thenReturn(true);
+
+        // then
+        assertThatThrownBy(() -> authService.registerProfile(registerRequest))
+                .isInstanceOf(DuplicateNicknameException.class);
+
     }
 }
