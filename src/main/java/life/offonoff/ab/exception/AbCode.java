@@ -1,6 +1,7 @@
 package life.offonoff.ab.exception;
 
 public enum AbCode {
+    INTERNAL_SERVER_ERROR,
     INVALID_FIELD,
     INVALID_LENGTH_OF_FIELD,
 
