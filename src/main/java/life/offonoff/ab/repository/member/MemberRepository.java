@@ -13,6 +13,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     List<Member> findAllVotedTo(Long memberId);
     Optional<Member> findByIdAndActiveTrue(Long memberId);
 
-    @Query("select m from Member m join fetch m.likedComments where m.id = :id")
-    Optional<Member> findByIdFetchLikedComments(@Param("id") Long memberId);
+    @Query("select m from Member m left join fetch m.likedComments where m.id = :id")
+    Optional<Member> findByIdWithLikedComments(@Param("id") Long memberId);
 }
