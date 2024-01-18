@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Embeddable
 public class PersonalInfo {
 
-    @Column(length = 40)
+    @Column(length = 40, unique = true)
     private String nickname;
     private LocalDate birthDate;
     @Enumerated(EnumType.STRING)

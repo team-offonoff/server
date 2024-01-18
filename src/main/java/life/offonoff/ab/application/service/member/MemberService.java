@@ -33,7 +33,7 @@ public class MemberService {
     }
 
     //== exists ==//
-    public boolean exists(final Long memberId) {
+    public boolean existsById(final Long memberId) {
         try {
             findById(memberId);
         } catch (MemberNotFoundException notFountException) {
@@ -42,12 +42,16 @@ public class MemberService {
         return true;
     }
 
-    public boolean exists(final String email) {
+    public boolean existsByEmail(final String email) {
         try {
             findByEmail(email);
         } catch (MemberNotFoundException notFountException) {
             return false;
         }
         return true;
+    }
+
+    public boolean existsByNickname(final String nickname) {
+        return memberRepository.existsByNickname(nickname);
     }
 }
