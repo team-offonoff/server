@@ -6,6 +6,9 @@ import java.util.regex.Pattern;
 public class TextUtils {
     private static final Pattern graphemePattern = Pattern.compile("\\X");
 
+    // 한글, 영문, 숫자
+    private static final Pattern specialCharacterFreePattern = Pattern.compile("^[0-9a-zA-Zㄱ-ㅎ가-힣]*$");
+
     /*
      * 이모티콘이 포함된 문자와 같이  2byte가 넘는 문자가 있을 경우 String의 길이는 우리가 인식하는 글자 단위보다 길어진다.
      * 이 함수는 우리가 인식하는 대로 길이를 읽어온다.
@@ -36,4 +39,12 @@ public class TextUtils {
     public static int countGraphemeClustersWithLongerEmoji(String text) {
         return countGraphemeClusters(text) + countEmojis(text);
     }
+
+    /*
+    * 한글, 영문, 숫자
+     */
+    public static boolean isOnlyKoreanEnglishNumberIncluded(String text) {
+        return specialCharacterFreePattern.matcher(text).matches();
+    }
+
 }
