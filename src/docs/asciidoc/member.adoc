@@ -1,0 +1,26 @@
+
+== 7. 멤버 API
+### 7.1. 멤버 마이페이지 정보 수정
+
+[source.html]
+POST /members/profile/information
+
+#### OK
+
+operation::member-controller-test/update-members-profile-information_with-valid-field_success[snippets="http-request,http-response"]
+
+#### E1. 닉네임에 한글, 영문, 숫자 외에 문자 포함
+
+operation::member-controller-test/update-members-profile-information_with-illegal-letter-nickname_exception[snippets="http-request,http-response"]
+
+#### E2. 닉네임이 8자 초과
+
+operation::member-controller-test/update-members-profile-information_with-long-nickname_exception[snippets="http-request,http-response"]
+
+#### E3. 닉네임 중복
+
+operation::member-controller-test/update-members-profile-information_with-duplicate-nickname_exception[snippets="http-request,http-response"]
+
+#### E4. 직업
+
+직업 필드 유효성은 요구사항 정해지면 수정 예정

@@ -129,7 +129,8 @@ class AuthServiceTest {
                 "job"
         );
 
-        when(memberService.existsByEmail(anyString())).thenReturn(true);
+        doThrow(DuplicateNicknameException.class)
+                .when(memberService).checkMembersNickname(anyString());
 
         // then
         assertThatThrownBy(() -> authService.registerProfile(registerRequest))

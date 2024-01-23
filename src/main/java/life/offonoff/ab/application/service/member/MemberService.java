@@ -1,5 +1,8 @@
 package life.offonoff.ab.application.service.member;
 
+import life.offonoff.ab.application.service.common.LengthInfo;
+import life.offonoff.ab.application.service.common.TextUtils;
+import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
 import life.offonoff.ab.application.service.request.MemberRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.*;
@@ -51,7 +54,33 @@ public class MemberService {
         return true;
     }
 
-    public boolean existsByNickname(final String nickname) {
-        return memberRepository.existsByNickname(nickname);
+    @Transactional
+    public void updateMembersProfileInformation(final Long memberId, final MemberProfileInfoRequest request) {
+        checkMembersNickname(request.nickname());
+        checkMembersJob(request.job());
+
+        Member member = findById(memberId);
+        member.updateNickname(request.nickname());
+        member.updateJob(request.job());
     }
+
+    public void checkMembersNickname(String nickname) {
+        int length = TextUtils.countGraphemeClusters(nickname);
+        if (length < LengthInfo.NICKNAME_LENGTH.getMinLength() || length > LengthInfo.NICKNAME_LENGTH.getMaxLength()) {
+            throw new LengthInvalidException("닉네임", LengthInfo.NICKNAME_LENGTH);
+        }
+
+        if (!TextUtils.isOnlyKoreanEnglishNumberIncluded(nickname)) {
+            throw new NotKoreanEnglishNumberException(nickname);
+        }
+
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new DuplicateNicknameException(nickname);
+        }
+    }
+
+    public void checkMembersJob(String job) {
+        // TODO: 요구사항 안나옴
+    }
+
 }
