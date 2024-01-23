@@ -7,7 +7,6 @@ import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -27,6 +26,14 @@ public class PersonalInfo {
         this.nickname = nickname;
         this.birthDate = birthDate;
         this.gender = gender;
+        this.job = job;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateJob(String job) {
         this.job = job;
     }
 }
