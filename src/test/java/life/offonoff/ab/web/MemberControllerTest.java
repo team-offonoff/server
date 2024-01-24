@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
+import life.offonoff.ab.application.service.request.ProfileImageRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.exception.DuplicateNicknameException;
 import life.offonoff.ab.exception.LengthInvalidException;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -86,8 +88,25 @@ class MemberControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("abCode").value("DUPLICATE_NICKNAME"));
     }
 
+    @Test
+    void updateMembersProfileImage() throws Exception {
+        ProfileImageRequest request = new ProfileImageRequest("htttps://tetestst/test.png");
+
+        mvc.perform(put(MemberUri.PROFILE_IMAGE).with(csrf().asHeader())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void removeMembersProfileImage() throws Exception {
+        mvc.perform(delete(MemberUri.PROFILE_IMAGE).with(csrf().asHeader()))
+                .andExpect(status().isOk());
+    }
+
     private static class MemberUri {
         private static final String BASE = "/members";
         private static final String PROFILE_INFO = BASE + "/profile/information";
+        private static final String PROFILE_IMAGE = BASE + "/profile/image";
     }
 }

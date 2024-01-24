@@ -24,3 +24,21 @@ operation::member-controller-test/update-members-profile-information_with-duplic
 #### E4. 직업
 
 직업 필드 유효성은 요구사항 정해지면 수정 예정
+
+### 7.2 멤버의 프로필 이미지 변경
+
+[source.html]
+PUT members/profile/image
+
+#### OK
+
+operation::member-controller-test/update-members-profile-image[snippets="http-request,http-response"]
+
+### 7.3 멤버의 프로필 이미지 삭제
+
+[source.html]
+DELETE members/profile/image
+
+#### OK
+
+operation::member-controller-test/remove-members-profile-image[snippets="http-request,http-response"]

@@ -1,5 +1,6 @@
 package life.offonoff.ab.application.service.member;
 
+import life.offonoff.ab.application.service.S3Service;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final S3Service s3Service;
 
     //== join ==//
     @Transactional
@@ -81,6 +83,27 @@ public class MemberService {
 
     public void checkMembersJob(String job) {
         // TODO: 요구사항 안나옴
+    }
+
+    @Transactional
+    public void updateMembersProfileImage(Long memberId, String imageUrl) {
+        Member member = findById(memberId);
+        removeMembersProfileImage(member);
+
+        member.updateProfileImageUrl(imageUrl);
+    }
+
+    @Transactional
+    public void removeMembersProfileImage(Long memberId) {
+        Member member = findById(memberId);
+        removeMembersProfileImage(member);
+    }
+
+    private void removeMembersProfileImage(Member member) {
+        String originalUrl = member.getProfileImageUrl();
+        if (originalUrl != null) {
+            s3Service.deleteFile(originalUrl);
+        }
     }
 
 }

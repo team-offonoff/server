@@ -58,5 +58,5 @@ public enum AbCode {
 
     NOT_KOREAN_ENGLISH_NUMBER,
 
-    ;
+    S3_INVALID_FILE_URL, S3_INVALID_KEY_NAME;
 }
