@@ -52,6 +52,8 @@ operation::member-controller-test/remove-members-profile-image[snippets="http-re
 [source.html]
 GET members/terms
 
+#### OK
+
 operation::member-controller-test/get-members-terms-agreement[snippets="http-request,http-response"]
 
 ### 7.5 멤버의 약관 동의 정보 수정
@@ -59,4 +61,17 @@ operation::member-controller-test/get-members-terms-agreement[snippets="http-req
 [source.html]
 PUT members/terms
 
+#### OK
+
 operation::member-controller-test/update-members-terms-agreement[snippets="http-request,http-response"]
+
+### 7.6 멤버 탈퇴
+
+아직 복구는 고려하지 않음
+
+[source.html]
+PUT members/status
+
+#### OK
+
+operation::member-controller-test/update-members-status[snippets="http-request,http-response"]

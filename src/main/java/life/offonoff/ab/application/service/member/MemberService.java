@@ -39,6 +39,23 @@ public class MemberService {
                 .orElseThrow(() -> new MemberByEmailNotFoundException(email));
     }
 
+    public Member findMember(final Long memberId) {
+        Member member = findById(memberId);
+        if (!member.isActive()) {
+            throw new MemberDeactivatedException(memberId);
+        }
+        return member;
+    }
+
+    public Member findMember(final String email) {
+        Member member = findByEmail(email);
+        if (!member.isActive()) {
+            throw new MemberDeactivatedException(email);
+        }
+        return member;
+    }
+
+
     //== exists ==//
     public boolean existsById(final Long memberId) {
         try {
@@ -63,7 +80,7 @@ public class MemberService {
         checkMembersNickname(request.nickname());
         checkMembersJob(request.job());
 
-        Member member = findById(memberId);
+        Member member = findMember(memberId);
         member.updateNickname(request.nickname());
         member.updateJob(request.job());
     }
@@ -96,7 +113,7 @@ public class MemberService {
 
     @Transactional
     public void updateMembersProfileImage(Long memberId, String imageUrl) {
-        Member member = findById(memberId);
+        Member member = findMember(memberId);
         removeMembersProfileImage(member);
 
         member.updateProfileImageUrl(imageUrl);
@@ -104,7 +121,7 @@ public class MemberService {
 
     @Transactional
     public void removeMembersProfileImage(Long memberId) {
-        Member member = findById(memberId);
+        Member member = findMember(memberId);
         removeMembersProfileImage(member);
     }
 
@@ -117,13 +134,19 @@ public class MemberService {
 
     @Transactional
     public TermsResponse updateMembersTermsAgreement(final Long memberId, final TermsUpdateRequest request) {
-        Member member = findById(memberId);
+        Member member = findMember(memberId);
         member.agreeTerms(request.toTermsEnabled());
         return TermsResponse.from(member.getTermsEnabled());
     }
 
     public TermsResponse getMembersTermsAgreement(Long memberId) {
-        Member member = findById(memberId);
+        Member member = findMember(memberId);
         return TermsResponse.from(member.getTermsEnabled());
+    }
+
+    @Transactional
+    public void activateMember(final Long memberId, final boolean activated) {
+        Member member = findMember(memberId);
+        member.activate(activated);
     }
 }

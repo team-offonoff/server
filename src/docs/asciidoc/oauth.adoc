@@ -11,20 +11,28 @@
 
 ### 2.1. authorize_code & redirect_uri
 
-OK. 신규 회원
+#### OK. 신규 회원
 
 operation::o-auth-controller-test/oauth_kakao_new_member_by_code[snippets="request-fields,response-fields,http-request,http-response"]
 
-OK. 기존 회원
+#### OK. 기존 회원
 
 operation::o-auth-controller-test/oauth_kakao_existing_member_by_code[snippets="http-request,http-response"]
 
+#### E1. 탈퇴한 회원
+
+operation::o-auth-controller-test/oauth_kakao_deactivated_member_by_code[snippets="http-request,http-response"]
+
 ### 2.2. id_token
 
-OK. 신규 회원
+#### OK. 신규 회원
 
 operation::o-auth-controller-test/oauth_kakao_new_member_by_id-token[snippets="http-request,http-response"]
 
-OK. 기존 회원
+#### OK. 기존 회원
 
 operation::o-auth-controller-test/oauth_kakao_existing_member_by_id-token[snippets="http-request,http-response"]
+
+#### E1. 탈퇴한 회원
+
+operation::o-auth-controller-test/oauth_kakao_deactivated_member_by_id-token[snippets="http-request,http-response"]

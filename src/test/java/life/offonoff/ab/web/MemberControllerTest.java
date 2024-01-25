@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
+import life.offonoff.ab.application.service.request.MemberStatusRequest;
 import life.offonoff.ab.application.service.request.ProfileImageRequest;
 import life.offonoff.ab.application.service.request.TermsUpdateRequest;
 import life.offonoff.ab.config.WebConfig;
@@ -137,10 +138,22 @@ class MemberControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("marketingTermsEnabled").value(false));
     }
 
+    @Test
+    void updateMembersStatus() throws Exception {
+        MemberStatusRequest request = new MemberStatusRequest(false);
+
+        mvc.perform(put(MemberUri.STATUS).with(csrf().asHeader())
+                            .header("Authorization", "Bearer ACCESS_TOKEN")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
     private static class MemberUri {
         private static final String BASE = "/members";
         private static final String PROFILE_INFO = BASE + "/profile/information";
         private static final String PROFILE_IMAGE = BASE + "/profile/image";
         private static final String TERMS = BASE + "/terms";
+        private static final String STATUS = BASE + "/status";
     }
 }

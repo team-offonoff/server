@@ -5,6 +5,7 @@ import life.offonoff.ab.application.service.auth.OAuthService;
 import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.member.JoinStatus;
+import life.offonoff.ab.exception.MemberDeactivatedException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
@@ -17,13 +18,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 
-import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.*;
-import static life.offonoff.ab.domain.member.JoinStatus.*;
-import static org.mockito.Mockito.*;
+import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.BY_CODE;
+import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.BY_IDTOKEN;
+import static life.offonoff.ab.domain.member.JoinStatus.AUTH_REGISTERED;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = OAuthController.class,
             excludeFilters = {
@@ -87,6 +91,21 @@ class OAuthControllerTest extends RestDocsTest {
     }
 
     @Test
+    void oauth_kakao_deactivated_member_by_code() throws Exception {
+        OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
+
+        when(oAuthService.authorize(any()))
+                .thenThrow(MemberDeactivatedException.class);
+
+        mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.abCode").value("DEACTIVATED_MEMBER"))
+                .andDo(print());
+    }
+
+    @Test
     void oauth_kakao_new_member_by_idToken() throws Exception {
         // given
         OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
@@ -115,6 +134,21 @@ class OAuthControllerTest extends RestDocsTest {
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.newMember").value(false))
+                .andDo(print());
+    }
+
+    @Test
+    void oauth_kakao_deactivated_member_by_idToken() throws Exception {
+        OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
+
+        when(oAuthService.authorize(any()))
+                .thenThrow(MemberDeactivatedException.class);
+
+        mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.abCode").value("DEACTIVATED_MEMBER"))
                 .andDo(print());
     }
 

@@ -5,6 +5,7 @@ import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.DuplicateNicknameException;
 import life.offonoff.ab.exception.LengthInvalidException;
+import life.offonoff.ab.exception.MemberDeactivatedException;
 import life.offonoff.ab.exception.NotKoreanEnglishNumberException;
 import life.offonoff.ab.repository.member.MemberRepository;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -106,5 +107,41 @@ class MemberServiceTest {
 
         assertThatThrownBy(code)
                 .isInstanceOf(LengthInvalidException.class);
+    }
+
+    @Test
+    void activateMember_deactivate() {
+        // given
+        Member member = TestEntityUtil.TestMember.builder()
+                .id(1L)
+                .nickname("닉네임")
+                .job("직업")
+                .build()
+                .buildMember();
+        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
+
+        // when
+        memberService.activateMember(1L, false);
+
+        // then
+        assertThat(member.isActive()).isFalse();
+    }
+
+    @Test
+    void findMember_deactivatedMember_exception() {
+        Member member = TestEntityUtil.TestMember.builder()
+                .id(1L)
+                .nickname("닉네임")
+                .job("직업")
+                .build()
+                .buildMember();
+        member.activate(false);
+        when(memberRepository.findById(any())).thenReturn(Optional.of(member));
+
+        ThrowingCallable code = () ->
+                memberService.findMember(1L);
+
+        assertThatThrownBy(code)
+                .isInstanceOf(MemberDeactivatedException.class);
     }
 }

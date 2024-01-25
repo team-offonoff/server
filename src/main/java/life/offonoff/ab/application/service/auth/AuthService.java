@@ -100,7 +100,7 @@ public class AuthService {
 
         beforeSignIn(request);
 
-        Member member = memberService.findByEmail(request.getEmail());
+        Member member = memberService.findMember(request.getEmail());
 
         return new SignInResponse(member.getId(),
                                   member.getJoinStatus(),
@@ -109,7 +109,7 @@ public class AuthService {
 
     private void beforeSignIn(SignInRequest request) {
         String email = request.getEmail();
-        Member member = memberService.findByEmail(email);
+        Member member = memberService.findMember(email);
 
         // email existence
         if (!memberService.existsByEmail(email)) {
