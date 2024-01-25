@@ -42,3 +42,17 @@ DELETE members/profile/image
 #### OK
 
 operation::member-controller-test/remove-members-profile-image[snippets="http-request,http-response"]
+
+### 7.4 멤버의 약관 동의 정보 조회
+
+[source.html]
+GET members/terms
+
+operation::member-controller-test/get-members-terms-agreement[snippets="http-request,http-response"]
+
+### 7.5 멤버의 약관 동의 정보 수정
+
+[source.html]
+PUT members/terms
+
+operation::member-controller-test/update-members-terms-agreement[snippets="http-request,http-response"]

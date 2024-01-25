@@ -15,7 +15,7 @@ import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
-import life.offonoff.ab.web.response.auth.join.TermsResponse;
+import life.offonoff.ab.web.response.auth.join.JoinTermsResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -151,7 +151,7 @@ class AuthControllerTest extends RestDocsTest {
         Long memberId = 1L;
 
         TermsRequest request = new TermsRequest(memberId, true);
-        TermsResponse response = new TermsResponse(1L, JoinStatus.COMPLETE, "access_token");
+        JoinTermsResponse response = new JoinTermsResponse(1L, JoinStatus.COMPLETE, "access_token");
 
         when(authService.registerTerms(any(TermsRequest.class))).thenReturn(response);
 

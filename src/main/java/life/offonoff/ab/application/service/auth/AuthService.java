@@ -15,7 +15,7 @@ import life.offonoff.ab.util.token.TokenProvider;
 import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
-import life.offonoff.ab.web.response.auth.join.TermsResponse;
+import life.offonoff.ab.web.response.auth.join.JoinTermsResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -90,9 +90,9 @@ public class AuthService {
         member.agreeTerms(request.toTermsEnabled());
 
         Long memberId = member.getId();
-        return new TermsResponse(memberId,
-                                 member.getJoinStatus(),
-                                 tokenProvider.generateToken(memberId));
+        return new JoinTermsResponse(memberId,
+                                     member.getJoinStatus(),
+                                     tokenProvider.generateToken(memberId));
     }
 
     //== Sign In ==//

@@ -5,9 +5,11 @@ import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
 import life.offonoff.ab.application.service.request.MemberRequest;
+import life.offonoff.ab.application.service.request.TermsUpdateRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.member.MemberRepository;
+import life.offonoff.ab.web.response.TermsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,4 +108,15 @@ public class MemberService {
         }
     }
 
+    @Transactional
+    public TermsResponse updateMembersTermsAgreement(final Long memberId, final TermsUpdateRequest request) {
+        Member member = findById(memberId);
+        member.agreeTerms(request.toTermsEnabled());
+        return TermsResponse.from(member.getTermsEnabled());
+    }
+
+    public TermsResponse getMembersTermsAgreement(Long memberId) {
+        Member member = findById(memberId);
+        return TermsResponse.from(member.getTermsEnabled());
+    }
 }
