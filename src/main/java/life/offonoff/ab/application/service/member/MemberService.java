@@ -84,7 +84,14 @@ public class MemberService {
     }
 
     public void checkMembersJob(String job) {
-        // TODO: 요구사항 안나옴
+        int length = TextUtils.countGraphemeClusters(job);
+        if (length < LengthInfo.JOB_LENGTH.getMinLength() || length > LengthInfo.JOB_LENGTH.getMaxLength()) {
+            throw new LengthInvalidException("직업", LengthInfo.JOB_LENGTH);
+        }
+
+        if (!TextUtils.isOnlyKoreanEnglishNumberIncluded(job)) {
+            throw new NotKoreanEnglishNumberException(job);
+        }
     }
 
     @Transactional

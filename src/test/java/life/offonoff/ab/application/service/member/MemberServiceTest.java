@@ -10,7 +10,6 @@ import life.offonoff.ab.repository.member.MemberRepository;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +33,7 @@ class MemberServiceTest {
     MemberRepository memberRepository;
 
     @Test
-    void updateMembersProfileInformation_withValidField_success() {
+    void updateMembersProfileInformation_withValidFields_success() {
         // given
         MemberProfileInfoRequest request = new MemberProfileInfoRequest("바뀔닉네임", "바뀔직업");
         Member member = TestEntityUtil.TestMember.builder()
@@ -46,11 +45,11 @@ class MemberServiceTest {
         when(memberRepository.findById(any())).thenReturn(Optional.of(member));
 
         // when
-        Executable code = () ->
-            memberService.updateMembersProfileInformation(1L, request);
+        memberService.updateMembersProfileInformation(1L, request);
 
         // then
-        assertDoesNotThrow(code);
+        assertThat(member.getPersonalInfo().getJob()).isEqualTo("바뀔직업");
+        assertThat(member.getPersonalInfo().getNickname()).isEqualTo("바뀔닉네임");
     }
 
     @Test
@@ -85,5 +84,27 @@ class MemberServiceTest {
 
         assertThatThrownBy(code)
                 .isInstanceOf(DuplicateNicknameException.class);
+    }
+
+    @Test
+    void updateMembersProfileInformation_withIllegalLetterJob_exception() {
+        MemberProfileInfoRequest request = new MemberProfileInfoRequest("바뀔닉네임", "바뀔직업!");
+
+        ThrowingCallable code = () ->
+                memberService.updateMembersProfileInformation(1L, request);
+
+        assertThatThrownBy(code)
+                .isInstanceOf(NotKoreanEnglishNumberException.class);
+    }
+
+    @Test
+    void updateMembersProfileInformation_withLongJob_exception() {
+        MemberProfileInfoRequest request = new MemberProfileInfoRequest("바뀔닉네임", "무려12자가넘는직업이라니");
+
+        ThrowingCallable code = () ->
+                memberService.updateMembersProfileInformation(1L, request);
+
+        assertThatThrownBy(code)
+                .isInstanceOf(LengthInvalidException.class);
     }
 }

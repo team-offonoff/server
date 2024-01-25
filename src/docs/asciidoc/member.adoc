@@ -9,7 +9,7 @@ POST /members/profile/information
 
 operation::member-controller-test/update-members-profile-information_with-valid-field_success[snippets="http-request,http-response"]
 
-#### E1. 닉네임에 한글, 영문, 숫자 외에 문자 포함
+#### E1. 닉네임에 한글, 영문, 숫자 외 문자 포함
 
 operation::member-controller-test/update-members-profile-information_with-illegal-letter-nickname_exception[snippets="http-request,http-response"]
 
@@ -21,9 +21,13 @@ operation::member-controller-test/update-members-profile-information_with-long-n
 
 operation::member-controller-test/update-members-profile-information_with-duplicate-nickname_exception[snippets="http-request,http-response"]
 
-#### E4. 직업
+#### E4. 직업에 한글, 영문, 숫자 외 문자 포함
 
-직업 필드 유효성은 요구사항 정해지면 수정 예정
+닉네임일때 에러와 동일
+
+### E5. 직업이 12자 초과
+
+닉네임일때 에러와 동일
 
 ### 7.2 멤버의 프로필 이미지 변경
 

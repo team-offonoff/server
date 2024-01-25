@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum LengthInfo {
     COMMENT_CONTENT(1, 255),
     PAGEABLE_SIZE(0, 100),
-    NICKNAME_LENGTH(1, 8)
+    NICKNAME_LENGTH(1, 8),
+    JOB_LENGTH(1, 12)
     ;
 
     private final int minLength;
