@@ -5,6 +5,7 @@ import life.offonoff.ab.application.service.auth.OAuthService;
 import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.member.JoinStatus;
+import life.offonoff.ab.exception.IllegalJoinStatusException;
 import life.offonoff.ab.exception.MemberDeactivatedException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.BY_CODE;
 import static life.offonoff.ab.application.service.request.oauth.AuthorizeType.BY_IDTOKEN;
 import static life.offonoff.ab.domain.member.JoinStatus.AUTH_REGISTERED;
+import static life.offonoff.ab.domain.member.JoinStatus.COMPLETE;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -80,7 +82,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignInResponse(false, 1L, AUTH_REGISTERED));
+                .thenReturn(new OAuthSignInResponse(false, 1L, COMPLETE, "access_token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,13 +129,28 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignInResponse(false, 1L, AUTH_REGISTERED));
+                .thenReturn(new OAuthSignInResponse(false, 1L, COMPLETE, "access_token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.newMember").value(false))
+                .andDo(print());
+    }
+
+    @Test
+    void oauth_kakao_not_completety_joined_member_by_idToken() throws Exception {
+        // given
+        OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
+
+        when(oAuthService.authorize(any()))
+                .thenThrow(new IllegalJoinStatusException(1L, AUTH_REGISTERED));
+
+        mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
