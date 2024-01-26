@@ -2,7 +2,7 @@ package life.offonoff.ab.exception;
 
 public class DuplicateNicknameException extends DuplicateException {
 
-    private static final String MESSAGE = "중복된 닉네임입니다.";
+    private static final String MESSAGE = "이미 사용중인 닉네임이에요.";
     private final String nickname;
 
     public DuplicateNicknameException(String nickname) {

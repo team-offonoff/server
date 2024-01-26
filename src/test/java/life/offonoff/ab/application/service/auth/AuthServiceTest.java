@@ -7,6 +7,7 @@ import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.exception.DuplicateException;
 import life.offonoff.ab.exception.DuplicateNicknameException;
+import life.offonoff.ab.exception.MemberByEmailNotFoundException;
 import life.offonoff.ab.exception.MemberNotFoundException;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
@@ -48,7 +49,7 @@ class AuthServiceTest {
 
         when(memberService.existsByEmail(anyString())).thenReturn(true);
         when(passwordEncoder.isMatch(anyString(), anyString())).thenReturn(true);
-        when(memberService.findByEmail(anyString())).thenReturn(member);
+        when(memberService.findMember(anyString())).thenReturn(member);
         when(jwtProvider.generateToken(nullable(Long.class))).thenReturn("access_token");
 
         // when
@@ -71,6 +72,22 @@ class AuthServiceTest {
 
         // when
         assertThatThrownBy(() -> authService.signIn(request)).isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void signIn_deactivatedMember_exception() {
+        // given
+        String email = "email";
+        String password = "password";
+
+        SignInRequest request = new SignInRequest(email, password);
+
+        when(memberService.findMember(anyString()))
+                .thenThrow(MemberByEmailNotFoundException.class);
+
+        // when
+        assertThatThrownBy(() -> authService.signIn(request))
+                .isInstanceOf(MemberByEmailNotFoundException.class);
     }
 
     @Test
@@ -129,7 +146,8 @@ class AuthServiceTest {
                 "job"
         );
 
-        when(memberService.existsByEmail(anyString())).thenReturn(true);
+        doThrow(DuplicateNicknameException.class)
+                .when(memberService).checkMembersNickname(anyString());
 
         // then
         assertThatThrownBy(() -> authService.registerProfile(registerRequest))

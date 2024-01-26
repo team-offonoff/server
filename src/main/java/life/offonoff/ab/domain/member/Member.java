@@ -252,4 +252,22 @@ public class Member extends BaseEntity {
                 .findAny()
                 .orElse(null);
     }
+
+    public void updateNickname(String nickname) {
+        if (personalInfo.getNickname().equals(nickname)) {
+            return;
+        }
+        this.personalInfo.updateNickname(nickname);
+    }
+
+    public void updateJob(String job) {
+        if (personalInfo.getJob().equals(job)) {
+            return;
+        }
+        this.personalInfo.updateJob(job);
+    }
+
+    public void updateProfileImageUrl(String imageUrl) {
+        this.profileImageUrl = imageUrl;
+    }
 }

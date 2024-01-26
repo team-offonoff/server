@@ -1,6 +1,8 @@
 package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.exception.IllegalImageExtension;
+import life.offonoff.ab.exception.S3InvalidFileUrlException;
+import life.offonoff.ab.exception.S3InvalidKeyNameException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,9 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -28,7 +33,7 @@ public class S3Service {
     private final String baseDir;
     private final Pattern fileNamePattern =
             Pattern.compile("(.*\\.(jpg|jpeg|png|gif|bmp))", Pattern.CASE_INSENSITIVE);
-
+    private final Pattern keynamePattern = Pattern.compile("^https://.+\\.s3\\..+\\.amazonaws.com/(.+)");
     public S3Service(
             @Value("${cloud.aws.credentials.access-key}") String accessKey,
             @Value("${cloud.aws.credentials.secret-key}") String secretKey,
@@ -110,6 +115,47 @@ public class S3Service {
             PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
 
             return presignedRequest.url();
+        }
+    }
+
+    public void deleteFile(String fileUrl) {
+        String keyName = getKeyNameFromFileUrl(fileUrl);
+        deleteObject(keyName);
+    }
+
+    private String getKeyNameFromFileUrl(String fileUrl) {
+        Matcher matcher = keynamePattern.matcher(fileUrl);
+        if (!matcher.matches()) {
+            log.warn("S3 파일 삭제 요청 URL이 올바르지 않습니다. | URL: {}", fileUrl);
+            throw new S3InvalidFileUrlException(fileUrl);
+        }
+        String keyName = matcher.group(1);
+        // 띄어쓰기 포함된 파일 이름의 경우 +를 띄어쓰기로 대체해줘야 삭제됨
+        return keyName.replace('+', ' ');
+    }
+
+    private void deleteObject(String keyName) {
+        try (S3Client s3 = S3Client.builder()
+                     .region(Region.AP_NORTHEAST_2)
+                     .credentialsProvider(credentialsProvider)
+                     .build()) {
+
+            DeleteObjectRequest request = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(keyName)
+                    .build();
+
+            DeleteObjectResponse response = s3.deleteObject(request);
+            boolean isSuccessful = response.sdkHttpResponse().isSuccessful();
+            if (!isSuccessful) {
+                // ! 주의할 것
+                // keyName이 존재해서 제대로 삭제되든,
+                // keyName이 틀려서 존재하지 않는 파일이어도 204 No Content 응답이 온다.
+                log.warn("keyName["+keyName+"] 삭제 실패 {} {}", response.sdkHttpResponse().statusCode(), response.sdkHttpResponse().statusText());
+            }
+        } catch (Exception e) {
+            log.warn("S3 삭제 요청 실패 [keyName={}]", keyName, e);
+            throw new S3InvalidKeyNameException(keyName);
         }
     }
 }

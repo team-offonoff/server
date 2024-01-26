@@ -1,0 +1,77 @@
+
+== 7. 멤버 API
+### 7.1. 멤버 마이페이지 정보 수정
+
+[source.html]
+POST /members/profile/information
+
+#### OK
+
+operation::member-controller-test/update-members-profile-information_with-valid-field_success[snippets="http-request,http-response"]
+
+#### E1. 닉네임에 한글, 영문, 숫자 외 문자 포함
+
+operation::member-controller-test/update-members-profile-information_with-illegal-letter-nickname_exception[snippets="http-request,http-response"]
+
+#### E2. 닉네임이 8자 초과
+
+operation::member-controller-test/update-members-profile-information_with-long-nickname_exception[snippets="http-request,http-response"]
+
+#### E3. 닉네임 중복
+
+operation::member-controller-test/update-members-profile-information_with-duplicate-nickname_exception[snippets="http-request,http-response"]
+
+#### E4. 직업에 한글, 영문, 숫자 외 문자 포함
+
+닉네임일때 에러와 동일
+
+### E5. 직업이 12자 초과
+
+닉네임일때 에러와 동일
+
+### 7.2 멤버의 프로필 이미지 변경
+
+[source.html]
+PUT members/profile/image
+
+#### OK
+
+operation::member-controller-test/update-members-profile-image[snippets="http-request,http-response"]
+
+### 7.3 멤버의 프로필 이미지 삭제
+
+[source.html]
+DELETE members/profile/image
+
+#### OK
+
+operation::member-controller-test/remove-members-profile-image[snippets="http-request,http-response"]
+
+### 7.4 멤버의 약관 동의 정보 조회
+
+[source.html]
+GET members/terms
+
+#### OK
+
+operation::member-controller-test/get-members-terms-agreement[snippets="http-request,http-response"]
+
+### 7.5 멤버의 약관 동의 정보 수정
+
+[source.html]
+PUT members/terms
+
+#### OK
+
+operation::member-controller-test/update-members-terms-agreement[snippets="http-request,http-response"]
+
+### 7.6 멤버 탈퇴
+
+아직 복구는 고려하지 않음
+
+[source.html]
+PUT members/status
+
+#### OK
+
+operation::member-controller-test/update-members-status[snippets="http-request,http-response"]
