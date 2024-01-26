@@ -36,3 +36,7 @@ operation::o-auth-controller-test/oauth_kakao_existing_member_by_id-token[snippe
 #### E1. 탈퇴한 회원
 
 operation::o-auth-controller-test/oauth_kakao_deactivated_member_by_id-token[snippets="http-request,http-response"]
+
+#### E2. 정보 미등록 회원
+
+operation::o-auth-controller-test/oauth_kakao_not_completety_joined_member_by_id-token[snippets="http-request,http-response"]
