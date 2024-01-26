@@ -58,6 +58,7 @@ public class OAuthService {
         return new OAuthSignInResponse(false,
                                         response.getMemberId(),
                                         response.getJoinStatus(),
-                                        response.getAccessToken());
+                                        response.getAccessToken(),
+                                        response.getRefreshToken());
     }
 }

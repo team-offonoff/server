@@ -7,9 +7,11 @@ import lombok.Getter;
 public class JoinTermsResponse extends JoinStatusResponse {
 
     private String accessToken;
+    private String refreshToken;
 
-    public JoinTermsResponse(Long memberId, JoinStatus status, String accessToken) {
+    public JoinTermsResponse(Long memberId, JoinStatus status, String accessToken, String refreshToken) {
         super(memberId, status);
         this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 }

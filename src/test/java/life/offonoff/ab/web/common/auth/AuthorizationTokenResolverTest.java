@@ -31,7 +31,7 @@ class AuthorizationTokenResolverTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer Token");
 
-        when(tokenProvider.getMemberIdFrom(anyString())).thenReturn(memberId);
+        when(tokenProvider.getMemberIdFromAccessToken(anyString())).thenReturn(memberId);
 
         // when
         Long resolved = tokenResolver.resolveToken(request);

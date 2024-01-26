@@ -10,6 +10,7 @@ import life.offonoff.ab.domain.member.Gender;
 import life.offonoff.ab.domain.member.JoinStatus;
 import life.offonoff.ab.domain.member.Provider;
 import life.offonoff.ab.exception.*;
+import life.offonoff.ab.exception.auth.token.ExpiredTokenException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -151,7 +153,7 @@ class AuthControllerTest extends RestDocsTest {
         Long memberId = 1L;
 
         TermsRequest request = new TermsRequest(memberId, true);
-        JoinTermsResponse response = new JoinTermsResponse(1L, JoinStatus.COMPLETE, "access_token");
+        JoinTermsResponse response = new JoinTermsResponse(1L, JoinStatus.COMPLETE, "access_token", "refresh_token");
 
         when(authService.registerTerms(any(TermsRequest.class))).thenReturn(response);
 
@@ -190,10 +192,11 @@ class AuthControllerTest extends RestDocsTest {
         // given
         String email = "email";
         String password = "password";
-        String jwt = "jwt";
+        String accessToken = "access_token";
+        String refreshToken = "refresh_token";
 
         SignInRequest request = new SignInRequest(email, password);
-        SignInResponse response = new SignInResponse(1L, JoinStatus.AUTH_REGISTERED, jwt);
+        SignInResponse response = new SignInResponse(1L, JoinStatus.AUTH_REGISTERED, accessToken, refreshToken);
 
         when(authService.signIn(any(SignInRequest.class))).thenReturn(response);
 
@@ -266,6 +269,86 @@ class AuthControllerTest extends RestDocsTest {
                         jsonPath("abCode").value(AbCode.ILLEGAL_JOIN_STATUS.name()))
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("인증 토큰 재발급")
+    void get_auth_tokens() throws Exception {
+        // given
+        String newAccessToken = "new_access_token";
+        String newRefreshToken = "new_refresh_token";
+
+        TokenRequest request = new TokenRequest("old_refresh_token");
+        TokenResponse expected = TokenResponse.builder()
+                                              .memberId(1L)
+                                              .accessToken(newAccessToken)
+                                              .refreshToken(newRefreshToken)
+                                              .build();
+
+        when(authService.getAuthTokens(any())).thenReturn(expected);
+
+        // then
+        mvc.perform(get(BASE + TOKENS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.memberId").value(expected.getMemberId()),
+                        jsonPath("$.accessToken").value(expected.getAccessToken()),
+                        jsonPath("$.refreshToken").value(expected.getRefreshToken()))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("만료된 refresh_token으로 재발급은 예외")
+    void get_auth_tokens_exception_expired_refresh_token() throws Exception {
+        // given
+        TokenRequest request = new TokenRequest("expired_refresh_token");
+
+        when(authService.getAuthTokens(any())).thenThrow(ExpiredTokenException.class);
+
+        // then
+        mvc.perform(get(BASE + TOKENS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("비활성화된 Member의 refresh_token으로 재발급은 예외")
+    void get_auth_tokens_exception_deactivated_member() throws Exception {
+        // given
+        TokenRequest request = new TokenRequest("old_refresh_token");
+
+        when(authService.getAuthTokens(any())).thenThrow(MemberDeactivatedException.class);
+
+        // then
+        mvc.perform(get(BASE + TOKENS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 Member의 refresh_token으로 재발급은 예외")
+    void get_auth_tokens_exception_not_found_member() throws Exception {
+        // given
+        TokenRequest request = new TokenRequest("old_refresh_token");
+
+        when(authService.getAuthTokens(any())).thenThrow(MemberByIdNotFoundException.class);
+
+        // then
+        mvc.perform(get(BASE + TOKENS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request)))
+                .andExpectAll(
+                        status().isNotFound())
+                .andDo(print());
+    }
+
     static class AuthUri {
         public static final String BASE = "/auth";
         public static final String SIGN_UP = "/signup";
@@ -273,5 +356,6 @@ class AuthControllerTest extends RestDocsTest {
         public static final String PROFILE = "/profile";
         public static final String TERMS = "/terms";
         public static final String SIGN_IN = "/signin";
+        public static final String TOKENS = "/tokens";
     }
 }

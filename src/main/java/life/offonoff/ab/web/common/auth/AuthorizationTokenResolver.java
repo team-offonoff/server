@@ -32,7 +32,7 @@ public class AuthorizationTokenResolver {
     private Long getMemberId(TokenTypeAndValue typeAndValue) {
 
         if (typeAndValue.isTypeOf(TokenType.BEARER)) {
-            return tokenProvider.getMemberIdFrom(typeAndValue.getTokenValue());
+            return tokenProvider.getMemberIdFromAccessToken(typeAndValue.getTokenValue());
         }
 
         throw new UnsupportedAuthTokenTypeException(typeAndValue.getTokenType());
