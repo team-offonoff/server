@@ -57,3 +57,21 @@ E3. 회원가입 완료 전 로그인 요청
 ``ILLEGAL_JOIN_STATUS`` 일 땐 ``errorContent.payload``에 멤버 ID 포함하여 응답
 
 operation::auth-controller-test/signin_before_join-completed[snippets="http-request,http-response"]
+
+### 4.3 인증 토큰 재발급
+
+- `refresh_token` 으로만 재발급 받도록 구현했습니다.
+
+operation::auth-controller-test/get_auth_tokens[snippets="http-request,http-response"]
+
+E1. 만료된 refresh_token으로 요청
+
+operation::auth-controller-test/get_auth_tokens_exception_expired_refresh_token[snippets="http-request,http-response"]
+
+E2. 존재하지 않는 Member ID로 요청
+
+operation::auth-controller-test/get_auth_tokens_exception_not_found_member[snippets="http-request,http-response"]
+
+E3. 비활성화된 Member ID로 요청
+
+operation::auth-controller-test/get_auth_tokens_exception_deactivated_member[snippets="http-request,http-response"]
