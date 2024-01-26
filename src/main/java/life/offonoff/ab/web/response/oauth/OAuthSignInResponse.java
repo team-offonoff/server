@@ -6,7 +6,10 @@ import lombok.Getter;
 @Getter
 public class OAuthSignInResponse extends OAuthResponse {
 
-    public OAuthSignInResponse(Boolean newMember, Long memberId, JoinStatus joinStatus) {
+    private String accessToken;
+
+    public OAuthSignInResponse(Boolean newMember, Long memberId, JoinStatus joinStatus, String accessToken) {
         super(newMember, memberId, joinStatus);
+        this.accessToken = accessToken;
     }
 }
