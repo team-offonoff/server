@@ -12,6 +12,8 @@ import life.offonoff.ab.exception.IllegalPasswordException;
 import life.offonoff.ab.exception.MemberByEmailNotFoundException;
 import life.offonoff.ab.util.password.PasswordEncoder;
 import life.offonoff.ab.util.token.TokenProvider;
+import life.offonoff.ab.web.TokenRequest;
+import life.offonoff.ab.web.TokenResponse;
 import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
@@ -88,11 +90,11 @@ public class AuthService {
 
         Member member = memberService.findById(request.getMemberId());
         member.agreeTerms(request.toTermsEnabled());
-
-        Long memberId = member.getId();
-        return new JoinTermsResponse(memberId,
+        // TODO : OCP에 맞게 설계 (정보 등록의 마지막 단계가 변할 때마다 코드 변경 불가피)
+        return new JoinTermsResponse(member.getId(),
                                      member.getJoinStatus(),
-                                     tokenProvider.generateToken(memberId));
+                                     tokenProvider.generateAccessToken(member.getId()),
+                                     tokenProvider.generateRefreshToken(member.getId()));
     }
 
     //== Sign In ==//
@@ -104,7 +106,8 @@ public class AuthService {
 
         return new SignInResponse(member.getId(),
                                   member.getJoinStatus(),
-                                  tokenProvider.generateToken(member.getId()));
+                                  tokenProvider.generateAccessToken(member.getId()),
+                                  tokenProvider.generateRefreshToken(member.getId()));
     }
 
     private void beforeSignIn(SignInRequest request) {
@@ -127,4 +130,19 @@ public class AuthService {
         }
     }
 
+    public TokenResponse getAuthTokens(TokenRequest request) {
+        final Long memberId = findMemberOfToken(request.getRefreshToken()).getId();
+
+        return TokenResponse.builder()
+                            .memberId(memberId)
+                            .accessToken(tokenProvider.generateAccessToken(memberId))
+                            .refreshToken(tokenProvider.generateRefreshToken(memberId))
+                            .build();
+    }
+
+    private Member findMemberOfToken(String refreshToken) {
+        final Long parsedMemberId = tokenProvider.getMemberIdFromRefreshToken(refreshToken);
+
+        return memberService.findMember(parsedMemberId);
+    }
 }

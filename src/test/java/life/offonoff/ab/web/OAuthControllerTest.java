@@ -82,7 +82,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_CODE, "authorize_code", "redirect_uri", null);
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignInResponse(false, 1L, COMPLETE, "access_token"));
+                .thenReturn(new OAuthSignInResponse(false, 1L, COMPLETE, "access_token", "refresh_token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -129,7 +129,7 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
         when(oAuthService.authorize(any()))
-                .thenReturn(new OAuthSignInResponse(false, 1L, COMPLETE, "access_token"));
+                .thenReturn(new OAuthSignInResponse(false, 1L, COMPLETE, "access_token", "refresh_token"));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)

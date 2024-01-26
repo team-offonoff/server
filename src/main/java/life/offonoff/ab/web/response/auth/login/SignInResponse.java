@@ -12,4 +12,5 @@ public class SignInResponse {
     private Long memberId;
     private JoinStatus joinStatus;
     private String accessToken;
+    private String refreshToken;
 }

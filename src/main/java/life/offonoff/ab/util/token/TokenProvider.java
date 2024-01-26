@@ -2,7 +2,10 @@ package life.offonoff.ab.util.token;
 
 public interface TokenProvider {
 
-    String generateToken(Long memberId);
+    String generateAccessToken(Long memberId);
+    String generateRefreshToken(Long memberId);
 
-    Long getMemberIdFrom(String token);
+    Long getMemberIdFromAccessToken(String token);
+    Long getMemberIdFromRefreshToken(String token);
+
 }

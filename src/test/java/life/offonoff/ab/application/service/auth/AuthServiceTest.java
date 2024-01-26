@@ -1,24 +1,28 @@
 package life.offonoff.ab.application.service.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.auth.ProfileRegisterRequest;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.*;
-import life.offonoff.ab.exception.DuplicateException;
-import life.offonoff.ab.exception.DuplicateNicknameException;
-import life.offonoff.ab.exception.MemberByEmailNotFoundException;
-import life.offonoff.ab.exception.MemberNotFoundException;
+import life.offonoff.ab.exception.*;
+import life.offonoff.ab.exception.auth.token.ExpiredTokenException;
+import life.offonoff.ab.exception.auth.token.InvalidSignatureTokenException;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
+import life.offonoff.ab.web.TokenRequest;
+import life.offonoff.ab.web.TokenResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.security.SignatureException;
 import java.time.LocalDate;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
@@ -50,7 +54,7 @@ class AuthServiceTest {
         when(memberService.existsByEmail(anyString())).thenReturn(true);
         when(passwordEncoder.isMatch(anyString(), anyString())).thenReturn(true);
         when(memberService.findMember(anyString())).thenReturn(member);
-        when(jwtProvider.generateToken(nullable(Long.class))).thenReturn("access_token");
+        when(jwtProvider.generateAccessToken(nullable(Long.class))).thenReturn("access_token");
 
         // when
         SignInResponse response = authService.signIn(request);
@@ -153,5 +157,95 @@ class AuthServiceTest {
         assertThatThrownBy(() -> authService.registerProfile(registerRequest))
                 .isInstanceOf(DuplicateNicknameException.class);
 
+    }
+
+    @Test
+    @DisplayName("refresh_token으로 새로운 refresh/access token 발급")
+    void getAuthTokens() {
+        // given
+        Member member = TestMember.builder()
+                                  .id(1L)
+                                  .build().buildMember();
+
+        TokenRequest request = new TokenRequest("old_refresh_token");
+
+        when(jwtProvider.getMemberIdFromRefreshToken(anyString())).thenReturn(member.getId());
+        when(memberService.findMember(anyLong())).thenReturn(member);
+
+        // when
+        TokenResponse tokenResponse = authService.getAuthTokens(request);
+
+        // then
+        assertThat(tokenResponse.getMemberId()).isEqualTo(member.getId());
+    }
+
+    @Test
+    @DisplayName("refresh_token의 member-id가 존재하지 않는 member-id면 예외")
+    void getAuthTokens_member_not_found() {
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        TokenRequest request = new TokenRequest("old_refresh_token");
+
+        when(jwtProvider.getMemberIdFromRefreshToken(anyString())).thenReturn(member.getId());
+        when(memberService.findMember(anyLong())).thenThrow(MemberByIdNotFoundException.class);
+
+        // then
+        assertThatThrownBy(() -> authService.getAuthTokens(request))
+                .isInstanceOf(MemberByIdNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("refresh_token의 member-id가 비활성화된 member면 예외")
+    void getAuthTokens_member_deactivated() {
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        TokenRequest request = new TokenRequest("old_refresh_token");
+
+        when(jwtProvider.getMemberIdFromRefreshToken(anyString())).thenReturn(member.getId());
+        when(memberService.findMember(anyLong())).thenThrow(MemberDeactivatedException.class);
+
+        // then
+        assertThatThrownBy(() -> authService.getAuthTokens(request))
+                .isInstanceOf(MemberDeactivatedException.class);
+    }
+
+    @Test
+    @DisplayName("만료된 refresh_token로 재발급 요청은 예외")
+    void getAuthTokens_expired_refresh_token() {
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        TokenRequest request = new TokenRequest("expired_refresh_token");
+
+        when(jwtProvider.getMemberIdFromRefreshToken(anyString())).thenThrow(ExpiredTokenException.class);
+
+        // then
+        assertThatThrownBy(() -> authService.getAuthTokens(request))
+                .isInstanceOf(ExpiredTokenException.class);
+    }
+
+    @Test
+    @DisplayName("다른 서명의 refresh_token로 재발급 요청은 예외")
+    void getAuthTokens_invalid_refresh_token() {
+        // given
+        Member member = TestMember.builder()
+                .id(1L)
+                .build().buildMember();
+
+        TokenRequest request = new TokenRequest("invalid_refresh_token");
+
+        when(jwtProvider.getMemberIdFromRefreshToken(anyString())).thenThrow(InvalidSignatureTokenException.class);
+
+        // then
+        assertThatThrownBy(() -> authService.getAuthTokens(request))
+                .isInstanceOf(InvalidSignatureTokenException.class);
     }
 }
