@@ -22,8 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
-                .allowedOrigins("https://offonoff.me")
+                .allowedOrigins("http://localhost:5173", "https://offonoff.me")
                 .allowCredentials(true)
                 // OPTION 요청은 preflight
                 .allowedMethods("GET", "POST", "OPTION");
