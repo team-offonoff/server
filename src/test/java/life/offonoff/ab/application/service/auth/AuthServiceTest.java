@@ -1,6 +1,5 @@
 package life.offonoff.ab.application.service.auth;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.auth.ProfileRegisterRequest;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
@@ -11,18 +10,16 @@ import life.offonoff.ab.exception.auth.token.ExpiredTokenException;
 import life.offonoff.ab.exception.auth.token.InvalidSignatureTokenException;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.util.password.PasswordEncoder;
-import life.offonoff.ab.web.TokenRequest;
-import life.offonoff.ab.web.TokenResponse;
+import life.offonoff.ab.web.response.TokenRequest;
+import life.offonoff.ab.web.response.TokenResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.security.SignatureException;
 import java.time.LocalDate;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
