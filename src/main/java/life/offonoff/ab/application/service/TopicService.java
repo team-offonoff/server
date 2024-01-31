@@ -18,6 +18,10 @@ import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
+import life.offonoff.ab.web.response.ChoiceCountResponse;
+import life.offonoff.ab.web.response.CommentResponse;
+import life.offonoff.ab.web.response.VoteResponse;
+import life.offonoff.ab.web.response.VoteResponseWithCount;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -161,20 +166,33 @@ public class TopicService {
 
     //== Vote ==//
     @Transactional
-    public void voteForTopicByMember(final Long topicId, final Long memberId, final VoteRequest request) {
+    public VoteResponse voteForTopicByMember(final Long topicId, final Long memberId, final VoteRequest request) {
         Member member = findMember(memberId);
         Topic topic = findTopic(topicId);
         final LocalDateTime votedAt = convertUnixTime(request.votedAt());
 
-        voteForTopic(member, topic, votedAt, request.choiceOption());
+        return voteForTopic(member, topic, votedAt, request.choiceOption());
     }
 
-    private void voteForTopic(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
+    private VoteResponse voteForTopic(final Member member, final Topic topic, final LocalDateTime votedAt, ChoiceOption choiceOption) {
         checkMemberVotableForTopic(member, topic, votedAt);
 
         Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
         voteRepository.save(vote);
+
+        if (topic.hasVoteResult()) {
+            return VoteResponseWithCount.from(findChoiceCounts(topic.getId()), getLatestCommentOfTopic(topic));
+        }
+        return VoteResponse.from(getLatestCommentOfTopic(topic));
+    }
+
+    private CommentResponse getLatestCommentOfTopic(Topic topic) {
+        return CommentResponse.from(
+                commentRepository
+                        .findFirstByTopicIdOrderByCreatedAtDesc(topic.getId())
+                        .orElse(null)
+        );
     }
 
     private void checkMemberVotableForTopic(final Member member, final Topic topic, final LocalDateTime votedAt) {
@@ -200,21 +218,23 @@ public class TopicService {
     }
 
     @Transactional
-    public void modifyVoteForTopicByMember(final Long topicId, final Long memberId, final VoteModifyRequest request) {
+    public VoteResponse modifyVoteForTopicByMember(final Long topicId, final Long memberId, final VoteModifyRequest request) {
         final LocalDateTime modifiedAt = convertUnixTime(request.getModifiedAt());
         final ChoiceOption modifiedOption = request.getModifiedOption();
 
         Vote vote = findVoteByMemberIdAndTopicId(memberId, topicId);
 
-        modifyVote(vote, modifiedOption, modifiedAt);
+        return modifyVote(vote, modifiedOption, modifiedAt);
     }
 
-    private void modifyVote(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
+    private VoteResponse modifyVote(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
         checkVoteModifiable(vote, modifiedOption, modifiedAt);
 
         deleteVotersComments(vote.getVoter(), vote.getTopic());
 
         vote.changeOption(modifiedOption, modifiedAt);
+
+        return VoteResponse.from(getLatestCommentOfTopic(vote.getTopic()));
     }
 
     private void checkVoteModifiable(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {
@@ -248,5 +268,9 @@ public class TopicService {
 
         eventPublisher.publishEvent(
                 new TopicReportEvent(TopicResponse.from(topic), topic.getReports().size()));
+    }
+
+    public List<ChoiceCountResponse> findChoiceCounts(Long topicId) {
+        return voteRepository.findChoiceCountsByTopicId(topicId);
     }
 }
