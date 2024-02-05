@@ -20,6 +20,7 @@ POST /topics/info/voting?keywordId=..&hidden=..
 - 헤더에 토큰이 포함돼있다면 해당 멤버가 hide한 토픽은 제외합니다.
 - 모든 `Query Parameter` 는 `optional`
 - `최신순` 정렬은 `sort=createdAt,desc` 로 가능합니다. -> `/voting?keyword=##&sort=createdAt,desc`
+- 탈퇴한 멤버일 경우 ``author.active``가 ``false``로 프론트에서 처리 필요
 
 OK. 토큰 O / 기본 조회 (전체 키워드 & 투표 순)
 
