@@ -77,17 +77,17 @@ public class TopicServiceTest {
     }
 
     @Test
-    void TopicCreateRequest_equalOrLessThanMaxLength25_success() {
+    void TopicCreateRequest_equalOrLessThanMaxLength20_success() {
         assertDoesNotThrow(() -> TopicTestDtoHelper.builder()
-                .title("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
+                .title("엄청길어요엄청길어요엄청길어요엄청길어요")
                 .build().createRequest()
         );
     }
 
     @Test
-    void TopicCreateRequest_greaterThanMaxLength25_throwsError() {
+    void TopicCreateRequest_greaterThanMaxLength20_throwsError() {
         assertThatThrownBy(() -> TopicTestDtoHelper.builder()
-                .title("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
+                .title("엄청길어요엄청길어요엄청길어요엄청길어요엄청길어요")
                 .build().createRequest()
         ).isInstanceOf(LengthInvalidException.class);
     }

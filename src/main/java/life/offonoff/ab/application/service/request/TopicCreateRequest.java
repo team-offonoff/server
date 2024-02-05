@@ -9,6 +9,9 @@ import lombok.Builder;
 
 import java.util.List;
 
+import static life.offonoff.ab.application.service.common.LengthInfo.TOPIC_KEYWORD;
+import static life.offonoff.ab.application.service.common.LengthInfo.TOPIC_TITLE;
+
 @Builder
 public record TopicCreateRequest(
         @NotNull(message = "토픽의 Side를 선택해주세요. (A/B)")
@@ -19,11 +22,14 @@ public record TopicCreateRequest(
         List<ChoiceCreateRequest> choices,
         Long deadline
 ) {
-    private static final int TOPIC_TITLE_MAX_LENGTH = 25;
-
     public TopicCreateRequest {
-        if (TextUtils.countGraphemeClustersWithLongerEmoji(title) > TOPIC_TITLE_MAX_LENGTH) {
-            throw new LengthInvalidException("토픽 제목", 1, TOPIC_TITLE_MAX_LENGTH);
+        int titleLength = TextUtils.countGraphemeClusters(title);
+        if (titleLength < TOPIC_TITLE.getMinLength() || titleLength > TOPIC_TITLE.getMaxLength()) {
+            throw new LengthInvalidException("토픽 제목", TOPIC_TITLE);
+        }
+        int keywordLength = TextUtils.countGraphemeClusters(keywordName);
+        if (keywordLength < TOPIC_KEYWORD.getMinLength() || keywordLength > TOPIC_KEYWORD.getMaxLength()) {
+            throw new LengthInvalidException("토픽 키워드", TOPIC_KEYWORD);
         }
     }
 

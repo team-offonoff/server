@@ -26,6 +26,7 @@ public class Topic extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 40)
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

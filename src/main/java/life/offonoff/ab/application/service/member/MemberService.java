@@ -87,8 +87,8 @@ public class MemberService {
 
     public void checkMembersNickname(String nickname) {
         int length = TextUtils.countGraphemeClusters(nickname);
-        if (length < LengthInfo.NICKNAME_LENGTH.getMinLength() || length > LengthInfo.NICKNAME_LENGTH.getMaxLength()) {
-            throw new LengthInvalidException("닉네임", LengthInfo.NICKNAME_LENGTH);
+        if (length < LengthInfo.NICKNAME.getMinLength() || length > LengthInfo.NICKNAME.getMaxLength()) {
+            throw new LengthInvalidException("닉네임", LengthInfo.NICKNAME);
         }
 
         if (!TextUtils.isOnlyKoreanEnglishNumberIncluded(nickname)) {

@@ -15,11 +15,12 @@ import java.time.LocalDate;
 @Embeddable
 public class PersonalInfo {
 
-    @Column(length = 40, unique = true)
+    @Column(length = 20, unique = true)
     private String nickname;
     private LocalDate birthDate;
     @Enumerated(EnumType.STRING)
     private Gender gender;
+    @Column(length = 20)
     private String job;
 
     public PersonalInfo(String nickname, LocalDate birthDate, Gender gender, String job) {
