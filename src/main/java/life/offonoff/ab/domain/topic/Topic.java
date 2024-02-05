@@ -70,20 +70,6 @@ public class Topic extends BaseEntity {
     private boolean active = true;
 
     // Constructor
-    public Topic(String title, TopicSide side, LocalDateTime deadline) {
-        this.title = title;
-        this.side = side;
-        this.deadline = deadline;
-    }
-
-    public Topic(String title, TopicSide side) {
-        this(title, side, LocalDateTime.now().plusHours(24));
-    }
-
-    public Topic(Member member, Keyword keyword, String title, TopicSide side) {
-        this(member, keyword, title, side, LocalDateTime.now().plusHours(24));
-    }
-
     public Topic(Member member, Keyword keyword, String title, TopicSide side, LocalDateTime deadline) {
         this.title = title;
         this.side = side;
@@ -91,19 +77,28 @@ public class Topic extends BaseEntity {
         associate(member, keyword, null);
     }
 
+    public Topic(Member member, String title, TopicSide side) {
+        this(member, null, title, side, null);
+    }
+
     //== 연관관계 매핑 ==//
     public void associate(Member member, Keyword keyword, TopicContent content) {
         this.author = member;
         member.publishTopic(this);
 
-        this.keyword = keyword;
-        keyword.addTopic(this);
+        if (keyword != null) {
+            this.keyword = keyword;
+            keyword.addTopic(this);
+        }
 
         this.content = content;
     }
 
     //== Getter ==//
     public Long getDeadlineSecond() {
+        if (deadline == null){
+            return null;
+        }
         return deadline.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
@@ -130,6 +125,9 @@ public class Topic extends BaseEntity {
     }
 
     public boolean isBeforeDeadline(LocalDateTime requestTime) {
+        if (deadline == null) {
+            return true;
+        }
         return requestTime.isBefore(deadline);
     }
 

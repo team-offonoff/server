@@ -3,12 +3,14 @@ package life.offonoff.ab.web;
 import jakarta.validation.Valid;
 import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.TopicService;
-import life.offonoff.ab.application.service.request.*;
+import life.offonoff.ab.application.service.request.TopicCreateRequest;
+import life.offonoff.ab.application.service.request.TopicSearchRequest;
+import life.offonoff.ab.application.service.request.VoteModifyRequest;
+import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.VoteResponse;
-import life.offonoff.ab.web.response.VoteResponseWithCount;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +30,6 @@ public class TopicController {
     private final TopicService topicService;
     private final CommentService commentService;
 
-    // TODO: 토픽 보여주기 기능 완료 후 TopicResponse 수정
     @PostMapping
     public ResponseEntity<TopicResponse> createTopic(
             @Authorized Long memberId,

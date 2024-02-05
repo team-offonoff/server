@@ -13,7 +13,6 @@ import java.util.List;
 public record TopicCreateRequest(
         @NotNull(message = "토픽의 Side를 선택해주세요. (A/B)")
         TopicSide side,
-        @NotBlank(message = "토픽의 키워드를 입력해주세요.")
         String keywordName,
         @NotBlank(message = "토픽의 title을 입력해주세요.")
         String title,

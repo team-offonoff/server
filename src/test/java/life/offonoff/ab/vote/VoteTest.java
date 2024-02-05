@@ -21,7 +21,7 @@ class VoteTest {
         int seq = 0;
         Member member = createMember("email", "password");
 
-        Topic topic = createTopic(seq, TopicSide.TOPIC_A);
+        Topic topic = createTopic(seq, TopicSide.TOPIC_B);
 
         // when
         Vote vote = createVote(ChoiceOption.CHOICE_A);

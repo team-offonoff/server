@@ -34,7 +34,7 @@ class KeywordRepositoryTest {
     @DisplayName("키워드 Slice 조회, id 기반으로 정렬")
     void keyword_slice_sort_by_id_desc() {
         // given
-        TopicSide side = TopicSide.TOPIC_A;
+        TopicSide side = TopicSide.TOPIC_B;
         Pageable pageable = createPageableAsc(0, 2, "id");
 
         Keyword keyword1 = new Keyword("key1", side);

@@ -16,7 +16,6 @@ import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.web.response.CommentResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ import java.time.LocalDateTime;
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest
@@ -284,7 +283,7 @@ class CommentServiceTest {
     }
 
     private Long createRandomTopic() {
-        Topic topic = createTopic(0, TopicSide.TOPIC_A);
+        Topic topic = createTopic(0, TopicSide.TOPIC_B);
         em.persist(topic);
         return topic.getId();
     }

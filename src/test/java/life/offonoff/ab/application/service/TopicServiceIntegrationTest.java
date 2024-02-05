@@ -3,7 +3,6 @@ package life.offonoff.ab.application.service;
 import life.offonoff.ab.application.service.member.MemberService;
 import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
-import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
@@ -20,7 +19,6 @@ import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,14 +55,33 @@ public class TopicServiceIntegrationTest {
         Long topicId = topicService.createMembersTopic(
                 member.getId(),
                 TopicTestDtoHelper.builder()
-                        .topicSide(TopicSide.TOPIC_A)
-                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
+                        .topicSide(TopicSide.TOPIC_B)
+                        .keyword(new Keyword("key", TopicSide.TOPIC_B))
                         .build().createRequest()).topicId();
 
         // then
-        Optional<Keyword> keyword = keywordRepository.findByNameAndSide("key", TopicSide.TOPIC_A);
+        Optional<Keyword> keyword = keywordRepository.findByNameAndSide("key", TopicSide.TOPIC_B);
         assertThat(keyword).isNotEmpty();
         assertThat(keyword.get().getTopics().get(0).getId()).isEqualTo(topicId);
+    }
+
+    @Test
+    void createMembersTopic_withoutKeywordAndDeadlineAsSideA() {
+        // given
+        Member member = createMemberByEmailAndNickname("email", "nickname");
+
+        // when
+        Long topicId = topicService.createMembersTopic(
+                member.getId(),
+                TopicTestDtoHelper.builder()
+                        .topicSide(TopicSide.TOPIC_A)
+                        .deadline(null)
+                        .build().createRequest()).topicId();
+
+        // then
+        Topic topic = topicRepository.findById(topicId).get();
+        assertThat(topic.getKeyword()).isNull();
+        assertThat(topic.getDeadline()).isNull();
     }
 
     @Test
@@ -216,8 +233,8 @@ public class TopicServiceIntegrationTest {
         return topicService.createMembersTopic(
                 memberId,
                 TopicTestDtoHelper.builder()
-                        .topicSide(TopicSide.TOPIC_A)
-                        .keyword(new Keyword("key", TopicSide.TOPIC_A))
+                        .topicSide(TopicSide.TOPIC_B)
+                        .keyword(new Keyword("key", TopicSide.TOPIC_B))
                         .build().createRequest());
     }
 }

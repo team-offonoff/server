@@ -130,7 +130,7 @@ public class TopicServiceTest {
                 .buildMember();
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
-        when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(new Keyword("key", TopicSide.TOPIC_A)));
+        when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(new Keyword("key", TopicSide.TOPIC_B)));
 
         TopicCreateRequest request = TopicTestDtoHelper.builder()
                 .build()
@@ -151,7 +151,7 @@ public class TopicServiceTest {
                 .id(1L)
                 .build()
                 .buildMember();
-        Keyword keyword = new Keyword("key", TopicSide.TOPIC_A);
+        Keyword keyword = new Keyword("key", TopicSide.TOPIC_B);
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(member));
         when(keywordRepository.findByNameAndSide(any(), any())).thenReturn(Optional.of(keyword));
@@ -302,7 +302,7 @@ public class TopicServiceTest {
                 .id(topicId)
                 .deadline(deadline)
                 .author(author)
-                .side(TopicSide.TOPIC_A)
+                .side(TopicSide.TOPIC_B)
                 .build().buildTopic();
 
         VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A, getEpochSecond(deadline.minusHours(1)));
@@ -401,10 +401,10 @@ public class TopicServiceTest {
     @Builder
     public static class TopicTestDtoHelper {
         @Builder.Default
-        private Keyword keyword = new Keyword("key", TopicSide.TOPIC_A);
+        private Keyword keyword = new Keyword("key", TopicSide.TOPIC_B);
 
         @Builder.Default
-        private TopicSide topicSide = TopicSide.TOPIC_A;
+        private TopicSide topicSide = TopicSide.TOPIC_B;
 
         @Builder.Default
         private String title = "title";

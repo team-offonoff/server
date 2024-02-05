@@ -76,7 +76,7 @@ public class KeywordControllerTest extends RestDocsTest {
                 .thenReturn(keywordResponseSlice);
 
         mvc.perform(get(KeywordUri.BASE)
-                        .queryParam("side", TopicSide.TOPIC_A.name()))
+                        .queryParam("side", TopicSide.TOPIC_B.name()))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(queryParameters(
                         parameterWithName("side").description("토픽 키워드 SIDE - required"),
@@ -88,13 +88,13 @@ public class KeywordControllerTest extends RestDocsTest {
     private Slice<KeywordResponse> createDefaultKeywordSlice() {
         Keyword keyword1 = TestKeyword.builder()
                 .id(1L)
-                .side(TopicSide.TOPIC_A)
+                .side(TopicSide.TOPIC_B)
                 .name("key1")
                 .build().buildKeyword();
 
         Keyword keyword2 = TestKeyword.builder()
                 .id(2L)
-                .side(TopicSide.TOPIC_A)
+                .side(TopicSide.TOPIC_B)
                 .name("key2")
                 .build().buildKeyword();
 
