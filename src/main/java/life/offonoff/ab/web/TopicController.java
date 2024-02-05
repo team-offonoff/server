@@ -8,6 +8,7 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.VoteResponse;
+import life.offonoff.ab.web.response.VoteResponseWithCount;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -96,9 +97,7 @@ public class TopicController {
         @PathVariable("topicId") Long topicId,
         @Valid @RequestBody final VoteRequest request
     ) {
-        topicService.voteForTopicByMember(topicId, memberId, request);
-        return ok(VoteResponse.from(
-                commentService.getLatestCommentOfTopic(topicId)));
+        return ok(topicService.voteForTopicByMember(topicId, memberId, request));
     }
 
     @PatchMapping("/{topicId}/vote")
@@ -107,9 +106,7 @@ public class TopicController {
             @PathVariable("topicId") Long topicId,
             @Valid @RequestBody final VoteModifyRequest request
     ) {
-        topicService.modifyVoteForTopicByMember(topicId, memberId, request);
-        return ok(VoteResponse.from(
-                commentService.getLatestCommentOfTopic(topicId)));
+        return ok(topicService.modifyVoteForTopicByMember(topicId, memberId, request));
     }
 
     @GetMapping("/{topicId}/comment")

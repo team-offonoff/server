@@ -23,6 +23,7 @@ import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.CommentResponse;
+import life.offonoff.ab.web.response.VoteResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -192,14 +193,11 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void voteForTopic_byNonAuthor_success() throws Exception {
-        when(commentService.getLatestCommentOfTopic(any()))
-                .thenReturn(CommentResponse.from(
-                        new Comment(
-                        createRandomMember(),
-                        createRandomTopic(),
-                        ChoiceOption.CHOICE_A,
-                "content"
-                )));
+        when(topicService.voteForTopicByMember(any(), any(), any()))
+                .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(createRandomMember(),
+                                                                               createRandomTopic(),
+                                                                               ChoiceOption.CHOICE_A,
+                                                                               "content"))));
 
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());

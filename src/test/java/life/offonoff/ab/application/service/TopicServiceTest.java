@@ -302,6 +302,7 @@ public class TopicServiceTest {
                 .id(topicId)
                 .deadline(deadline)
                 .author(author)
+                .side(TopicSide.TOPIC_A)
                 .build().buildTopic();
 
         VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A, getEpochSecond(deadline.minusHours(1)));

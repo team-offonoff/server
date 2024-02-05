@@ -165,4 +165,8 @@ public class Topic extends BaseEntity {
     public boolean isWrittenBy(Member member) {
         return this.author.getId().equals(member.getId());
     }
+    // TODO: naming refactor
+    public boolean hasVoteResult() {
+        return side.equals(TopicSide.TOPIC_A);
+    }
 }

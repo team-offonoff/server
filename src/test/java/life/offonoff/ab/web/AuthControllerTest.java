@@ -14,6 +14,8 @@ import life.offonoff.ab.exception.auth.token.ExpiredTokenException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import life.offonoff.ab.web.response.TokenRequest;
+import life.offonoff.ab.web.response.TokenResponse;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
 import life.offonoff.ab.web.response.auth.join.JoinTermsResponse;

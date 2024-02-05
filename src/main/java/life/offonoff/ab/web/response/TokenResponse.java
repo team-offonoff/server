@@ -1,4 +1,4 @@
-package life.offonoff.ab.web;
+package life.offonoff.ab.web.response;
 
 import lombok.*;
 

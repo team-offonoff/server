@@ -6,6 +6,8 @@ import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.application.service.auth.AuthService;
 import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
+import life.offonoff.ab.web.response.TokenRequest;
+import life.offonoff.ab.web.response.TokenResponse;
 import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
