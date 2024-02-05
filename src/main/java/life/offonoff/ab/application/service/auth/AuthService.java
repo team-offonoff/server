@@ -7,7 +7,6 @@ import life.offonoff.ab.application.service.request.auth.SignInRequest;
 import life.offonoff.ab.application.service.request.auth.SignUpRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.DuplicateEmailException;
-import life.offonoff.ab.exception.IllegalJoinStatusException;
 import life.offonoff.ab.exception.IllegalPasswordException;
 import life.offonoff.ab.exception.MemberByEmailNotFoundException;
 import life.offonoff.ab.util.password.PasswordEncoder;
@@ -15,9 +14,9 @@ import life.offonoff.ab.util.token.TokenProvider;
 import life.offonoff.ab.web.response.TokenRequest;
 import life.offonoff.ab.web.response.TokenResponse;
 import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
+import life.offonoff.ab.web.response.auth.join.JoinTermsResponse;
 import life.offonoff.ab.web.response.auth.join.ProfileRegisterResponse;
 import life.offonoff.ab.web.response.auth.join.SignUpResponse;
-import life.offonoff.ab.web.response.auth.join.JoinTermsResponse;
 import life.offonoff.ab.web.response.auth.login.SignInResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -103,6 +102,9 @@ public class AuthService {
         beforeSignIn(request);
 
         Member member = memberService.findMember(request.getEmail());
+        if (!member.joinCompleted()) {
+            return new SignInResponse(member.getId(), member.getJoinStatus());
+        }
 
         return new SignInResponse(member.getId(),
                                   member.getJoinStatus(),
@@ -122,11 +124,6 @@ public class AuthService {
         // match password
         if (!passwordEncoder.isMatch(request.getPassword(), member.getPassword())) {
             throw new IllegalPasswordException();
-        }
-
-        // join status
-        if (!member.joinCompleted()) {
-            throw new IllegalJoinStatusException(member.getId(), member.getJoinStatus());
         }
     }
 

@@ -9,20 +9,25 @@
 ```
 
 ### 3.1. 개인 정보 등록
-OK
+#### OK
 
 operation::auth-controller-test/signup_profile[snippets="http-request,http-response"]
-E1. 개인 정보 중복 예외
+
+#### E1. 개인 정보 중복 +++<s>예외</s>+++
+
+예외 X. 요청 무시하고 기존 내용대로 응답
 
 operation::auth-controller-test/signup_profile_exception[snippets="http-request,http-response"]
 
 ### 3.2. 약관 동의
 
-OK
+#### OK
 
 operation::auth-controller-test/enable_terms[snippets="http-request,http-response"]
 
-E1. 약관 동의 중복 예외
+#### E1. 약관 동의 중복 +++<s>예외</s>+++
+
+예외 X. 요청 무시하고 기존 내용대로 응답
 
 operation::auth-controller-test/enable_terms_exception[snippets="http-request,http-response"]
 
@@ -52,11 +57,6 @@ operation::auth-controller-test/sign-in_exception_wrong_password[snippets="http-
 E2. 이메일 오류
 
 operation::auth-controller-test/sign-in_exception_email_not_found[snippets="http-request,http-response"]
-
-E3. 회원가입 완료 전 로그인 요청
-``ILLEGAL_JOIN_STATUS`` 일 땐 ``errorContent.payload``에 멤버 ID 포함하여 응답
-
-operation::auth-controller-test/signin_before_join-completed[snippets="http-request,http-response"]
 
 ### 4.3 인증 토큰 재발급
 

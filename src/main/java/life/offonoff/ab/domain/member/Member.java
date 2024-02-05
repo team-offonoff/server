@@ -10,8 +10,10 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
-import life.offonoff.ab.exception.IllegalJoinStatusException;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,27 +76,21 @@ public class Member extends BaseEntity {
     }
 
     public void registerAuthInfo(AuthenticationInfo authInfo) {
-        if (this.authInfo != null) {
-            throw new IllegalJoinStatusException(id, getJoinStatus());
+        if (this.authInfo == null) {
+            this.authInfo = authInfo;
         }
-
-        this.authInfo = authInfo;
     }
 
     public void registerPersonalInfo(PersonalInfo personalInfo) {
-        if (this.personalInfo != null) {
-            throw new IllegalJoinStatusException(id, getJoinStatus());
+        if (this.personalInfo == null) {
+            this.personalInfo = personalInfo;
         }
-
-        this.personalInfo = personalInfo;
     }
 
     public void agreeTerms(TermsEnabled termsEnabled) {
-        if (this.termsEnabled != null) {
-            throw new IllegalJoinStatusException(id, getJoinStatus());
+        if (this.termsEnabled == null) {
+            this.termsEnabled = termsEnabled;
         }
-
-        this.termsEnabled = termsEnabled;
     }
 
     //== 연관관계 매핑 ==//

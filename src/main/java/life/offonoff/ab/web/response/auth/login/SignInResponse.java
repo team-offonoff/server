@@ -1,7 +1,6 @@
 package life.offonoff.ab.web.response.auth.login;
 
 import life.offonoff.ab.domain.member.JoinStatus;
-import life.offonoff.ab.web.response.auth.join.JoinStatusResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,4 +12,8 @@ public class SignInResponse {
     private JoinStatus joinStatus;
     private String accessToken;
     private String refreshToken;
+
+    public SignInResponse(Long id, JoinStatus joinStatus) {
+        this(id, joinStatus, null, null);
+    }
 }
