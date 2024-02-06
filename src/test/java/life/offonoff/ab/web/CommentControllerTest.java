@@ -4,7 +4,6 @@ import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.application.service.request.CommentUpdateRequest;
 import life.offonoff.ab.config.WebConfig;
-import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
@@ -58,7 +57,7 @@ class CommentControllerTest extends RestDocsTest {
         CommentResponse response = new CommentResponse(
                 1L,
                 topicId,
-                new MemberResponse(writerId, "writerNickname", "writerProfileImageUrl"),
+                new MemberResponse(writerId, "writerNickname", "writerProfileImageUrl", true),
                 null,
                 content,
                 new CommentReactionResponse(0, 0, false, false),
@@ -178,7 +177,7 @@ class CommentControllerTest extends RestDocsTest {
         CommentResponse response1 = new CommentResponse(
                 1L,
                 topicId,
-                new MemberResponse(1L, "member1", "imageUrl1"),
+                new MemberResponse(1L, "member1", "imageUrl1", true),
                 null,
                 "content1",
                 new CommentReactionResponse(0, 0, true, false),
@@ -187,7 +186,7 @@ class CommentControllerTest extends RestDocsTest {
         CommentResponse response2 = new CommentResponse(
                 2L,
                 topicId,
-                new MemberResponse(2L, "member2", "imageUrl2"),
+                new MemberResponse(2L, "member2", "imageUrl2", true),
                 null,
                 "content2",
                 new CommentReactionResponse(1, 0, true, false),
@@ -256,7 +255,7 @@ class CommentControllerTest extends RestDocsTest {
         CommentResponse response = new CommentResponse(
                 1L,
                 2L,
-                new MemberResponse(1L, "writerNickname", "writerProfileImageUrl"),
+                new MemberResponse(1L, "writerNickname", "writerProfileImageUrl", true),
                 null,
                 "new content",
                 new CommentReactionResponse(0, 0, false, false),
