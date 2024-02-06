@@ -5,7 +5,6 @@ import life.offonoff.ab.application.service.auth.OAuthService;
 import life.offonoff.ab.application.service.request.oauth.OAuthRequest;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.member.JoinStatus;
-import life.offonoff.ab.exception.IllegalJoinStatusException;
 import life.offonoff.ab.exception.MemberDeactivatedException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
@@ -145,12 +144,13 @@ class OAuthControllerTest extends RestDocsTest {
         OAuthRequest request = new OAuthRequest(BY_IDTOKEN, null, null, "id_token");
 
         when(oAuthService.authorize(any()))
-                .thenThrow(new IllegalJoinStatusException(1L, AUTH_REGISTERED));
+                .thenReturn(new OAuthSignInResponse(false, 1L, AUTH_REGISTERED, null, null));
 
         mvc.perform(post(OAuthUri.BASE + OAuthUri.KAKAO + OAuthUri.AUTHORIZE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.joinStatus").value("AUTH_REGISTERED"))
                 .andDo(print());
     }
 

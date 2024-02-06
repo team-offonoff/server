@@ -1,31 +1,32 @@
 package life.offonoff.ab.domain.member;
 
-import life.offonoff.ab.exception.IllegalJoinStatusException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class MemberTest {
 
     @Test
-    @DisplayName("AuthInfo 중복 등록시 예외")
+    @DisplayName("AuthInfo 중복 등록시 예외X 그냥 무시")
     void register_authInfo_exception() {
         // given
         String email = "email";
         String password = "password";
         Provider provider = Provider.NONE;
         AuthenticationInfo authInfo = new AuthenticationInfo(email, password, provider);
-
-        // when
         Member member = new Member(email, password, provider);
 
+        // when
+        Executable code = () -> member.registerAuthInfo(authInfo);
+
         // then
-        assertThatThrownBy(() -> member.registerAuthInfo(authInfo))
-                .isInstanceOf(IllegalJoinStatusException.class);
+        assertDoesNotThrow(code);
     }
 
     @Test
@@ -46,18 +47,18 @@ public class MemberTest {
     }
 
     @Test
-    @DisplayName("PersonalInfo 중복 등록시 예외")
+    @DisplayName("PersonalInfo 중복 등록시 예외X 그냥 무시")
     void register_personalInfo_exception() {
         // given
         Member member = new Member("email", "password", Provider.NONE);
         PersonalInfo personalInfo = new PersonalInfo("nickname", LocalDate.now(), Gender.ETC, "job");
-
-        // when
         member.registerPersonalInfo(personalInfo);
 
+        // when
+        Executable code = () -> member.registerPersonalInfo(personalInfo);
+
         // then
-        assertThatThrownBy(() -> member.registerPersonalInfo(personalInfo))
-                .isInstanceOf(IllegalJoinStatusException.class);
+        assertDoesNotThrow(code);
     }
 
     @Test
@@ -78,7 +79,7 @@ public class MemberTest {
     }
 
     @Test
-    @DisplayName("TermsEnabled 중복 등록시 예외")
+    @DisplayName("TermsEnabled 중복 등록시 예외X 그냥 무시")
     void register_termsEnabled_exception() {
         // given
         Member member = new Member("email", "password", Provider.NONE);
@@ -86,12 +87,12 @@ public class MemberTest {
         member.registerPersonalInfo(personalInfo);
 
         TermsEnabled termsEnabled = new TermsEnabled(true);
-
-        // when
         member.agreeTerms(termsEnabled);
 
+        // when
+        Executable code = () -> member.agreeTerms(termsEnabled);
+
         // then
-        assertThatThrownBy(() -> member.agreeTerms(termsEnabled))
-                .isInstanceOf(IllegalJoinStatusException.class);
+        assertDoesNotThrow(code);
     }
 }

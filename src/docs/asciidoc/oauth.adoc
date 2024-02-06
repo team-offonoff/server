@@ -37,6 +37,8 @@ operation::o-auth-controller-test/oauth_kakao_existing_member_by_id-token[snippe
 
 operation::o-auth-controller-test/oauth_kakao_deactivated_member_by_id-token[snippets="http-request,http-response"]
 
-#### E2. 정보 미등록 회원
+#### E2. 정보 미등록 회원 +++<s>예외</s>+++
+
+에러X
 
 operation::o-auth-controller-test/oauth_kakao_not_completety_joined_member_by_id-token[snippets="http-request,http-response"]

@@ -127,24 +127,24 @@ class AuthControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("개인 정보 중복 등록시 예외")
+    @DisplayName("개인 정보 중복 등록시 예외X 기존 내용대로 유지")
     void signup_profile_exception() throws Exception {
-        // given
+        Long memberId = 1L;
         LocalDate birth = LocalDate.of(2023, 11, 28);
-
-        ProfileRegisterRequest request = new ProfileRegisterRequest(1L,
-                                                           "nickname",
+        ProfileRegisterRequest request = new ProfileRegisterRequest(memberId,
+                                                                    "nickname",
                                                                     birth,
                                                                     Gender.MALE,
                                                                     "job");
-        when(authService.registerProfile(any(ProfileRegisterRequest.class)))
-                .thenThrow(new IllegalJoinStatusException(1L, JoinStatus.COMPLETE));
+        ProfileRegisterResponse response = new ProfileRegisterResponse(memberId, JoinStatus.PERSONAL_REGISTERED);
+
+        when(authService.registerProfile(any(ProfileRegisterRequest.class))).thenReturn(response);
 
         // then
         mvc.perform(post(BASE + SIGN_UP + PROFILE)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(request)))
-                .andExpect(jsonPath("$.abCode").value(AbCode.ILLEGAL_JOIN_STATUS.name()))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(om.writeValueAsString(request)))
+                .andExpect(jsonPath("$.memberId").value(response.getMemberId()))
                 .andDo(print());
     }
 
@@ -168,24 +168,22 @@ class AuthControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("중복 약관 동의는 예외")
+    @DisplayName("중복 약관 동의는 예외X 기존 내용대로 유지")
     void enable_terms_exception() throws Exception {
         // given
         Long memberId = 1L;
 
         TermsRequest request = new TermsRequest(memberId, true);
+        JoinTermsResponse response = new JoinTermsResponse(1L, JoinStatus.COMPLETE, "access_token", "refresh_token");
 
-        when(authService.registerTerms(any(TermsRequest.class)))
-                .thenThrow(new IllegalJoinStatusException(1L, JoinStatus.PERSONAL_REGISTERED));
+        when(authService.registerTerms(any(TermsRequest.class))).thenReturn(response);
 
         // when
         mvc.perform(post(BASE + SIGN_UP + TERMS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(request)))
-                .andExpect(jsonPath("$.abCode").value(AbCode.ILLEGAL_JOIN_STATUS.name()))
-                .andExpect(jsonPath("$.accessToken").doesNotExist())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(om.writeValueAsString(request)))
+                .andExpect(jsonPath("$.accessToken").exists())
                 .andDo(print());
-
     }
 
     @Test
@@ -247,28 +245,6 @@ class AuthControllerTest extends RestDocsTest {
                         .content(om.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("abCode").value(AbCode.ILLEGAL_PASSWORD.name()))
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("회원가입 최종 완료 전에 로그인하면 예외")
-    void signin_before_joinCompleted() throws Exception {
-        // given
-        String email = "email";
-        String password = "password";
-
-        SignInRequest request = new SignInRequest(email, password);
-
-        when(authService.signIn(any(SignInRequest.class)))
-                .thenThrow(new IllegalJoinStatusException(1L, JoinStatus.AUTH_REGISTERED));
-
-        // then
-        mvc.perform(post(BASE + SIGN_IN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(request)))
-                .andExpectAll(
-                        status().isBadRequest(),
-                        jsonPath("abCode").value(AbCode.ILLEGAL_JOIN_STATUS.name()))
                 .andDo(print());
     }
 
