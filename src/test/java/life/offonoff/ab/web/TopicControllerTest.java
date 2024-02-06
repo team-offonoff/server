@@ -22,8 +22,10 @@ import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
+import life.offonoff.ab.web.response.ChoiceCountResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.VoteResponse;
+import life.offonoff.ab.web.response.VoteResponseWithCount;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,6 +41,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -192,7 +195,30 @@ public class TopicControllerTest extends RestDocsTest {
     }
 
     @Test
-    void voteForTopic_byNonAuthor_success() throws Exception {
+    void voteForTopicA_byNonAuthor_success() throws Exception {
+        CommentResponse commentResponse = CommentResponse.from(new Comment(createRandomMember(),
+                createRandomTopic(),
+                ChoiceOption.CHOICE_A,
+                "content"));
+        List<ChoiceCountResponse> choiceCounts = List.of(new ChoiceCountResponse(ChoiceOption.CHOICE_A, 0L),
+                new ChoiceCountResponse(ChoiceOption.CHOICE_B, 0L));
+
+        when(topicService.voteForTopicByMember(any(), any(), any()))
+                .thenReturn(VoteResponseWithCount.from(choiceCounts, commentResponse));
+
+        VoteRequest request = new VoteRequest(
+                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+
+        mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
+                                .writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.latestComment.content").value("content"));
+    }
+
+    @Test
+    void voteForTopicB_byNonAuthor_success() throws Exception {
         when(topicService.voteForTopicByMember(any(), any(), any()))
                 .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(createRandomMember(),
                                                                                createRandomTopic(),
