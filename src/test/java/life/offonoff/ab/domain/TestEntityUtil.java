@@ -19,12 +19,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.UUID;
 
 public class TestEntityUtil {
 
     //== Member ==//
     public static Member createRandomMember() {
-        return createCompletelyJoinedMember("email", "pass", "nickname");
+        return createCompletelyJoinedMember(UUID.randomUUID().toString(), "pass", "nickname");
     }
 
     public static Member createMember(String email, String password) {
@@ -44,19 +45,20 @@ public class TestEntityUtil {
 
     //== Topic ==//
     public static Topic createRandomTopic() {
-        return createTopic(1, TopicSide.TOPIC_A);
+        return createTopic(1, TopicSide.TOPIC_B);
     }
 
     public static Topic createTopic(int seq, TopicSide side) {
         String topicTitle = "TITLE_" + seq;
-        return new Topic(topicTitle, side);
+        Member member = createRandomMember();
+        return new Topic(member, topicTitle, side);
     }
 
     //== Keyword ==//
 
     public static Keyword createKeyword(int seq) {
         String name = "키워드" + seq; // 6자까지만 가능
-        return new Keyword(name, TopicSide.TOPIC_A);
+        return new Keyword(name, TopicSide.TOPIC_B);
     }
     //== Comment ==//
 
@@ -120,7 +122,7 @@ public class TestEntityUtil {
         private Long id;
 
         @Builder.Default
-        private TopicSide side = TopicSide.TOPIC_A;
+        private TopicSide side = TopicSide.TOPIC_B;
         @Builder.Default
         private String name = "key";
 
@@ -137,20 +139,19 @@ public class TestEntityUtil {
         private TopicSide side;
         private String title;
         private Keyword keyword;
-        private Member author;
         private int voteCount;
 
+        @Builder.Default
+        private Member author = createRandomMember();
         @Builder.Default
         private LocalDateTime deadline = LocalDateTime.now();
         @Builder.Default
         private TopicStatus status = TopicStatus.VOTING;
 
         public Topic buildTopic() {
-            Topic topic = new Topic(title, side, deadline);
+            Topic topic = new Topic(author, keyword, title, side, deadline);
             ReflectionTestUtils.setField(topic, "id", id);
             ReflectionTestUtils.setField(topic, "voteCount", voteCount);
-            ReflectionTestUtils.setField(topic, "keyword", keyword);
-            ReflectionTestUtils.setField(topic, "author", author);
             ReflectionTestUtils.setField(topic, "status", status);
             return topic;
         }

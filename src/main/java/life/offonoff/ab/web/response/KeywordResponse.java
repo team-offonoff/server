@@ -9,6 +9,9 @@ public record KeywordResponse(
         TopicSide topicSide
 ) {
     public static KeywordResponse from(Keyword keyword) {
+        if (keyword == null) {
+            return null;
+        }
         return new KeywordResponse(keyword.getId(), keyword.getName(), keyword.getSide());
     }
 }

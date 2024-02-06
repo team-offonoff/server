@@ -21,7 +21,7 @@ public class Keyword {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 6)
+    @Column(length = 10)
     private String name;
     @Enumerated(EnumType.STRING)
     private TopicSide side;

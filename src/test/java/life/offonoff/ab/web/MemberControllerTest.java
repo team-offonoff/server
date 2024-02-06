@@ -69,7 +69,7 @@ class MemberControllerTest extends RestDocsTest {
     void updateMembersProfileInformation_withLongNickname_exception() throws Exception {
         MemberProfileInfoRequest request = new MemberProfileInfoRequest("무려8자넘는닉네임", "바뀔직업");
 
-        doThrow(new LengthInvalidException("닉네임", LengthInfo.NICKNAME_LENGTH))
+        doThrow(new LengthInvalidException("닉네임", LengthInfo.NICKNAME))
                 .when(memberService).updateMembersProfileInformation(any(), any());
 
         mvc.perform(put(MemberUri.PROFILE_INFO).with(csrf().asHeader())

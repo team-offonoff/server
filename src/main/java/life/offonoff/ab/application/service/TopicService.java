@@ -55,9 +55,8 @@ public class TopicService {
     @Transactional
     public TopicResponse createMembersTopic(final Long memberId, final TopicCreateRequest request) {
         Member member = findMember(memberId);
-        Keyword keyword = findOrCreateKeyword(request.keywordName(), request.side());
-        LocalDateTime deadline = convertUnixTime(request.deadline());
-        Topic topic = new Topic(member, keyword, request.title(), request.side(), deadline);
+
+        Topic topic = convertToTopic(member, request);
         topicRepository.save(topic);
 
         request.choices().stream()
@@ -67,6 +66,17 @@ public class TopicService {
         // topic 생성 이벤트 발행
         eventPublisher.publishEvent(new TopicCreateEvent(topic));
         return TopicResponse.from(topic);
+    }
+
+    private Topic convertToTopic(final Member member, final TopicCreateRequest request) {
+        // A Side에선 마감시간과 키워드 없음
+        boolean shouldHaveDeadlineAndKeyword = request.side() == TopicSide.TOPIC_B;
+        if (shouldHaveDeadlineAndKeyword) {
+            Keyword keyword = findOrCreateKeyword(request.keywordName(), request.side());
+            LocalDateTime deadline = convertUnixTime(request.deadline());
+            return new Topic(member, keyword, request.title(), request.side(), deadline);
+        }
+        return new Topic(member, request.title(), request.side());
     }
 
     @Transactional

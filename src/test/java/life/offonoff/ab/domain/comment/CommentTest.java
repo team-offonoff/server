@@ -18,7 +18,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_A))
+                .topic(createTopic(0, TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member liker = createMember("email", "password");
@@ -38,7 +38,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_A))
+                .topic(createTopic(0, TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member liker = createMember("email", "password");
@@ -58,7 +58,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_A))
+                .topic(createTopic(0, TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member hater = createMember("email", "password");
@@ -77,7 +77,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_A))
+                .topic(createTopic(0, TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member hater = createMember("email", "password");
