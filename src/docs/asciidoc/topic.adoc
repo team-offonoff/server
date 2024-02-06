@@ -87,9 +87,13 @@ E2. 작성자가 아닌 유저가 상태 변경 시도
 [source.html]
 POST /topics/{topicId}/vote
 
-OK
+OK. 토픽A
 
-operation::topic-controller-test/vote-for-topic_by-non-author_success[snippets="http-request,http-response"]
+operation::topic-controller-test/vote-for-topic-a_by-non-author_success[snippets="http-request,http-response"]
+
+OK. 토픽B
+
+operation::topic-controller-test/vote-for-topic-b_by-non-author_success[snippets="http-request,http-response"]
 
 E1. 토픽 작성자가 투표
 
