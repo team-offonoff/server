@@ -132,8 +132,8 @@ public class Topic extends BaseEntity {
         return requestTime.isBefore(deadline);
     }
 
-    public void endVote() {
-        this.status = TopicStatus.VOTING_ENDED;
+    public void closeVote() {
+        this.status = TopicStatus.CLOSED;
     }
 
     public void noticed() {
