@@ -26,6 +26,7 @@ public record TopicResponse(
         KeywordResponse keyword,
         List<ChoiceResponse> choices,
         MemberResponse author,
+        Long createdAt,
         ChoiceOption selectedOption
 ) {
     public static TopicResponse from(Topic topic) {
@@ -40,6 +41,7 @@ public record TopicResponse(
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor()),
+                topic.getCreatedSecond(),
                 null // 선택 option이 없을 경우 null 처리
         );
     }
@@ -61,6 +63,7 @@ public record TopicResponse(
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor()),
+                topic.getCreatedSecond(),
                 retrieversVotedOption
         );
     }
