@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.exception.LengthInvalidException;
+import life.offonoff.ab.exception.NotKoreanEnglishNumberException;
 import lombok.Builder;
 
 import java.util.List;
@@ -27,10 +28,15 @@ public record TopicCreateRequest(
         if (titleLength < TOPIC_TITLE.getMinLength() || titleLength > TOPIC_TITLE.getMaxLength()) {
             throw new LengthInvalidException("토픽 제목", TOPIC_TITLE);
         }
-        if (keywordName != null) {
+
+        boolean shouldHaveKeyword = side == TopicSide.TOPIC_B;
+        if (shouldHaveKeyword) {
             int keywordLength = TextUtils.countGraphemeClusters(keywordName);
             if (keywordLength < TOPIC_KEYWORD.getMinLength() || keywordLength > TOPIC_KEYWORD.getMaxLength()) {
                 throw new LengthInvalidException("토픽 키워드", TOPIC_KEYWORD);
+            }
+            if (!TextUtils.isOnlyKoreanEnglishNumberIncluded(keywordName)) {
+                throw new NotKoreanEnglishNumberException(keywordName);
             }
         }
     }
