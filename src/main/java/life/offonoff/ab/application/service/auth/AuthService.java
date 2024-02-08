@@ -61,7 +61,7 @@ public class AuthService {
 
     //== JoinStatus ==//
     public JoinStatusResponse getJoinStatus(Long memberId) {
-        Member member = memberService.findById(memberId);
+        Member member = memberService.findMemberIncludeDeactivated(memberId);
         return new JoinStatusResponse(member.getId(), member.getJoinStatus());
     }
 
@@ -70,7 +70,7 @@ public class AuthService {
 
         beforeRegisterProfile(request);
 
-        Member member = memberService.findById(request.getMemberId());
+        Member member = memberService.findMemberIncludeDeactivated(request.getMemberId());
         member.registerPersonalInfo(request.toPersonalInfo());
 
         return new ProfileRegisterResponse(member.getId(), member.getJoinStatus());
@@ -87,7 +87,7 @@ public class AuthService {
     @Transactional
     public JoinStatusResponse registerTerms(TermsRequest request) {
 
-        Member member = memberService.findById(request.getMemberId());
+        Member member = memberService.findMemberIncludeDeactivated(request.getMemberId());
         member.agreeTerms(request.toTermsEnabled());
         // TODO : OCP에 맞게 설계 (정보 등록의 마지막 단계가 변할 때마다 코드 변경 불가피)
         return new JoinTermsResponse(member.getId(),

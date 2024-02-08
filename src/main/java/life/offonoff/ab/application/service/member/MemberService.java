@@ -29,7 +29,7 @@ public class MemberService {
     }
 
     //== find ==//
-    public Member findById(final Long memberId) {
+    public Member findMemberIncludeDeactivated(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberByIdNotFoundException(memberId)); // custom exception 추가 후 예외 핸들
     }
@@ -40,7 +40,7 @@ public class MemberService {
     }
 
     public Member findMember(final Long memberId) {
-        Member member = findById(memberId);
+        Member member = findMemberIncludeDeactivated(memberId);
         if (!member.isActive()) {
             throw new MemberDeactivatedException(memberId);
         }
@@ -59,7 +59,7 @@ public class MemberService {
     //== exists ==//
     public boolean existsById(final Long memberId) {
         try {
-            findById(memberId);
+            findMemberIncludeDeactivated(memberId);
         } catch (MemberNotFoundException notFountException) {
             return false;
         }
