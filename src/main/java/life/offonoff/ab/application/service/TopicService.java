@@ -192,9 +192,9 @@ public class TopicService {
         voteRepository.save(vote);
 
         if (topic.hasVoteResult()) {
-            return VoteResponseWithCount.from(findChoiceCounts(topic.getId()), getLatestCommentOfTopic(topic));
+            return VoteResponseWithCount.from(getLatestCommentOfTopic(topic), TopicResponse.from(topic, member), findChoiceCounts(topic.getId()));
         }
-        return VoteResponse.from(getLatestCommentOfTopic(topic));
+        return VoteResponse.from(getLatestCommentOfTopic(topic), TopicResponse.from(topic, member));
     }
 
     private CommentResponse getLatestCommentOfTopic(Topic topic) {
@@ -244,7 +244,7 @@ public class TopicService {
 
         vote.changeOption(modifiedOption, modifiedAt);
 
-        return VoteResponse.from(getLatestCommentOfTopic(vote.getTopic()));
+        return VoteResponse.from(getLatestCommentOfTopic(vote.getTopic()), TopicResponse.from(vote.getTopic(), vote.getVoter()));
     }
 
     private void checkVoteModifiable(Vote vote, ChoiceOption modifiedOption, LocalDateTime modifiedAt) {

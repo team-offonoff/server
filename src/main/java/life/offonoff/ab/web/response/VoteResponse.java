@@ -1,5 +1,6 @@
 package life.offonoff.ab.web.response;
 
+import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,8 +9,9 @@ import lombok.RequiredArgsConstructor;
 public class VoteResponse {
 
     private final CommentResponse latestComment;
+    private final TopicResponse topic;
 
-    public static VoteResponse from(CommentResponse comment) {
-        return new VoteResponse(comment);
+    public static VoteResponse from(CommentResponse comment, TopicResponse topic) {
+        return new VoteResponse(comment, topic);
     }
 }

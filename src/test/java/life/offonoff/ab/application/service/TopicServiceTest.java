@@ -454,6 +454,7 @@ public class TopicServiceTest {
                     .topicTitle(title)
                     .keyword(new KeywordResponse(keywordId, keyword.getName(), keyword.getSide()))
                     .choices(choiceResponses)
+                    .createdAt(getEpochSecond(LocalDateTime.now()))
                     .build();
         }
     }
