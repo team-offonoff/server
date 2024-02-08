@@ -3,7 +3,7 @@
 ### 7.1. 멤버 마이페이지 정보 수정
 
 [source.html]
-POST /members/profile/information
+PUT /members/profile/information
 
 #### OK
 
