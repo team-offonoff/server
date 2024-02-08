@@ -27,9 +27,11 @@ public record TopicCreateRequest(
         if (titleLength < TOPIC_TITLE.getMinLength() || titleLength > TOPIC_TITLE.getMaxLength()) {
             throw new LengthInvalidException("토픽 제목", TOPIC_TITLE);
         }
-        int keywordLength = TextUtils.countGraphemeClusters(keywordName);
-        if (keywordLength < TOPIC_KEYWORD.getMinLength() || keywordLength > TOPIC_KEYWORD.getMaxLength()) {
-            throw new LengthInvalidException("토픽 키워드", TOPIC_KEYWORD);
+        if (keywordName != null) {
+            int keywordLength = TextUtils.countGraphemeClusters(keywordName);
+            if (keywordLength < TOPIC_KEYWORD.getMinLength() || keywordLength > TOPIC_KEYWORD.getMaxLength()) {
+                throw new LengthInvalidException("토픽 키워드", TOPIC_KEYWORD);
+            }
         }
     }
 
