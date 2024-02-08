@@ -6,6 +6,7 @@ import life.offonoff.ab.configuration.TestConfig;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +64,7 @@ class TopicRepositoryTest {
         List<Topic> topics1 = topicRepository.findAll();
 
         TopicSearchRequest request = TopicSearchRequest.builder()
-                .topicStatus(TopicStatus.VOTING)
+                .status(TopicStatus.VOTING)
                 .build();
 
         // when
@@ -118,6 +119,105 @@ class TopicRepositoryTest {
         );
     }
 
+    @Test
+    @DisplayName("TopicSide로 A토픽 Slice 조회")
+    void 토픽_검색_sideA() {
+        // given
+        // Member
+        Member member = createMember("email", "password");
+        em.persist(member);
+
+        // Topic
+        Topic topicA = TestTopic.builder()
+                .voteCount(10)
+                .author(member)
+                .side(TopicSide.TOPIC_A)
+                .build().buildTopic();
+
+        topicRepository.save(topicA);
+
+        TopicSearchRequest request = TopicSearchRequest.builder()
+                .side(topicA.getSide())
+                .build();
+        // when
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, createVoteCountDescPageable(0, 1));
+
+        // then
+        assertAll(
+                () -> assertThat(topicSlice.isEmpty()).isFalse(),
+                () -> assertThat(topicSlice.getContent()).containsExactlyElementsOf(List.of(topicA))
+                );
+    }
+
+    @Test
+    @DisplayName("TopicSide로 B토픽 Slice 조회")
+    void 토픽_검색_sideB() {
+        // given
+        // Member
+        Member member = createMember("email", "password");
+        em.persist(member);
+
+        // Keyword
+        Keyword keyword = createKeyword(1);
+
+        // Topic
+        Topic topicB = TestTopic.builder()
+                .voteCount(10)
+                .keyword(keyword)
+                .author(member)
+                .side(TopicSide.TOPIC_B)
+                .build().buildTopic();
+
+        topicRepository.save(topicB);
+
+        TopicSearchRequest request = TopicSearchRequest.builder()
+                .side(topicB.getSide())
+                .build();
+        // when
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, createVoteCountDescPageable(0, 1));
+
+        // then
+        assertAll(
+                () -> assertThat(topicSlice.isEmpty()).isFalse(),
+                () -> assertThat(topicSlice.getContent()).containsExactlyElementsOf(List.of(topicB))
+        );
+    }
+
+    @Test
+    @DisplayName("CLOSED 토픽 Slice 조회")
+    void 토픽_검색_CLOSED() {
+        // given
+        // Member
+        Member member = createMember("email", "password");
+        em.persist(member);
+
+        // Keyword
+        Keyword keyword = createKeyword(1);
+
+        // Topic
+        Topic topicB = TestTopic.builder()
+                .voteCount(10)
+                .keyword(keyword)
+                .author(member)
+                .side(TopicSide.TOPIC_B)
+                .status(TopicStatus.CLOSED)
+                .build().buildTopic();
+
+        topicRepository.save(topicB);
+
+        TopicSearchRequest request = TopicSearchRequest.builder()
+                .side(topicB.getSide())
+                .status(TopicStatus.CLOSED)
+                .build();
+        // when
+        Slice<Topic> topicSlice = topicRepository.findAll(member.getId(), request, createVoteCountDescPageable(0, 1));
+
+        // then
+        assertAll(
+                () -> assertThat(topicSlice.isEmpty()).isFalse(),
+                () -> assertThat(topicSlice.getContent()).containsExactlyElementsOf(List.of(topicB))
+        );
+    }
     @Test
     @DisplayName("")
     void findBy_TopicSearchCond() {
@@ -184,7 +284,7 @@ class TopicRepositoryTest {
 
         // when
         Slice<Topic> topics = topicRepository.findAll(member.getId(),
-                                                      new TopicSearchRequest(null, null),
+                                                      TopicSearchRequest.builder().build(),
                                                       createVoteCountDescPageable(0, 2));
 
         // then

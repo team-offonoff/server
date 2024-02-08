@@ -6,7 +6,6 @@ import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.vote.VotingResult;
-import life.offonoff.ab.exception.TopicNotFoundException;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.repository.topic.TopicSearchCond;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -56,7 +54,7 @@ public class VotingTopicContainerService implements VotingTopicService {
         log.info("Voting Ended : {}", ended.size());
         ended.forEach(vt -> {
             Topic topic = vt.getTopic();
-            topic.endVote();
+            topic.closeVote();
 
             VotingResult result = aggregateVote(topic);
 

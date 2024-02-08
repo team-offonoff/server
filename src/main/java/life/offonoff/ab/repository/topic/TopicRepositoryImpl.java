@@ -7,7 +7,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.hide.QHiddenTopic;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +31,10 @@ public class TopicRepositoryImpl implements TopicRepositoryCustom {
 
         JPAQuery<Topic> baseQuery = queryFactory.selectFrom(topic)
                                                 .join(topic.author).fetchJoin()
-                                                .join(topic.keyword).fetchJoin()
-                                                .where(eqTopicStatus(request.getTopicStatus()),
-                                                        eqKeyword(request.getKeywordId()))
+                                                .leftJoin(topic.keyword).fetchJoin()
+                                                .where(eqTopicStatus(request.getStatus()),
+                                                        eqKeyword(request.getKeywordId()),
+                                                        eqTopicSide(request.getSide()))
                                                 .orderBy(TopicOrderBy.getOrderSpecifiers(pageable.getSort()))
                                                 .offset(pageable.getOffset())
                                                 .limit(pageable.getPageSize() + 1);

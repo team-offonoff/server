@@ -39,7 +39,7 @@ public class VotingTopicReadableService implements VotingTopicService {
         log.info("Voting Ended : {}", ended.size());
         ended.forEach(
                 topic -> {
-                    topic.endVote();
+                    topic.closeVote();
                     VotingResult result = aggregateVote(topic);
 
                     // 투표 종료 이벤트 발행

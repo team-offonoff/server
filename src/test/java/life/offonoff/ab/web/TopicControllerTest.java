@@ -16,6 +16,7 @@ import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.pagination.PagingUtil;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
+import static life.offonoff.ab.domain.topic.TopicStatus.CLOSED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -102,10 +104,11 @@ public class TopicControllerTest extends RestDocsTest {
                 .thenReturn(topicResponseSlice);
 
         mvc.perform(
-                        get(TopicUri.RETRIEVE_IN_VOTING)
+                        get(TopicUri.RETRIEVE)
                                 .header("AUTHORIZATION", "Bearer ACCESS_TOKEN"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(queryParameters(
+                        parameterWithName("status").description("`VOTING`, `CLOSED` 중 하나, default `VOTING`").optional(),
                         parameterWithName("keyword_id").description("토픽 키워드 ID").optional(),
                         parameterWithName("page").description("page number - default `0`").optional(),
                         parameterWithName("size").description("page size - default `10` [min, max] [0, 100]").optional(),
@@ -121,10 +124,10 @@ public class TopicControllerTest extends RestDocsTest {
                 .thenReturn(topicSlice);
 
         mvc.perform(
-                        get(TopicUri.RETRIEVE_IN_VOTING)
-                                .header("AUTHORIZATION", "Bearer ACCESS_TOKEN")
-                                .param("keyword_id", String.valueOf(1L)))
-                .andExpect(status().isOk());
+                get(TopicUri.RETRIEVE)
+                        .header("AUTHORIZATION", "Bearer ACCESS_TOKEN")
+                        .param("keyword_id", String.valueOf(1L)))
+                        .andExpect(status().isOk());
     }
 
     @Test
@@ -136,7 +139,23 @@ public class TopicControllerTest extends RestDocsTest {
         when(topicService.findAll(isNull(Long.class), any(TopicSearchRequest.class), any(Pageable.class)))
                 .thenReturn(topicResponseSlice);
 
-        mvc.perform(get(TopicUri.RETRIEVE_IN_VOTING))
+        mvc.perform(get(TopicUri.RETRIEVE)
+                .header("side", TopicSide.TOPIC_A))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void getTopicSlice_closed() throws Exception {
+        Slice<TopicResponse> topicResponseSlice = createDefaultTopicSlice();
+
+        when(topicService.findAll(any(), any(), any()))
+                .thenReturn(topicResponseSlice);
+
+        mvc.perform(
+                        get(TopicUri.RETRIEVE)
+                                .header("AUTHORIZATION", "Bearer ACCESS_TOKEN")
+                                .param("status", String.valueOf(CLOSED)))
                 .andExpect(status().isOk());
     }
 
@@ -455,8 +474,8 @@ public class TopicControllerTest extends RestDocsTest {
     private static class TopicUri {
         private static final String BASE = "/topics";
         private static final String INFO = "/info";
-        private static final String VOTING = "/voting";
-        private static final String RETRIEVE_IN_VOTING = BASE + INFO + VOTING;
+        private static final String RETRIEVE = BASE + INFO;
+        private static final String RETRIEVE_IN_STATUS = BASE + INFO + "?status={}";
         private static final String REPORT = BASE + "/{topicId}/report";
         private static final String STATUS = BASE + "/{topicId}/status?active={active}";
         private static final String VOTE = BASE + "/{topicId}/vote";

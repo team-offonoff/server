@@ -11,8 +11,8 @@ public class TopicSpecificationFactory {
 
         if (request instanceof TopicSearchRequest searchRequest) {
 
-            if (searchRequest.getTopicStatus() != null) {
-                spec = spec.and(TopicSpecifications.status(searchRequest.getTopicStatus()));
+            if (searchRequest.getStatus() != null) {
+                spec = spec.and(TopicSpecifications.status(searchRequest.getStatus()));
             }
             if (searchRequest.getKeywordId() != null) {
                 spec = spec.and(TopicSpecifications.keyword(searchRequest.getKeywordId()));
