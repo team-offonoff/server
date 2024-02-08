@@ -23,7 +23,7 @@ public class Choice extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ChoiceOption choiceOption;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "choice_content_id")
     private ChoiceContent content;
 
