@@ -205,7 +205,10 @@ public class TopicServiceTest {
         vote.associate(retriever, topic);
 
           // search params
-        TopicSearchRequest request = new TopicSearchRequest(TopicStatus.VOTING, null);
+        TopicSearchRequest request = TopicSearchRequest.builder()
+                .status(TopicStatus.VOTING)
+                .build();
+
         Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "voteCount");
 
         Slice<Topic> topics = new SliceImpl<>(List.of(topic), pageable, false);
@@ -258,7 +261,10 @@ public class TopicServiceTest {
                 .build().buildTopic();
 
         // search params
-        TopicSearchRequest request = new TopicSearchRequest(TopicStatus.VOTING, null);
+        TopicSearchRequest request = TopicSearchRequest.builder()
+                .status(TopicStatus.VOTING)
+                .build();
+
         Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "voteCount");
 
         Slice<Topic> topics = new SliceImpl<>(List.of(topic), pageable, false);

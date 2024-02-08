@@ -3,6 +3,7 @@ package life.offonoff.ab.repository.topic.booleanexpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 
@@ -14,7 +15,12 @@ import static life.offonoff.ab.domain.topic.hide.QHiddenTopic.hiddenTopic;
 public class TopicBooleanExpression {
 
     public static BooleanExpression eqTopicStatus(TopicStatus topicStatus) {
-        return topicStatus != null ? topic.status.eq(topicStatus) : null;
+        TopicStatus status = TopicStatus.VOTING; // default STATUS condition
+
+        if (topicStatus != null) {
+            status = topicStatus;
+        }
+        return topic.status.eq(status);
     }
 
     public static BooleanExpression gtDeadline(LocalDateTime compareTime) {
@@ -27,6 +33,10 @@ public class TopicBooleanExpression {
 
     public static BooleanExpression eqKeyword(Long keywordId) {
         return keywordId != null ? topic.keyword.id.eq(keywordId) : null;
+    }
+
+    public static BooleanExpression eqTopicSide(TopicSide side) {
+        return side != null ? topic.side.eq(side) : null;
     }
 
     public static BooleanExpression hideFor(Long memberId) {
