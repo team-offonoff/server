@@ -45,6 +45,11 @@ public record TopicResponse(
     }
 
     public static TopicResponse from(Topic topic, Member retriever) {
+        ChoiceOption retrieversVotedOption = retriever.getVotedOptionOfTopic(topic);// TODO : topics.size * votes.size 시간 복잡도 개선
+        return TopicResponse.from(topic, retrieversVotedOption);
+    }
+
+    public static TopicResponse from(Topic topic, ChoiceOption retrieversVotedOption) {
         return new TopicResponse(
                 topic.getId(),
                 topic.getSide(),
@@ -56,7 +61,7 @@ public record TopicResponse(
                 KeywordResponse.from(topic.getKeyword()),
                 topic.getChoices().stream().map(ChoiceResponse::from).toList(),
                 MemberResponse.from(topic.getAuthor()),
-                retriever.getVotedOptionOfTopic(topic) // TODO : topics.size * votes.size 시간 복잡도 개선
+                retrieversVotedOption
         );
     }
 }

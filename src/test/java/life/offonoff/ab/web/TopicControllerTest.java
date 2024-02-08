@@ -196,15 +196,16 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void voteForTopicA_byNonAuthor_success() throws Exception {
+        Topic topic = createRandomTopic();
         CommentResponse commentResponse = CommentResponse.from(new Comment(createRandomMember(),
-                createRandomTopic(),
+                topic,
                 ChoiceOption.CHOICE_A,
                 "content"));
         List<ChoiceCountResponse> choiceCounts = List.of(new ChoiceCountResponse(ChoiceOption.CHOICE_A, 0L),
                 new ChoiceCountResponse(ChoiceOption.CHOICE_B, 0L));
 
         when(topicService.voteForTopicByMember(any(), any(), any()))
-                .thenReturn(VoteResponseWithCount.from(choiceCounts, commentResponse));
+                .thenReturn(VoteResponseWithCount.from(commentResponse, TopicResponse.from(topic, ChoiceOption.CHOICE_A), choiceCounts));
 
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
@@ -219,11 +220,13 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void voteForTopicB_byNonAuthor_success() throws Exception {
+        Topic topic = createRandomTopic();
         when(topicService.voteForTopicByMember(any(), any(), any()))
                 .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(createRandomMember(),
-                                                                               createRandomTopic(),
+                                                                               topic,
                                                                                ChoiceOption.CHOICE_A,
-                                                                               "content"))));
+                                                                               "content")),
+                                              TopicResponse.from(topic, ChoiceOption.CHOICE_A)));
 
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
@@ -289,10 +292,17 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void modifyVoteForTopic_not_duplicated_option() throws Exception {
-
+        Topic topic = createRandomTopic();
         VoteModifyRequest request = new VoteModifyRequest(
                 ChoiceOption.CHOICE_B, getEpochSecond(LocalDateTime.now().plusMinutes(30))
         );
+
+        when(topicService.modifyVoteForTopicByMember(any(), any(), any()))
+                .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(createRandomMember(),
+                                                                               topic,
+                                                                               ChoiceOption.CHOICE_A,
+                                                                               "content")),
+                                              TopicResponse.from(topic, ChoiceOption.CHOICE_B)));
 
         mvc.perform(patch(TopicUri.VOTE, 1).with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -304,7 +314,6 @@ public class TopicControllerTest extends RestDocsTest {
 
     @Test
     void modifyVoteForTopic_exception_duplicated_option() throws Exception {
-
         Long topicId = 1L;
         ChoiceOption modifiedOption = ChoiceOption.CHOICE_A;
 
@@ -338,7 +347,7 @@ public class TopicControllerTest extends RestDocsTest {
 
         mvc.perform(get(TopicUri.TOPIC_COMMENT, 1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.latestComment.content").value("content"));
+                .andExpect(jsonPath("$.content").value("content"));
     }
 
     private Slice<TopicResponse> createDefaultTopicSlice() {

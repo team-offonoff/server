@@ -10,6 +10,7 @@ import life.offonoff.ab.application.service.request.VoteRequest;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.VoteResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
@@ -111,11 +112,10 @@ public class TopicController {
     }
 
     @GetMapping("/{topicId}/comment")
-    public ResponseEntity<VoteResponse> getTopCommentOfTopic(
+    public ResponseEntity<CommentResponse> getTopCommentOfTopic(
             @Authorized Long memberId,
             @PathVariable("topicId") Long topicId
     ) {
-        return ok(VoteResponse.from(
-                commentService.getLatestCommentOfTopic(topicId)));
+        return ok(commentService.getLatestCommentOfTopic(topicId));
     }
 }
