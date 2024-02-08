@@ -4,6 +4,7 @@ import life.offonoff.ab.exception.AbException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -61,6 +62,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(errorWrapper);
+    }
+
+    // Request DTO 생성 중 exception 발생한 경우
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    private ResponseEntity<ErrorWrapper> handleHttpMessageNotReadableException(final HttpMessageNotReadableException e) {
+        final Throwable cause = e.getCause().getCause();
+        if (cause instanceof AbException) {
+            return handleAbException((AbException) cause);
+        }
+        return handleException(e);
     }
 
     @ExceptionHandler(Exception.class)
