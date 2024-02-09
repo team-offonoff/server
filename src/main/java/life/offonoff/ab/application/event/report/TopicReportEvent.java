@@ -18,7 +18,7 @@ public class TopicReportEvent implements ReportEvent{
         try {
             content = objectMapper.writeValueAsString(topic);
         } catch (JsonProcessingException e) {
-            content = "topicId: "+topic.topicId() + "\ntopicTitle: "+topic.topicTitle();
+            content = "topicId: "+topic.getTopicId() + "\ntopicTitle: "+topic.getTopicTitle();
         }
         return content;
     }

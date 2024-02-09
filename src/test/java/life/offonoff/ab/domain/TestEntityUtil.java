@@ -19,6 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TestEntityUtil {
@@ -46,6 +48,16 @@ public class TestEntityUtil {
     //== Topic ==//
     public static Topic createRandomTopic() {
         return createTopic(1, TopicSide.TOPIC_B);
+    }
+
+    public static Topic createRandomTopicHavingChoices(ChoiceOption... options) {
+        Topic topic = createRandomTopic();
+
+        for (var option : options) {
+            createChoice(topic, option, null);
+        }
+
+        return topic;
     }
 
     public static Topic createTopic(int seq, TopicSide side) {
