@@ -3,7 +3,7 @@
 ### 7.1. 멤버 마이페이지 정보 수정
 
 [source.html]
-POST /members/profile/information
+PUT /members/profile/information
 
 #### OK
 
@@ -75,3 +75,12 @@ PUT members/status
 #### OK
 
 operation::member-controller-test/update-members-status[snippets="http-request,http-response"]
+
+### 7.7 멤버 프로필 조회
+
+[source.html]
+GET members/profile
+
+#### OK
+
+operation::member-controller-test/get-members-profile[snippets="http-request,http-response"]

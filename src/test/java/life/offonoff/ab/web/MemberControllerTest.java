@@ -8,6 +8,8 @@ import life.offonoff.ab.application.service.request.MemberStatusRequest;
 import life.offonoff.ab.application.service.request.ProfileImageRequest;
 import life.offonoff.ab.application.service.request.TermsUpdateRequest;
 import life.offonoff.ab.config.WebConfig;
+import life.offonoff.ab.domain.TestEntityUtil;
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.DuplicateNicknameException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.exception.NotKoreanEnglishNumberException;
@@ -21,7 +23,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -39,6 +41,18 @@ class MemberControllerTest extends RestDocsTest {
     @MockBean
     MemberService memberService;
 
+    @Test
+    void getMembersProfile() throws Exception {
+        Member member = TestEntityUtil.createCompletelyJoinedMember("email", "pass", "닉네임");
+        when(memberService.findMember(nullable(Long.class)))
+                .thenReturn(member);
+
+        mvc.perform(get(MemberUri.PROFILE)
+                            .header("Authorization", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nickname").value("닉네임"));
+    }
+    
     @Test
     void updateMembersProfileInformation_withValidField_success() throws Exception {
         MemberProfileInfoRequest request = new MemberProfileInfoRequest("바뀔닉네임", "바뀔직업");
@@ -151,6 +165,7 @@ class MemberControllerTest extends RestDocsTest {
 
     private static class MemberUri {
         private static final String BASE = "/members";
+        private static final String PROFILE = BASE + "/profile";
         private static final String PROFILE_INFO = BASE + "/profile/information";
         private static final String PROFILE_IMAGE = BASE + "/profile/image";
         private static final String TERMS = BASE + "/terms";

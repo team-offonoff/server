@@ -1,7 +1,6 @@
 package life.offonoff.ab.repository.member;
 
 import life.offonoff.ab.configuration.TestConfig;
-import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.TestEntityUtil.TestMember;
 import life.offonoff.ab.domain.member.Member;
 import org.assertj.core.api.Assertions;

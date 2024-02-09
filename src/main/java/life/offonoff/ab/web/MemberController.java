@@ -6,7 +6,7 @@ import life.offonoff.ab.application.service.request.MemberStatusRequest;
 import life.offonoff.ab.application.service.request.ProfileImageRequest;
 import life.offonoff.ab.application.service.request.TermsUpdateRequest;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
-import life.offonoff.ab.web.response.MemberInfoResponse;
+import life.offonoff.ab.web.response.MembersProfileResponse;
 import life.offonoff.ab.web.response.TermsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +21,11 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/info")
-    public ResponseEntity<MemberInfoResponse> getMemberInfo(@Authorized Long memberId) {
-        MemberInfoResponse response = MemberInfoResponse.of(memberService.findById(memberId));
+    @GetMapping("/profile")
+    public ResponseEntity<MembersProfileResponse> getMembersProfile(
+            @Authorized final Long memberId
+    ) {
+        MembersProfileResponse response = MembersProfileResponse.from(memberService.findMember(memberId));
         return ResponseEntity.ok(response);
     }
 
