@@ -5,6 +5,7 @@ import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.choice.Choice;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
@@ -111,6 +112,28 @@ public class Topic extends BaseEntity {
     public void addVote(Vote vote) {
         votes.add(vote);
         voteCount++;
+
+        Choice selectedChoice = getChoiceByOption(vote.getSelectedOption());
+        selectedChoice.increaseVoteCount();
+    }
+
+    private Choice getChoiceByOption(ChoiceOption option) {
+        return this.choices.stream()
+                           .filter(choice -> choice.isOptionOf(option))
+                           .findFirst()
+                           .get();
+    }
+
+    public void changeVotedChoiceOption(ChoiceOption beforeOption, ChoiceOption afterOption) {
+        for (Choice choice : choices) {
+            if (choice.isOptionOf(beforeOption)) {
+                choice.decreaseVoteCount();
+            }
+
+            if (choice.isOptionOf(afterOption)) {
+                choice.increaseVoteCount();
+            }
+        }
     }
 
     public void activate(boolean active) {
@@ -164,8 +187,12 @@ public class Topic extends BaseEntity {
     public boolean isWrittenBy(Member member) {
         return this.author.getId().equals(member.getId());
     }
-    // TODO: naming refactor
-    public boolean hasVoteResult() {
+
+    public boolean shouldHaveVoteResult() {
         return side.equals(TopicSide.TOPIC_A);
+    }
+
+    public boolean shouldHaveLatestComment() {
+        return side.equals(TopicSide.TOPIC_B);
     }
 }

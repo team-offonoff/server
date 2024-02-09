@@ -9,5 +9,5 @@ import lombok.Getter;
 public class ChoiceCountResponse {
 
     private ChoiceOption choiceOption;
-    private Long voteCount;
+    private int voteCount;
 }
