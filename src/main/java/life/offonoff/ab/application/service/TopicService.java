@@ -18,10 +18,8 @@ import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.comment.CommentRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.web.response.ChoiceCountResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.VoteResponse;
-import life.offonoff.ab.web.response.VoteResponseWithCount;
 import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -191,18 +188,16 @@ public class TopicService {
         vote.associate(member, topic);
         voteRepository.save(vote);
 
-        if (topic.hasVoteResult()) {
-            return VoteResponseWithCount.from(getLatestCommentOfTopic(topic), TopicResponse.from(topic, member), findChoiceCounts(topic.getId()));
-        }
         return VoteResponse.from(getLatestCommentOfTopic(topic), TopicResponse.from(topic, member));
     }
 
     private CommentResponse getLatestCommentOfTopic(Topic topic) {
-        return CommentResponse.from(
-                commentRepository
-                        .findFirstByTopicIdOrderByCreatedAtDesc(topic.getId())
-                        .orElse(null)
-        );
+        if (topic.shouldHaveLatestComment()) {
+            return CommentResponse.from(
+                    commentRepository.findFirstByTopicIdOrderByCreatedAtDesc(topic.getId())
+                                     .orElse(null));
+        }
+        return null;
     }
 
     private void checkMemberVotableForTopic(final Member member, final Topic topic, final LocalDateTime votedAt) {
@@ -278,9 +273,5 @@ public class TopicService {
 
         eventPublisher.publishEvent(
                 new TopicReportEvent(TopicResponse.from(topic), topic.getReports().size()));
-    }
-
-    public List<ChoiceCountResponse> findChoiceCounts(Long topicId) {
-        return voteRepository.findChoiceCountsByTopicId(topicId);
     }
 }
