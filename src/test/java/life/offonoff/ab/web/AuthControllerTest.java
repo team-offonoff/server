@@ -265,7 +265,7 @@ class AuthControllerTest extends RestDocsTest {
         when(authService.getAuthTokens(any())).thenReturn(expected);
 
         // then
-        mvc.perform(get(BASE + TOKENS)
+        mvc.perform(post(BASE + TOKENS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(request)))
                 .andExpectAll(
@@ -285,7 +285,7 @@ class AuthControllerTest extends RestDocsTest {
         when(authService.getAuthTokens(any())).thenThrow(ExpiredTokenException.class);
 
         // then
-        mvc.perform(get(BASE + TOKENS)
+        mvc.perform(post(BASE + TOKENS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(request)))
                 .andExpectAll(
@@ -302,7 +302,7 @@ class AuthControllerTest extends RestDocsTest {
         when(authService.getAuthTokens(any())).thenThrow(MemberDeactivatedException.class);
 
         // then
-        mvc.perform(get(BASE + TOKENS)
+        mvc.perform(post(BASE + TOKENS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(request)))
                 .andExpectAll(
@@ -319,7 +319,7 @@ class AuthControllerTest extends RestDocsTest {
         when(authService.getAuthTokens(any())).thenThrow(MemberByIdNotFoundException.class);
 
         // then
-        mvc.perform(get(BASE + TOKENS)
+        mvc.perform(post(BASE + TOKENS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(request)))
                 .andExpectAll(
