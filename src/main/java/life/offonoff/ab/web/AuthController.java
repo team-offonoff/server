@@ -59,7 +59,7 @@ public class AuthController {
     /**
      * 인증 토큰 (access, refresh) 재발급 API
      */
-    @GetMapping("/tokens")
+    @PostMapping("/tokens")
     public ResponseEntity<TokenResponse> getTokens(@RequestBody TokenRequest request) {
         return ResponseEntity.ok(authService.getAuthTokens(request));
     }
