@@ -263,7 +263,8 @@ public class Member extends BaseEntity {
         this.personalInfo.updateJob(job);
     }
 
-    public void updateProfileImageUrl(String imageUrl) {
+    public String updateProfileImageUrl(String imageUrl) {
         this.profileImageUrl = imageUrl;
+        return this.profileImageUrl;
     }
 }

@@ -3,10 +3,7 @@ package life.offonoff.ab.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.member.MemberService;
-import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
-import life.offonoff.ab.application.service.request.MemberStatusRequest;
-import life.offonoff.ab.application.service.request.ProfileImageRequest;
-import life.offonoff.ab.application.service.request.TermsUpdateRequest;
+import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.member.Member;
@@ -113,11 +110,15 @@ class MemberControllerTest extends RestDocsTest {
     void updateMembersProfileImage() throws Exception {
         ProfileImageRequest request = new ProfileImageRequest("htttps://tetestst/test.png");
 
+        when(memberService.updateMembersProfileImage(nullable(Long.class), any()))
+                .thenReturn(new ProfileImageResponse("htttps://tetestst/test.png"));
+
         mvc.perform(put(MemberUri.PROFILE_IMAGE).with(csrf().asHeader())
                             .header("Authorization", "Bearer ACCESS_TOKEN")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(new ObjectMapper().writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.imageUrl").value("htttps://tetestst/test.png"));
     }
 
     @Test

@@ -5,6 +5,7 @@ import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
 import life.offonoff.ab.application.service.request.MemberRequest;
+import life.offonoff.ab.application.service.request.ProfileImageResponse;
 import life.offonoff.ab.application.service.request.TermsUpdateRequest;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.exception.*;
@@ -112,11 +113,12 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMembersProfileImage(Long memberId, String imageUrl) {
+    public ProfileImageResponse updateMembersProfileImage(Long memberId, String imageUrl) {
         Member member = findMember(memberId);
         removeMembersProfileImage(member);
 
-        member.updateProfileImageUrl(imageUrl);
+        String updatedUrl = member.updateProfileImageUrl(imageUrl);
+        return new ProfileImageResponse(updatedUrl);
     }
 
     @Transactional
