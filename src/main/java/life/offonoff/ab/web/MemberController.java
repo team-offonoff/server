@@ -1,10 +1,7 @@
 package life.offonoff.ab.web;
 
 import life.offonoff.ab.application.service.member.MemberService;
-import life.offonoff.ab.application.service.request.MemberProfileInfoRequest;
-import life.offonoff.ab.application.service.request.MemberStatusRequest;
-import life.offonoff.ab.application.service.request.ProfileImageRequest;
-import life.offonoff.ab.application.service.request.TermsUpdateRequest;
+import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.response.MembersProfileResponse;
 import life.offonoff.ab.web.response.TermsResponse;
@@ -38,12 +35,12 @@ public class MemberController {
     }
 
     @PutMapping("/profile/image")
-    public ResponseEntity<Void> updateMembersProfileImage(
+    public ResponseEntity<ProfileImageResponse> updateMembersProfileImage(
             @Authorized final Long memberId,
             @RequestBody final ProfileImageRequest request
         ) {
-        memberService.updateMembersProfileImage(memberId, request.imageUrl());
-        return ResponseEntity.ok().build();
+        ProfileImageResponse response = memberService.updateMembersProfileImage(memberId, request.imageUrl());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/profile/image")
