@@ -8,6 +8,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
+import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.DuplicateVoteOptionException;
@@ -117,7 +118,7 @@ public class TopicServiceTest {
                         .build().createRequest());
 
         // then
-        assertThat(topicResponse.keyword().keywordId()).isEqualTo(keyword.getId());
+        assertThat(topicResponse.getKeyword().keywordId()).isEqualTo(keyword.getId());
     }
 
     @Test
@@ -196,12 +197,15 @@ public class TopicServiceTest {
                 .id(1L)
                 .title("topic1")
                 .author(author)
+                .side(TopicSide.TOPIC_B)
                 .keyword(keyword)
                 .voteCount(100)
                 .build().buildTopic();
 
+        Choice choice = createChoice(topic, ChoiceOption.CHOICE_A, null);
+
           // vote
-        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        Vote vote = new Vote(choice.getChoiceOption(), LocalDateTime.now());
         vote.associate(retriever, topic);
 
           // search params
@@ -226,7 +230,7 @@ public class TopicServiceTest {
                 () -> assertThat(responses.getSize()).isEqualTo(topics.getSize()),
                 () -> assertThat(responses.getContent()
                                           .get(0)
-                                          .selectedOption()).isEqualTo(vote.getSelectedOption())
+                                          .getSelectedOption()).isEqualTo(vote.getSelectedOption())
         );
     }
 
@@ -255,6 +259,7 @@ public class TopicServiceTest {
         Topic topic = TestTopic.builder()
                 .id(1L)
                 .title("topic1")
+                .side(TopicSide.TOPIC_B)
                 .author(author)
                 .keyword(keyword)
                 .voteCount(100)
@@ -282,7 +287,7 @@ public class TopicServiceTest {
                 () -> assertThat(responses.getSize()).isEqualTo(topics.getSize()),
                 () -> assertThat(responses.getContent()
                         .get(0)
-                        .selectedOption()).isEqualTo(null)
+                        .getSelectedOption()).isEqualTo(null)
         );
     }
 
@@ -311,7 +316,9 @@ public class TopicServiceTest {
                 .side(TopicSide.TOPIC_B)
                 .build().buildTopic();
 
-        VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A, getEpochSecond(deadline.minusHours(1)));
+        Choice choice = createChoice(topic, ChoiceOption.CHOICE_A, null);
+
+        VoteRequest request = new VoteRequest(choice.getChoiceOption(), getEpochSecond(deadline.minusHours(1)));
 
         when(memberRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(voter));
         when(topicRepository.findByIdAndActiveTrue(anyLong())).thenReturn(Optional.of(topic));
@@ -340,12 +347,15 @@ public class TopicServiceTest {
 
         Topic topic = TestTopic.builder()
                 .id(topicId)
+                .side(TopicSide.TOPIC_A)
                 .deadline(deadline)
                 .author(author)
                 .build().buildTopic();
 
+        Choice choice = createChoice(topic, ChoiceOption.CHOICE_A, null);
+
         // Vote 생성
-        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        Vote vote = new Vote(choice.getChoiceOption(), LocalDateTime.now());
         vote.associate(voter, topic);
 
         // Comment 생성
@@ -387,8 +397,10 @@ public class TopicServiceTest {
                 .author(author)
                 .build().buildTopic();
 
+        Choice choice = createChoice(topic, ChoiceOption.CHOICE_A, null);
+
         // Vote 생성
-        Vote vote = new Vote(ChoiceOption.CHOICE_A, LocalDateTime.now());
+        Vote vote = new Vote(choice.getChoiceOption(), LocalDateTime.now());
         vote.associate(voter, topic);
 
         when(voteRepository.findByVoterIdAndTopicId(any(), any())).thenReturn(Optional.of(vote));

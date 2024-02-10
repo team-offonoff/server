@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.CommentNotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +45,7 @@ class CommentServiceTest {
     Vote vote;
     Keyword keyword;
     Topic topic;
+    List<Choice> choices;
 
     @BeforeEach
     void beforeEach() {
@@ -57,6 +60,9 @@ class CommentServiceTest {
                 .author(author)
                 .keyword(keyword)
                 .build().buildTopic(); em.persist(topic);
+
+        choices = List.of(createChoice(topic, ChoiceOption.CHOICE_A, null),
+                          createChoice(topic, ChoiceOption.CHOICE_B, null));
 
         voter = TestMember.builder()
                 .role(Role.USER)

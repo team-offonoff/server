@@ -27,6 +27,8 @@ public class Choice extends BaseEntity {
     @JoinColumn(name = "choice_content_id")
     private ChoiceContent content;
 
+    private int voteCount;
+
     //== Constructor ==//
     public Choice(Topic topic, ChoiceOption option, ChoiceContent content) {
         this.topic = topic;
@@ -37,4 +39,15 @@ public class Choice extends BaseEntity {
     }
 
     //== Method ==//
+    public boolean isOptionOf(ChoiceOption selectedOption) {
+        return this.choiceOption.equals(selectedOption);
+    }
+
+    public void increaseVoteCount() {
+        this.voteCount++;
+    }
+
+    public void decreaseVoteCount() {
+        this.voteCount--;
+    }
 }

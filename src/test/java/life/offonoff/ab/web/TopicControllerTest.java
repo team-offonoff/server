@@ -16,18 +16,20 @@ import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
-import life.offonoff.ab.domain.topic.TopicStatus;
+import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.topic.choice.content.ImageTextChoiceContent;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
-import life.offonoff.ab.web.response.ChoiceCountResponse;
+import life.offonoff.ab.web.response.topic.choice.ChoiceResponseWithCount;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.VoteResponse;
-import life.offonoff.ab.web.response.VoteResponseWithCount;
 import life.offonoff.ab.web.response.topic.TopicResponse;
+import life.offonoff.ab.web.response.topic.choice.ChoiceResponsesFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -216,36 +218,44 @@ public class TopicControllerTest extends RestDocsTest {
     @Test
     void voteForTopicA_byNonAuthor_success() throws Exception {
         Topic topic = createRandomTopic();
-        CommentResponse commentResponse = CommentResponse.from(new Comment(createRandomMember(),
-                topic,
+
+        Choice choiceA = createChoice(topic,
                 ChoiceOption.CHOICE_A,
-                "content"));
-        List<ChoiceCountResponse> choiceCounts = List.of(new ChoiceCountResponse(ChoiceOption.CHOICE_A, 0L),
-                new ChoiceCountResponse(ChoiceOption.CHOICE_B, 0L));
+                new ImageTextChoiceContent("imageUrlA", "choiceA"));
+        Choice choiceB = createChoice(topic,
+                ChoiceOption.CHOICE_B,
+                new ImageTextChoiceContent("imageUrlB", "choiceB"));
 
         when(topicService.voteForTopicByMember(any(), any(), any()))
-                .thenReturn(VoteResponseWithCount.from(commentResponse, TopicResponse.from(topic, ChoiceOption.CHOICE_A), choiceCounts));
+                .thenReturn(VoteResponse.from(null, TopicResponse.from(topic)));
 
-        VoteRequest request = new VoteRequest(
-                ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        VoteRequest request = new VoteRequest(ChoiceOption.CHOICE_A,
+                                              LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
 
         mvc.perform(post(TopicUri.VOTE, 1).with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().registerModule(new JavaTimeModule()) // For serializing localdatetime
                                 .writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.latestComment.content").value("content"));
+                .andExpect(status().isOk());
     }
 
     @Test
     void voteForTopicB_byNonAuthor_success() throws Exception {
         Topic topic = createRandomTopic();
+
+        Choice choiceA = createChoice(topic,
+                ChoiceOption.CHOICE_A,
+                new ImageTextChoiceContent("imageUrlA", "choiceA"));
+        Choice choiceB = createChoice(topic,
+                ChoiceOption.CHOICE_B,
+                new ImageTextChoiceContent("imageUrlB", "choiceB"));
+
         when(topicService.voteForTopicByMember(any(), any(), any()))
                 .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(createRandomMember(),
                                                                                topic,
                                                                                ChoiceOption.CHOICE_A,
                                                                                "content")),
-                                              TopicResponse.from(topic, ChoiceOption.CHOICE_A)));
+                                              TopicResponse.from(topic)));
 
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
@@ -312,16 +322,26 @@ public class TopicControllerTest extends RestDocsTest {
     @Test
     void modifyVoteForTopic_not_duplicated_option() throws Exception {
         Topic topic = createRandomTopic();
+
+        Member modifier = createRandomMember();
+
+        Choice choiceA = createChoice(topic,
+                ChoiceOption.CHOICE_A,
+                new ImageTextChoiceContent("imageUrlA", "choiceA"));
+        Choice choiceB = createChoice(topic,
+                ChoiceOption.CHOICE_B,
+                new ImageTextChoiceContent("imageUrlB", "choiceB"));
+
         VoteModifyRequest request = new VoteModifyRequest(
                 ChoiceOption.CHOICE_B, getEpochSecond(LocalDateTime.now().plusMinutes(30))
         );
 
         when(topicService.modifyVoteForTopicByMember(any(), any(), any()))
-                .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(createRandomMember(),
+                .thenReturn(VoteResponse.from(CommentResponse.from(new Comment(modifier,
                                                                                topic,
                                                                                ChoiceOption.CHOICE_A,
                                                                                "content")),
-                                              TopicResponse.from(topic, ChoiceOption.CHOICE_B)));
+                                              TopicResponse.from(topic, modifier)));
 
         mvc.perform(patch(TopicUri.VOTE, 1).with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)

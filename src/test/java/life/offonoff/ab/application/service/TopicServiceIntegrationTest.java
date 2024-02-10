@@ -57,7 +57,7 @@ public class TopicServiceIntegrationTest {
                 TopicTestDtoHelper.builder()
                         .topicSide(TopicSide.TOPIC_B)
                         .keyword(new Keyword("key", TopicSide.TOPIC_B))
-                        .build().createRequest()).topicId();
+                        .build().createRequest()).getTopicId();
 
         // then
         Optional<Keyword> keyword = keywordRepository.findByNameAndSide("key", TopicSide.TOPIC_B);
@@ -76,7 +76,7 @@ public class TopicServiceIntegrationTest {
                 TopicTestDtoHelper.builder()
                         .topicSide(TopicSide.TOPIC_A)
                         .deadline(null)
-                        .build().createRequest()).topicId();
+                        .build().createRequest()).getTopicId();
 
         // then
         Topic topic = topicRepository.findById(topicId).get();
@@ -92,10 +92,10 @@ public class TopicServiceIntegrationTest {
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
-        topicService.reportTopicByMember(response.topicId(), member.getId());
+        topicService.reportTopicByMember(response.getTopicId(), member.getId());
 
         // then
-        Topic topic = topicRepository.findByIdAndActiveTrue(response.topicId()).get();
+        Topic topic = topicRepository.findByIdAndActiveTrue(response.getTopicId()).get();
         assertThat(topic.isReportedBy(member)).isTrue();
         assertThat(topic.getReports().size()).isOne();
         assertThat(topic.getReports().get(0).getTopic().getId()).isEqualTo(topic.getId());
@@ -109,10 +109,10 @@ public class TopicServiceIntegrationTest {
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
-        topicService.reportTopicByMember(response.topicId(), member.getId());
-        assertThatThrownBy(() -> topicService.reportTopicByMember(response.topicId(), member.getId()))
+        topicService.reportTopicByMember(response.getTopicId(), member.getId());
+        assertThatThrownBy(() -> topicService.reportTopicByMember(response.getTopicId(), member.getId()))
                 .isInstanceOf(TopicReportDuplicateException.class);
-        Topic topic = topicRepository.findByIdAndActiveTrue(response.topicId()).get();
+        Topic topic = topicRepository.findByIdAndActiveTrue(response.getTopicId()).get();
         assertThat(topic.getReports().size()).isOne();
     }
 
@@ -123,10 +123,10 @@ public class TopicServiceIntegrationTest {
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
-        topicService.activateMembersTopic(member.getId(), response.topicId(), false);
+        topicService.activateMembersTopic(member.getId(), response.getTopicId(), false);
 
         // then
-        assertThat(topicRepository.findByIdAndActiveTrue(response.topicId())).isEmpty();
+        assertThat(topicRepository.findByIdAndActiveTrue(response.getTopicId())).isEmpty();
     }
 
     @Test
@@ -136,7 +136,7 @@ public class TopicServiceIntegrationTest {
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
-        topicService.deleteMembersTopic(member.getId(), response.topicId());
+        topicService.deleteMembersTopic(member.getId(), response.getTopicId());
 
         // then
         assertThat(memberRepository.findByIdAndActiveTrue(member.getId())).isNotEmpty();
@@ -150,8 +150,8 @@ public class TopicServiceIntegrationTest {
         TopicResponse response = createMembersTopic(member.getId());
 
         // when
-        Long keywordId = response.keyword().keywordId();
-        topicService.deleteMembersTopic(member.getId(), response.topicId());
+        Long keywordId = response.getKeyword().keywordId();
+        topicService.deleteMembersTopic(member.getId(), response.getTopicId());
 
         // then
         assertThat(keywordRepository.findById(keywordId)).isNotEmpty();
@@ -168,10 +168,10 @@ public class TopicServiceIntegrationTest {
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
         ThrowingCallable code = () ->
-                topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+                topicService.voteForTopicByMember(response.getTopicId(), voter.getId(), request);
 
         assertThatNoException().isThrownBy(code);
-        List<Vote> votes = topicRepository.findById(response.topicId()).get().getVotes();
+        List<Vote> votes = topicRepository.findById(response.getTopicId()).get().getVotes();
         assertThat(votes).isNotEmpty();
         assertThat(voteRepository.findAll()).isNotEmpty();
     }
@@ -184,7 +184,7 @@ public class TopicServiceIntegrationTest {
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
         ThrowingCallable code = () ->
-                topicService.voteForTopicByMember(response.topicId(), author.getId(), request);
+                topicService.voteForTopicByMember(response.getTopicId(), author.getId(), request);
 
         assertThatThrownBy(code)
                 .isInstanceOf(VoteByAuthorException.class);
@@ -199,7 +199,7 @@ public class TopicServiceIntegrationTest {
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toEpochSecond());
         ThrowingCallable code = () ->
-                topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+                topicService.voteForTopicByMember(response.getTopicId(), voter.getId(), request);
 
         assertThatThrownBy(code)
                 .isInstanceOf(FutureTimeRequestException.class);
@@ -212,10 +212,10 @@ public class TopicServiceIntegrationTest {
         TopicResponse response = createMembersTopic(author.getId());
         VoteRequest request = new VoteRequest(
                 ChoiceOption.CHOICE_A, LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
-        topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+        topicService.voteForTopicByMember(response.getTopicId(), voter.getId(), request);
 
         ThrowingCallable code = () ->
-                topicService.voteForTopicByMember(response.topicId(), voter.getId(), request);
+                topicService.voteForTopicByMember(response.getTopicId(), voter.getId(), request);
 
         assertThatThrownBy(code)
                 .isInstanceOf(AlreadyVotedException.class);
