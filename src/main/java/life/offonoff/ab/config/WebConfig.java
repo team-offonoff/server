@@ -25,7 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:5173", "https://offonoff.me")
                 .allowCredentials(true)
                 // OPTION 요청은 preflight
-                .allowedMethods("GET", "POST", "OPTION");
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTION");
     }
 
 
