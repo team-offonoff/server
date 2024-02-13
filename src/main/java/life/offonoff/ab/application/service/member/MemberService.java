@@ -131,6 +131,7 @@ public class MemberService {
         String originalUrl = member.getProfileImageUrl();
         if (originalUrl != null) {
             s3Service.deleteFile(originalUrl);
+            member.removeProfileImageUrl();
         }
     }
 

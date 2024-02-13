@@ -267,4 +267,8 @@ public class Member extends BaseEntity {
         this.profileImageUrl = imageUrl;
         return this.profileImageUrl;
     }
+
+    public void removeProfileImageUrl() {
+        this.profileImageUrl = null;
+    }
 }
