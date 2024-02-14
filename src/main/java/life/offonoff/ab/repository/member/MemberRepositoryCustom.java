@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MemberRepositoryCustom {
 
-    List<Member> findAllVotedTo(Long topicId);
+    List<Member> findAllListeningVoteResultAndVotedTopicId(Long topicId);
 
     Optional<Member> findByEmail(String email);
 }

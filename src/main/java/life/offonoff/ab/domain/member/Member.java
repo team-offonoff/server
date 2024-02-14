@@ -60,7 +60,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hiddenTopics = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "receiver", orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
     private boolean active = true;
@@ -233,6 +233,10 @@ public class Member extends BaseEntity {
         }
     }
 
+    public void changeNotificationEnabled(NotificationEnabled notificationEnabled) {
+        this.notificationEnabled = notificationEnabled;
+    }
+
     public boolean isAuthorOf(Topic topic) {
         return this == topic.getAuthor();
     }
@@ -266,5 +270,9 @@ public class Member extends BaseEntity {
     public String updateProfileImageUrl(String imageUrl) {
         this.profileImageUrl = imageUrl;
         return this.profileImageUrl;
+    }
+
+    public boolean listenVoteResult() {
+        return this.notificationEnabled.listeningVoteResult();
     }
 }

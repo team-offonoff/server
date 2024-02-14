@@ -10,7 +10,8 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    List<Member> findAllVotedTo(Long memberId);
+    List<Member> findAllListeningVoteResultAndVotedTopicId(Long memberId);
+
     Optional<Member> findByIdAndActiveTrue(Long memberId);
 
     @Query("select m from Member m left join fetch m.likedComments where m.id = :id")

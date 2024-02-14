@@ -9,7 +9,7 @@ import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
-import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.domain.vote.VoteResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,7 +60,7 @@ public class Topic extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "voting_result_id")
-    private VotingResult votingResult;
+    private VoteResult voteResult;
 
     @Enumerated(EnumType.STRING)
     private TopicStatus status = TopicStatus.VOTING;
@@ -144,8 +144,8 @@ public class Topic extends BaseEntity {
         this.choices.add(choice);
     }
 
-    public void setVotingResult(VotingResult votingResult) {
-        this.votingResult = votingResult;
+    public void setVoteResult(VoteResult voteResult) {
+        this.voteResult = voteResult;
     }
 
     public boolean isBeforeDeadline(LocalDateTime requestTime) {
