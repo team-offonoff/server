@@ -19,12 +19,13 @@ public abstract class Notification extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member receiver;
 
     private Boolean checked = false;
 
-    public Notification(Member member) {
-        this.member = member;
+    public Notification(Member receiver) {
+        this.receiver = receiver;
+        receiver.addNotification(this);
     }
 
     //== Method ==//

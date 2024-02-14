@@ -1,8 +1,8 @@
 package life.offonoff.ab.application.notice;
 
-import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.domain.vote.VoteResult;
 
 public interface NoticeService {
 
-    void noticeVotingResult(VotingResult result);
+    void noticeVotingResult(VoteResult result);
 }
