@@ -6,7 +6,7 @@ import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTop
  * 투표 종료의 기준 추상화
  */
 @FunctionalInterface
-public interface VotingEndCriteria {
+public interface VoteClosingCriteria {
 
     boolean check(VotingTopic votingTopic);
 }
