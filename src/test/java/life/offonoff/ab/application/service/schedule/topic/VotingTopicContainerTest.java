@@ -1,10 +1,9 @@
 package life.offonoff.ab.application.service.schedule.topic;
 
-import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
 import life.offonoff.ab.application.service.vote.votingtopic.container.store.VotingTopicStorage;
-import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.topic.Topic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class VotingTopicContainerTest {
     @Mock
     VotingTopicStorage storage;
     @Mock
-    VotingEndCriteria criteria;
+    VoteClosingCriteria criteria;
 
     @Test
     @DisplayName("빈 컨테이너는 사이즈가 0")

@@ -1,12 +1,12 @@
 package life.offonoff.ab.application.service.vote;
 
-import life.offonoff.ab.application.event.topic.VotingEndEvent;
-import life.offonoff.ab.application.service.vote.criteria.DeadlineVotingEndCriteria;
-import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.event.topic.VoteClosedEvent;
+import life.offonoff.ab.application.service.vote.criteria.DeadlineVoteClosingCriteria;
+import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.repository.topic.TopicSearchCond;
 import lombok.RequiredArgsConstructor;
@@ -34,23 +34,23 @@ public class VotingTopicReadableService implements VotingTopicService {
      */
     @Transactional
     @Override
-    public void endVote(VotingEndCriteria criteria) {
+    public void endVote(VoteClosingCriteria criteria) {
         List<Topic> ended = topicRepository.findAll(createTopicSearchCond(criteria));
         log.info("Voting Ended : {}", ended.size());
         ended.forEach(
                 topic -> {
                     topic.closeVote();
-                    VotingResult result = aggregateVote(topic);
+                    VoteResult result = aggregateVote(topic);
 
                     // 투표 종료 이벤트 발행
-                    eventPublisher.publishEvent(new VotingEndEvent(topic, result));
+                    eventPublisher.publishEvent(new VoteClosedEvent(topic, result));
                 }
         );
     }
 
-    private TopicSearchCond createTopicSearchCond(VotingEndCriteria criteria) {
+    private TopicSearchCond createTopicSearchCond(VoteClosingCriteria criteria) {
 
-        if (criteria instanceof DeadlineVotingEndCriteria deadlineCriteria) {
+        if (criteria instanceof DeadlineVoteClosingCriteria deadlineCriteria) {
             return new TopicSearchCond(null, deadlineCriteria.getCompareTime(), TopicStatus.VOTING);
         }
         return null;

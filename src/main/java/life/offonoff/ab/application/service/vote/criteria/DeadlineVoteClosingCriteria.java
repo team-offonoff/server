@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class DeadlineVotingEndCriteria implements VotingEndCriteria {
+public class DeadlineVoteClosingCriteria implements VoteClosingCriteria {
 
     private final LocalDateTime compareTime;
 

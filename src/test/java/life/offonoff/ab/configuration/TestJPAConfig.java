@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import javax.sql.DataSource;
 
 @TestConfiguration
-public class TestConfig {
+public class TestJPAConfig {
 
     @PersistenceContext
     private EntityManager em;

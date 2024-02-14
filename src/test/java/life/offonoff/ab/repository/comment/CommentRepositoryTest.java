@@ -1,6 +1,6 @@
 package life.offonoff.ab.repository.comment;
 
-import life.offonoff.ab.configuration.TestConfig;
+import life.offonoff.ab.configuration.TestJPAConfig;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Provider;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import static life.offonoff.ab.domain.TestEntityUtil.createRandomMember;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(TestConfig.class)
+@Import(TestJPAConfig.class)
 @EnableJpaAuditing
 @DataJpaTest
 public class CommentRepositoryTest {

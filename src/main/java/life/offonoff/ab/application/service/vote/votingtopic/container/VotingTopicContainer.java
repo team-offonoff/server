@@ -1,6 +1,6 @@
 package life.offonoff.ab.application.service.vote.votingtopic.container;
 
-import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.store.VotingTopicStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class VotingTopicContainer {
     /**
      * 투표가 끝난 토픽 반환
      */
-    public List<VotingTopic> getVotingEnded(VotingEndCriteria criteria) {
+    public List<VotingTopic> getVotingEnded(VoteClosingCriteria criteria) {
         return storage.popAllIf(criteria::check);
     }
 }

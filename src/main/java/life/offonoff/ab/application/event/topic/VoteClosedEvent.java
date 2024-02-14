@@ -1,10 +1,10 @@
 package life.offonoff.ab.application.event.topic;
 
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.domain.vote.VoteResult;
 
-public record VotingEndEvent(
+public record VoteClosedEvent(
         Topic topic,
-        VotingResult result
+        VoteResult result
 ) {
 }

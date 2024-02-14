@@ -1,6 +1,6 @@
 package life.offonoff.ab.repository.notice;
 
-import life.offonoff.ab.domain.notice.VotingResultNotification;
+import life.offonoff.ab.domain.notice.VoteResultNotification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +20,7 @@ public class NotificationJdbcRepository {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void batchInsertVotingResultNotices(List<VotingResultNotification> notifications) {
+    public void batchInsertVoteResultNotifications(List<VoteResultNotification> notifications) {
 
         Timestamp curTimeStamp = Timestamp.valueOf(LocalDateTime.now());
 
@@ -31,9 +31,9 @@ public class NotificationJdbcRepository {
                                  notifications,
                                  1000,
                                  (pstmt, n) -> {
-                                     pstmt.setLong(1, n.getMember().getId());
-                                     pstmt.setString(2, VOTING_RESULT_NOTIFICATION);
-                                     pstmt.setLong(3, n.getVotingResult().getId());
+                                     pstmt.setLong(1, n.getReceiver().getId());
+                                     pstmt.setString(2, VOTE_RESULT_NOTIFICATION);
+                                     pstmt.setLong(3, n.getVoteResult().getId());
                                      pstmt.setTimestamp(4, curTimeStamp);
                                      pstmt.setTimestamp(5, curTimeStamp);
                                  });

@@ -2,7 +2,7 @@ package life.offonoff.ab.repository.topic;
 
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
-import life.offonoff.ab.configuration.TestConfig;
+import life.offonoff.ab.configuration.TestJPAConfig;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -27,7 +27,7 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Import(TestConfig.class)
+@Import(TestJPAConfig.class)
 @DataJpaTest
 class TopicRepositoryTest {
 

@@ -1,10 +1,10 @@
 package life.offonoff.ab.repository.notice;
 
-import life.offonoff.ab.domain.notice.VotingResultNotification;
+import life.offonoff.ab.domain.notice.VoteResultNotification;
 
 import java.util.List;
 
 public interface NotificationRepositoryCustom {
 
-    void saveAll(List<VotingResultNotification> notifications);
+    void saveAll(List<VoteResultNotification> notifications);
 }

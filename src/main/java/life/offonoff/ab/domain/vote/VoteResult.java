@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class VotingResult extends BaseEntity {
+public class VoteResult extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +22,7 @@ public class VotingResult extends BaseEntity {
     //== 연관관계 매핑 ==//
     public void setTopic(Topic topic) {
         this.topic = topic;
-        topic.setVotingResult(this);
+        topic.setVoteResult(this);
         this.totalVoteCount = topic.getVoteCount();
     }
 

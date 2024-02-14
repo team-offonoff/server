@@ -1,11 +1,11 @@
 package life.offonoff.ab.application.service.vote.votingtopic.container;
 
-import life.offonoff.ab.application.event.topic.VotingEndEvent;
+import life.offonoff.ab.application.event.topic.VoteClosedEvent;
 import life.offonoff.ab.application.service.vote.VotingTopicService;
-import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.repository.topic.TopicSearchCond;
 import lombok.RequiredArgsConstructor;
@@ -49,17 +49,17 @@ public class VotingTopicContainerService implements VotingTopicService {
      */
     @Transactional
     @Override
-    public void endVote(VotingEndCriteria criteria) {
+    public void endVote(VoteClosingCriteria criteria) {
         List<VotingTopic> ended = container.getVotingEnded(criteria);
         log.info("Voting Ended : {}", ended.size());
         ended.forEach(vt -> {
             Topic topic = vt.getTopic();
             topic.closeVote();
 
-            VotingResult result = aggregateVote(topic);
+            VoteResult result = aggregateVote(topic);
 
             // 투표 종료 이벤트 발행
-            eventPublisher.publishEvent(new VotingEndEvent(topic, result));
+            eventPublisher.publishEvent(new VoteClosedEvent(topic, result));
         });
     }
 }
