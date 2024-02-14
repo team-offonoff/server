@@ -1,58 +1,31 @@
 package life.offonoff.ab.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import life.offonoff.ab.application.service.CommentService;
 import life.offonoff.ab.application.service.KeywordService;
-import life.offonoff.ab.application.service.TopicService;
-import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper;
-import life.offonoff.ab.application.service.TopicServiceTest.TopicTestDtoHelper.TopicTestDtoHelperBuilder;
-import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.config.WebConfig;
-import life.offonoff.ab.domain.TestEntityUtil;
-import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
-import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
-import life.offonoff.ab.domain.topic.choice.ChoiceOption;
-import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
-import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.KeywordResponse;
-import life.offonoff.ab.web.response.topic.TopicResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = KeywordController.class,

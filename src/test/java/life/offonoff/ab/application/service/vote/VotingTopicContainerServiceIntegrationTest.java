@@ -1,6 +1,6 @@
 package life.offonoff.ab.application.service.vote;
 
-import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
 import life.offonoff.ab.domain.member.Member;
@@ -12,15 +12,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +33,7 @@ public class VotingTopicContainerServiceIntegrationTest {
     VotingTopicService votingTopicContainerService;
 
     @MockBean
-    VotingEndCriteria criteria;
+    VoteClosingCriteria criteria;
     @MockBean
     VotingTopicContainer container;
     @MockBean
@@ -68,8 +63,8 @@ public class VotingTopicContainerServiceIntegrationTest {
 
         // then
         assertAll(
-                () -> assertThat(topic.getStatus()).isEqualTo(NOTICED),
-                () -> assertThat(topic.getVotingResult()).isNotNull()
+                () -> assertThat(topic.getStatus()).isEqualTo(CLOSED),
+                () -> assertThat(topic.getVoteResult()).isNotNull()
         );
     }
 
@@ -93,7 +88,7 @@ public class VotingTopicContainerServiceIntegrationTest {
 
         when(container.getVotingEnded(criteria)).thenReturn(votingTopics);
         when(topicRepository.findById(topic.getId())).thenReturn(Optional.of(topic));
-        when(memberRepository.findAllVotedTo(topic.getId())).thenReturn(voteMembers);
+        when(memberRepository.findAllListeningVoteResultAndVotedTopicId(topic.getId())).thenReturn(voteMembers);
         doNothing().when(notificationRepository).saveAll(any());
         
         // when

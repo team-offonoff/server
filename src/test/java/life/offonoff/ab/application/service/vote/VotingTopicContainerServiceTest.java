@@ -1,10 +1,10 @@
 package life.offonoff.ab.application.service.vote;
 
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainer;
-import life.offonoff.ab.application.service.vote.criteria.VotingEndCriteria;
+import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainerService;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VotingResult;
+import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class VotingTopicContainerServiceTest {
     @Mock
     ApplicationEventPublisher eventPublisher;
     @Mock
-    VotingEndCriteria criteria;
+    VoteClosingCriteria criteria;
 
     @Test
     @DisplayName("투표가 끝나면 투표 결과를 집계해 저장")
@@ -44,13 +44,13 @@ class VotingTopicContainerServiceTest {
                 .build().buildTopic();
 
         // when
-        VotingResult votingResult = votingTopicContainerService.aggregateVote(topic);
+        VoteResult voteResult = votingTopicContainerService.aggregateVote(topic);
 
         // then
         assertAll(
-                () -> assertThat(topic.getVotingResult()).isNotNull(),
-                () -> assertThat(topic.getVotingResult()).isEqualTo(votingResult),
-                () -> assertThat(votingResult.getTotalVoteCount()).isEqualTo(totalVoteCount)
+                () -> assertThat(topic.getVoteResult()).isNotNull(),
+                () -> assertThat(topic.getVoteResult()).isEqualTo(voteResult),
+                () -> assertThat(voteResult.getTotalVoteCount()).isEqualTo(totalVoteCount)
         );
     }
 
