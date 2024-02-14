@@ -275,4 +275,7 @@ public class Member extends BaseEntity {
     public boolean listenVoteResult() {
         return this.notificationEnabled.listeningVoteResult();
     }
+    public void removeProfileImageUrl() {
+        this.profileImageUrl = null;
+    }
 }
