@@ -24,7 +24,7 @@ public class NotificationJdbcRepository {
 
         Timestamp curTimeStamp = Timestamp.valueOf(LocalDateTime.now());
 
-        String query = "insert into notification (member_id, notification_type, voting_result_id, created_at, updated_at)" +
+        String query = "insert into notification (member_id, notification_type, vote_result_id, created_at, updated_at)" +
                 "values (?, ?, ?, ?, ?);";
 
         jdbcTemplate.batchUpdate(query,
