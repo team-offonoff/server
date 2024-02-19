@@ -15,6 +15,8 @@ import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.CommentNotFoundException;
 import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
 import life.offonoff.ab.exception.LengthInvalidException;
+import life.offonoff.ab.exception.UnableToViewCommentsException;
+import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -31,6 +35,7 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Transactional
 @SpringBootTest
@@ -126,12 +131,43 @@ class CommentServiceTest {
     @Test
     @DisplayName("토픽 작성자의 댓글은 selectedOption 이 null")
     void create_comment_by_author() {
-
         // when
         CommentResponse response = commentService.register(author.getId(), new CommentRequest(topic.getId(), "content"));
 
         // then
         assertThat(response.getWritersVotedOption()).isEqualTo(null);
+    }
+
+    @Test
+    @DisplayName("토픽 작성자는 투표 없이 댓글 조회 가능하다.")
+    void find_comments_by_topic_author() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // then
+        assertDoesNotThrow(() -> commentService.findAll(author.getId(), topic.getId(), pageable));
+    }
+
+    @Test
+    @DisplayName("투표자는 댓글 조회가 가능하다.")
+    void find_comments_by_voter() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // then
+        assertDoesNotThrow(() -> commentService.findAll(voter.getId(), topic.getId(), pageable));
+    }
+
+    @Test
+    @DisplayName("투표 없이 댓글 조회는 불가능하다.")
+    void find_comments_by_non_voter_then_exception() {
+        // given
+        Long nonVoterId = createRandomMember();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // then
+        assertThatThrownBy(() -> commentService.findAll(nonVoterId, topic.getId(), pageable))
+                .isInstanceOf(UnableToViewCommentsException.class);
     }
 
     @Test

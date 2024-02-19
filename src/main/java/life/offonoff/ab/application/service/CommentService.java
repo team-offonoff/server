@@ -54,11 +54,11 @@ public class CommentService {
     }
 
     private void checkMemberCanViewComments(Long memberId, Long topicId) {
-        if (!topicRepository.existsByIdAndActiveTrue(topicId)) {
-            throw new TopicNotFoundException(topicId);
-        }
+        Topic topic = findTopic(topicId);
+        Member member = findMember(memberId);
 
-        if (!voteRepository.existsByVoterIdAndTopicId(memberId, topicId)) {
+        if (!topic.isWrittenBy(member) &&
+                !voteRepository.existsByVoterIdAndTopicId(memberId, topicId)) {
             throw new UnableToViewCommentsException(topicId);
         }
     }

@@ -133,6 +133,22 @@ class CommentControllerTest extends RestDocsTest {
     }
 
     @Test
+    void get_comments_by_topic_author() throws Exception {
+        // give
+        Long topicId = 1L;
+
+        when(commentService.findAll(nullable(Long.class), anyLong(), any(Pageable.class)))
+                .thenReturn(PageResponse.of(2, new SliceImpl<>(createTwoCommentResponses(topicId))));
+
+        mvc.perform(get(CommentUri.BASE)
+                        .header("Authorization", "Bearer AUTHOR_ACCESS_TOKEN")
+                        .queryParam("topic-id", String.valueOf(topicId))
+                        .queryParam("page", String.valueOf(0))
+                        .queryParam("size", String.valueOf(50)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
     void get_comments_of_topic_empty_comments() throws Exception {
         Long topicId = 1L;
 
