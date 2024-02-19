@@ -22,4 +22,10 @@ public class VoteResultNoticeResponse extends NoticeResponse {
         this.topicId = topic.getId();
         this.topicTitle = topic.getTitle();
     }
+
+    public VoteResultNoticeResponse(Boolean checked, Long topicId, String topicTitle) {
+        super(VOTE_RESULT_NOTIFICATION, checked);
+        this.topicId = topicId;
+        this.topicTitle = topicTitle;
+    }
 }
