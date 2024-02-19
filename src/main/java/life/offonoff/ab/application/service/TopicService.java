@@ -2,6 +2,7 @@ package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.report.TopicReportEvent;
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
+import life.offonoff.ab.application.event.topic.VotedEvent;
 import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
@@ -187,6 +188,9 @@ public class TopicService {
         Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
         voteRepository.save(vote);
+
+        // publish VotedEvent
+        eventPublisher.publishEvent(new VotedEvent(vote));
 
         return VoteResponse.from(getLatestCommentOfTopic(topic), TopicResponse.from(topic, member));
     }
