@@ -3,6 +3,7 @@ package life.offonoff.ab.application.event.topic;
 import life.offonoff.ab.application.notice.NoticeService;
 import life.offonoff.ab.application.service.vote.VotingTopicService;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
+import life.offonoff.ab.domain.topic.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -42,5 +43,18 @@ public class TopicEventHandler {
         log.info("# Topic Vote Closed / topic-id : {}, deadline : {}", event.topic().getId(), event.topic().getDeadline());
 
         noticeService.noticeVoteResult(event.result());
+    }
+
+    /**
+     * 투표 이벤트
+     */
+    @EventListener
+    public void voted(VotedEvent event) {
+        Topic topic = event.getVote()
+                           .getTopic();
+
+        if (noticeService.shouldNoticeVoteCountForTopic(topic)) {
+            noticeService.noticeVoteCountOnTopic(topic);
+        }
     }
 }

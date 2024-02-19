@@ -6,6 +6,9 @@ import life.offonoff.ab.domain.TestEntityUtil.TestMember;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.notice.DefaultNotification;
 import life.offonoff.ab.domain.notice.Notification;
+import life.offonoff.ab.domain.notice.VoteCountOnTopicNotification;
+import life.offonoff.ab.domain.notice.VoteResultNotification;
+import life.offonoff.ab.web.response.notice.NoticeResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -13,7 +16,10 @@ import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
+import static life.offonoff.ab.domain.TestEntityUtil.createRandomMember;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @Import(TestJPAConfig.class)
@@ -36,7 +42,7 @@ class NotificationRepositoryTest {
         notificationRepository.save(notification);
 
         // when
-        List<Notification> notifications = notificationRepository.findAllByReceiverId(receiver.getId());
+        List<Notification> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(receiver.getId());
 
         // then
         assertThat(notifications.size()).isGreaterThan(0);

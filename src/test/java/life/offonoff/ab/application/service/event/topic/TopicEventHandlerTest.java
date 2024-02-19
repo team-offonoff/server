@@ -2,7 +2,10 @@ package life.offonoff.ab.application.service.event.topic;
 
 import life.offonoff.ab.application.event.topic.*;
 import life.offonoff.ab.application.notice.NoticeService;
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.domain.vote.VoteResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,5 +41,21 @@ class TopicEventHandlerTest {
 
         // then
         verify(noticeService).noticeVoteResult(any(VoteResult.class));
+    }
+
+    @Test
+    @DisplayName("VoteCount 알림 기준에 해당되면 알림 생성 메서드 호출한다.")
+    void noticeVoteCount_when_shouldNoticeVoteCount() {
+        // given
+        Vote vote = createVote(ChoiceOption.CHOICE_A);
+
+        when(noticeService.shouldNoticeVoteCountForTopic(any()))
+                .thenReturn(true);
+
+        // when
+        topicEventHandler.voted(new VotedEvent(vote));
+
+        // then
+        verify(noticeService).noticeVoteCountOnTopic(any());
     }
 }
