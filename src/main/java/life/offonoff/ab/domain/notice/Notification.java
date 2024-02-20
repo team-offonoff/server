@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,6 +22,7 @@ public abstract class Notification extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member receiver;
 
+    @ColumnDefault("false")
     private Boolean checked = false;
 
     public Notification(Member receiver) {

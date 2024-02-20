@@ -10,7 +10,11 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    List<Member> findAllListeningVoteResultAndVotedTopicId(Long memberId);
+    @Query("select m from Member m " +
+            "  join Vote v on v.voter.id = m.id " +
+            "    and v.topic.id = :topicId " +
+            "where m.notificationEnabled.voteResult = true")
+    List<Member> findAllListeningVoteResultAndVotedTopicId(Long topicId);
 
     Optional<Member> findByIdAndActiveTrue(Long memberId);
 

@@ -59,7 +59,7 @@ public class Topic extends BaseEntity {
     private List<TopicReport> reports = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "voting_result_id")
+    @JoinColumn(name = "vote_result_id")
     private VoteResult voteResult;
 
     @Enumerated(EnumType.STRING)

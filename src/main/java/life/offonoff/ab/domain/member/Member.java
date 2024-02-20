@@ -195,7 +195,7 @@ public class Member extends BaseEntity {
                 .anyMatch(v -> v.isFor(topic));
     }
 
-    public void readNotification(Notification notification) {
+    public void checkNotification(Notification notification) {
         notification.check();
     }
 

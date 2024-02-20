@@ -15,7 +15,7 @@ import static life.offonoff.ab.domain.notice.NotificationType.*;
 @DiscriminatorValue(VOTE_RESULT_NOTIFICATION)
 public class VoteResultNotification extends Notification {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private VoteResult voteResult;
 
     public VoteResultNotification(Member member, VoteResult voteResult) {
