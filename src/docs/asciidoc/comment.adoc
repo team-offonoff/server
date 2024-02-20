@@ -33,6 +33,10 @@ OK - 댓글이 하나도 없는 상황
 
 operation::comment-controller-test/get_comments_of_topic_empty_comments[snippets="http-request,http-response"]
 
+OK - 토픽 작성자가 조회
+
+operation::comment-controller-test/get_comments_by_topic_author[snippets="http-request,http-response"]
+
 E1. 존재하지 않는 토픽
 
 operation::comment-controller-test/get_comments_exception_topic_not_found[snippets="http-request,http-response"]
