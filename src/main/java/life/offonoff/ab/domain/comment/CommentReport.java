@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.topic;
+package life.offonoff.ab.domain.comment;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
@@ -12,7 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class TopicReport extends BaseEntity {
+public class CommentReport extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,12 +23,12 @@ public class TopicReport extends BaseEntity {
     private Member reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
-    private Topic topic;
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
-    public TopicReport(final Member reporter, final Topic topic) {
+    public CommentReport(final Member reporter, final Comment comment) {
         this.reporter = reporter;
-        this.topic = topic;
+        this.comment = comment;
     }
 
     public boolean isReportedBy(Member member) {

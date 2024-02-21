@@ -204,4 +204,17 @@ public class CommentService {
                 .orElse(null)
         );
     }
+
+    @Transactional
+    public void reportCommentByMember(final Long commentId, final Long memberId) {
+        Member member = findMember(memberId);
+        Comment comment = findById(commentId);
+
+        if (comment.isReportedBy(member)) {
+            throw new CommentReportDuplicateException(commentId, memberId);
+        }
+        comment.getReportedBy(member);
+
+        // TODO: 일단 댓글 신고는 임시 API라서 알림 받는 건 추후에 추가
+    }
 }

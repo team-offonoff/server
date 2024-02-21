@@ -31,6 +31,7 @@ import static life.offonoff.ab.exception.AbCode.INVALID_LENGTH_OF_FIELD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -288,11 +289,46 @@ class CommentControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("content").value("new content"));
     }
 
+    @Test
+    void createTopicReport() throws Exception {
+        mvc.perform(post(CommentUri.REPORT, 1)
+                            .with(csrf().asHeader())
+                            .header("Authorization", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void createTopicReport_withNonExistentTopic_TopicNotFoundException() throws Exception {
+        doThrow(new CommentNotFoundException(1L))
+                .when(commentService).reportCommentByMember(any(), any());
+
+        mvc.perform(post(CommentUri.REPORT, 1)
+                            .with(csrf().asHeader())
+                            .header("Authorization", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("abCode").value("COMMENT_NOT_FOUND"))
+                .andDo(print());
+    }
+
+    @Test
+    void createTopicReport_alreadyReported_TopicReportDuplicateException() throws Exception {
+        doThrow(new CommentReportDuplicateException(1L, 2L))
+                .when(commentService).reportCommentByMember(any(), any());
+
+        mvc.perform(post(CommentUri.REPORT, 1)
+                            .with(csrf().asHeader())
+                            .header("Authorization", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("abCode").value("DUPLICATE_COMMENT_REPORT"))
+                .andDo(print());
+    }
+
     private static class CommentUri {
         private static final String BASE = "/comments";
         private static final String COMMENT = BASE + "/{commentId}";
         private static final String DELETE = COMMENT;
         private static final String LIKE = COMMENT + "/like";
         private static final String HATE = COMMENT + "/hate";
+        private static final String REPORT = COMMENT + "/report";
     }
 }
