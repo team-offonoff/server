@@ -91,3 +91,20 @@ Errors
 3. 댓글 작성자가 아닌데 변경 시도 시: <<_e1_삭제_자격이_없을_때>>와 동일
 
 [%hardbreaks]
+
+### 5.7. 댓글 신고
+
+[source.html]
+POST /comments/{commentId}/report
+
+OK
+
+operation::comment-controller-test/create-topic-report[snippets="http-request,http-response"]
+
+E1. 존재하지 않는 댓글일때
+
+operation::comment-controller-test/create-topic-report_with-non-existent-topic_-topic-not-found-exception[snippets="http-request,http-response"]
+
+E2. 이미 신고한 댓글일때
+
+operation::comment-controller-test/create-topic-report_already-reported_-topic-report-duplicate-exception[snippets="http-request,http-response"]
