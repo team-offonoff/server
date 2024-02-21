@@ -7,6 +7,7 @@ import life.offonoff.ab.web.response.MembersProfileResponse;
 import life.offonoff.ab.web.response.TermsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,7 @@ public class MemberController {
             @Authorized final Long memberId,
             @RequestBody final MemberProfileInfoRequest request) {
         memberService.updateMembersProfileInformation(memberId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @PutMapping("/profile/image")
@@ -48,7 +49,7 @@ public class MemberController {
             @Authorized final Long memberId
     ) {
         memberService.removeMembersProfileImage(memberId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @GetMapping("/terms")
@@ -71,6 +72,6 @@ public class MemberController {
             @RequestBody final MemberStatusRequest request
     ) {
         memberService.activateMember(memberId, request.activated());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 }

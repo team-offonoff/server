@@ -7,7 +7,6 @@ import life.offonoff.ab.application.service.request.TopicCreateRequest;
 import life.offonoff.ab.application.service.request.TopicSearchRequest;
 import life.offonoff.ab.application.service.request.VoteModifyRequest;
 import life.offonoff.ab.application.service.request.VoteRequest;
-import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.web.common.aspect.auth.Authorized;
 import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentResponse;
@@ -16,6 +15,7 @@ import life.offonoff.ab.web.response.topic.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +61,7 @@ public class TopicController {
             @RequestParam Boolean hide
     ) {
         topicService.hideTopicForMember(memberId, topicId, hide);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @PostMapping("/{topicId}/report")
@@ -70,7 +70,7 @@ public class TopicController {
             @PathVariable("topicId") Long topicId
     ) {
        topicService.reportTopicByMember(topicId, memberId);
-        return ok().build();
+        return ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @PatchMapping("/{topicId}/status")
@@ -80,7 +80,7 @@ public class TopicController {
             @RequestParam Boolean active
     ) {
         topicService.activateMembersTopic(memberId, topicId, active);
-        return ok().build();
+        return ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @DeleteMapping("/{topicId}")
@@ -89,7 +89,7 @@ public class TopicController {
             @PathVariable("topicId") Long topicId
     ) {
         topicService.deleteMembersTopic(memberId, topicId);
-        return ok().build();
+        return ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @PostMapping("/{topicId}/vote")
