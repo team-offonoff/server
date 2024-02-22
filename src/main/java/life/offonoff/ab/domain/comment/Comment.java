@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -34,6 +37,9 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "topic_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Topic topic;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CommentReport> reports = new ArrayList<>();
 
     private int likeCount = 0;
     private int hateCount = 0;
@@ -104,5 +110,14 @@ public class Comment extends BaseEntity {
 
     public void changeContent(String content) {
         this.content = content;
+    }
+
+    public boolean isReportedBy(Member member) {
+        return reports.stream()
+                .anyMatch(report -> report.isReportedBy(member));
+    }
+
+    public void getReportedBy(Member member) {
+        reports.add(new CommentReport(member, this));
     }
 }

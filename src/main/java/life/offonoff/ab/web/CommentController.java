@@ -73,4 +73,13 @@ public class CommentController {
     ) {
         return ResponseEntity.ok(commentService.modifyMembersCommentContent(memberId, commentId, request.content()));
     }
+
+    @PostMapping("/{commentId}/report")
+    public ResponseEntity<Void> reportComment(
+            @Authorized Long memberId,
+            @PathVariable("commentId") Long commentId
+    ) {
+        commentService.reportCommentByMember(commentId, memberId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -273,7 +273,7 @@ public class TopicService {
         if (topic.isReportedBy(member)) {
             throw new TopicReportDuplicateException(topicId, memberId);
         }
-        topic.reportBy(member);
+        topic.getReportedBy(member);
 
         eventPublisher.publishEvent(
                 new TopicReportEvent(TopicResponse.from(topic), topic.getReports().size()));

@@ -3,6 +3,7 @@ package life.offonoff.ab.application.service;
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.request.CommentRequest;
+import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
@@ -12,16 +13,16 @@ import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
-import life.offonoff.ab.exception.CommentNotFoundException;
-import life.offonoff.ab.exception.IllegalCommentStatusChangeException;
-import life.offonoff.ab.exception.LengthInvalidException;
-import life.offonoff.ab.exception.UnableToViewCommentsException;
-import life.offonoff.ab.web.common.response.PageResponse;
+import life.offonoff.ab.exception.*;
+import life.offonoff.ab.repository.comment.CommentRepository;
+import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.web.response.CommentResponse;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -45,7 +46,13 @@ class CommentServiceTest {
 
     @Autowired CommentService commentService;
 
-    Member author;
+    @Mock
+    CommentRepository commentRepository;
+
+    @Mock
+    MemberRepository memberRepository;
+
+    Member topicAuthor;
     Member voter;
     Vote vote;
     Keyword keyword;
@@ -54,15 +61,15 @@ class CommentServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        author = TestMember.builder()
-                .build().buildMember(); em.persist(author);
+        topicAuthor = TestMember.builder()
+                .build().buildMember(); em.persist(topicAuthor);
 
         keyword = TestKeyword.builder()
                 .name("key")
                 .build().buildKeyword(); em.persist(keyword);
 
         topic = TestTopic.builder()
-                .author(author)
+                .author(topicAuthor)
                 .keyword(keyword)
                 .build().buildTopic(); em.persist(topic);
 
@@ -132,7 +139,7 @@ class CommentServiceTest {
     @DisplayName("토픽 작성자의 댓글은 selectedOption 이 null")
     void create_comment_by_author() {
         // when
-        CommentResponse response = commentService.register(author.getId(), new CommentRequest(topic.getId(), "content"));
+        CommentResponse response = commentService.register(topicAuthor.getId(), new CommentRequest(topic.getId(), "content"));
 
         // then
         assertThat(response.getWritersVotedOption()).isEqualTo(null);
@@ -145,7 +152,7 @@ class CommentServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // then
-        assertDoesNotThrow(() -> commentService.findAll(author.getId(), topic.getId(), pageable));
+        assertDoesNotThrow(() -> commentService.findAll(topicAuthor.getId(), topic.getId(), pageable));
     }
 
     @Test
@@ -316,6 +323,56 @@ class CommentServiceTest {
                 () -> assertThat(comment.getLikeCount()).isZero(),
                 () -> assertThat(comment.getHateCount()).isOne()
         );
+    }
+
+    @Test
+    void reportCommentByMember_success() {
+        // given
+        Comment comment = new Comment(voter, topic, ChoiceOption.CHOICE_A,"content");
+        em.persist(comment);
+        Member reporter = TestEntityUtil.createRandomMember();
+        em.persist(reporter);
+
+        // when
+        Executable code = () ->
+                commentService.reportCommentByMember(comment.getId(), reporter.getId());
+
+        // then
+        assertDoesNotThrow(code);
+    }
+
+    @Test
+    void reportCommentByMember_withNonExistentComment_exception() {
+        // given
+        Member reporter = TestEntityUtil.createRandomMember();
+        em.persist(reporter);
+
+        // when
+        ThrowingCallable code = () ->
+                commentService.reportCommentByMember(1L, reporter.getId());
+
+        // then
+        assertThatThrownBy(code)
+                .isInstanceOf(CommentNotFoundException.class);
+    }
+
+    @Test
+    void reportCommentByMember_withDuplicateReport_exception() {
+        // given
+        Comment comment = new Comment(voter, topic, ChoiceOption.CHOICE_A,"content");
+        em.persist(comment);
+        Member reporter = TestEntityUtil.createRandomMember();
+        em.persist(reporter);
+
+        commentService.reportCommentByMember(comment.getId(), reporter.getId());
+
+        // when
+        ThrowingCallable code = () ->
+                commentService.reportCommentByMember(comment.getId(), reporter.getId());
+
+        // then
+        assertThatThrownBy(code)
+                .isInstanceOf(CommentReportDuplicateException.class);
     }
 
     private Long createRandomMember() {
