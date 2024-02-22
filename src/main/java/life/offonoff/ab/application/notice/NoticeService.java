@@ -8,9 +8,11 @@ import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notice.NotificationRepository;
 import life.offonoff.ab.web.response.notice.NoticeResponse;
-import life.offonoff.ab.web.response.notice.NoticeResponseFactory;
+import life.offonoff.ab.web.response.notice.message.NoticeMessage;
+import life.offonoff.ab.web.response.notice.message.NoticeMessageFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +24,8 @@ import java.util.stream.Collectors;
 @Service
 public class NoticeService {
 
-    public static final int VOTE_COUNT_MODULO = 100;
+    @Value("${ab.notification.vote_on_topic.count_unit}")
+    public int voteCountUnit;
 
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
@@ -81,13 +84,13 @@ public class NoticeService {
 
         return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId)
                                      .stream()
-                                     .map(NoticeResponseFactory::createNoticeResponse)
+                                     .map(NoticeResponse::new)
                                      .toList();
     }
 
     public boolean shouldNoticeVoteCountForTopic(Topic topic) {
         // TODO : 투표 취소 후 다시 100단위를 넘었을 때 중복 알림 처리 && 추상화
-        return topic.getVoteCount() % VOTE_COUNT_MODULO == 0;
+        return topic.getVoteCount() % voteCountUnit == 0;
     }
 }
 
