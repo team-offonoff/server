@@ -29,4 +29,9 @@ public class VoteCountOnTopicNotification extends Notification {
         this.topic = topic;
         this.totalVoteCount = topic.getVoteCount();
     }
+
+    @Override
+    public String getType() {
+        return VOTE_COUNT_ON_TOPIC_NOTIFICATION;
+    }
 }

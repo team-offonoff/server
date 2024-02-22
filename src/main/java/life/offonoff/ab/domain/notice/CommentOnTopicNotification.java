@@ -17,4 +17,8 @@ import static life.offonoff.ab.domain.notice.NotificationType.COMMENT_ON_TOPIC_N
 @Entity
 @DiscriminatorValue(COMMENT_ON_TOPIC_NOTIFICATION)
 public class CommentOnTopicNotification extends Notification {
+    @Override
+    public String getType() {
+        return COMMENT_ON_TOPIC_NOTIFICATION;
+    }
 }

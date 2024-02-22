@@ -17,4 +17,9 @@ import static life.offonoff.ab.domain.notice.NotificationType.LIKE_IN_COMMENT_NO
 @Entity
 @DiscriminatorValue(LIKE_IN_COMMENT_NOTIFICATION)
 public class LikeInCommentNotification extends Notification {
+
+    @Override
+    public String getType() {
+        return LIKE_IN_COMMENT_NOTIFICATION;
+    }
 }

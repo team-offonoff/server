@@ -22,4 +22,9 @@ public class VoteResultNotification extends Notification {
         super(member);
         this.voteResult = voteResult;
     }
+
+    @Override
+    public String getType() {
+        return VOTE_RESULT_NOTIFICATION;
+    }
 }

@@ -8,12 +8,12 @@ import lombok.Getter;
 import static life.offonoff.ab.domain.notice.NotificationType.VOTE_RESULT_NOTIFICATION;
 
 @Getter
-public class VoteResultNoticeResponse extends NoticeResponse {
+public class VoteResultNoticeMessage extends NoticeResponse {
 
     private Long topicId;
     private String topicTitle;
 
-    public VoteResultNoticeResponse(VoteResultNotification notification) {
+    public VoteResultNoticeMessage(VoteResultNotification notification) {
         super(VOTE_RESULT_NOTIFICATION, notification.getChecked());
 
         VoteResult voteResult = notification.getVoteResult();
@@ -23,7 +23,7 @@ public class VoteResultNoticeResponse extends NoticeResponse {
         this.topicTitle = topic.getTitle();
     }
 
-    public VoteResultNoticeResponse(Boolean checked, Long topicId, String topicTitle) {
+    public VoteResultNoticeMessage(Boolean checked, Long topicId, String topicTitle) {
         super(VOTE_RESULT_NOTIFICATION, checked);
         this.topicId = topicId;
         this.topicTitle = topicTitle;

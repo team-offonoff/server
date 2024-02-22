@@ -34,4 +34,6 @@ public abstract class Notification extends BaseEntity {
     public void check() {
         this.checked = true;
     }
+
+    public abstract String getType();
 }

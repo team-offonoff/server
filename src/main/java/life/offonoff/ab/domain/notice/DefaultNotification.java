@@ -26,4 +26,9 @@ public class DefaultNotification extends Notification {
         this.title = title;
         this.content = content;
     }
+
+    @Override
+    public String getType() {
+        return DEFAULT;
+    }
 }
