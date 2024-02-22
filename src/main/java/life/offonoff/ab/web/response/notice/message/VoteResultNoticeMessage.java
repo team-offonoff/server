@@ -1,31 +1,26 @@
-package life.offonoff.ab.web.response.notice;
+package life.offonoff.ab.web.response.notice.message;
 
 import life.offonoff.ab.domain.notice.VoteResultNotification;
-import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VoteResult;
 import lombok.Getter;
 
-import static life.offonoff.ab.domain.notice.NotificationType.VOTE_RESULT_NOTIFICATION;
+import static life.offonoff.ab.web.response.notice.message.NoticeMessageTemplate.VOTE_RESULT_TITLE;
 
 @Getter
-public class VoteResultNoticeMessage extends NoticeResponse {
+public class VoteResultNoticeMessage extends NoticeMessage {
 
     private Long topicId;
-    private String topicTitle;
 
-    public VoteResultNoticeMessage(VoteResultNotification notification) {
-        super(VOTE_RESULT_NOTIFICATION, notification.getChecked());
-
-        VoteResult voteResult = notification.getVoteResult();
-        Topic topic = voteResult.getTopic();
-
-        this.topicId = topic.getId();
-        this.topicTitle = topic.getTitle();
+    public VoteResultNoticeMessage(String content, Long topicId) {
+        super(VOTE_RESULT_TITLE, content);
+        this.topicId = topicId;
     }
 
-    public VoteResultNoticeMessage(Boolean checked, Long topicId, String topicTitle) {
-        super(VOTE_RESULT_NOTIFICATION, checked);
-        this.topicId = topicId;
-        this.topicTitle = topicTitle;
+    public VoteResultNoticeMessage(VoteResultNotification notification) {
+        super(VOTE_RESULT_TITLE, notification.getVoteResult()
+                                             .getTopic()
+                                             .getTitle());
+        this.topicId = notification.getVoteResult()
+                                   .getTopic()
+                                   .getId();
     }
 }

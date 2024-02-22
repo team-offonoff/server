@@ -1,4 +1,4 @@
-package life.offonoff.ab.web.response.notice;
+package life.offonoff.ab.web.response.notice.message;
 
 import life.offonoff.ab.domain.notice.VoteCountOnTopicNotification;
 import life.offonoff.ab.domain.topic.Topic;
@@ -13,22 +13,17 @@ import static life.offonoff.ab.web.response.notice.message.NoticeMessageTemplate
 public class VoteCountOnTopicNoticeMessage extends NoticeMessage {
 
     private Long topicId;
-    private String topicTitle;
-    private int totalVoteCount;
 
-    public VoteCountOnTopicNoticeMessage(VoteCountOnTopicNotification notification) {
-        Topic topic = notification.getTopic();
-        this.topicId = topic.getId();
-        this.topicTitle = topic.getTitle();
-
-        this.totalVoteCount = notification.getTotalVoteCount();
-        super(VOTE_COUNT_ON_TOPIC_TITLE, );
+    public VoteCountOnTopicNoticeMessage(String title, String content, Long topicId) {
+        super(title, content);
+        this.topicId = topicId;
     }
 
-    public VoteCountOnTopicNoticeMessage(Boolean checked, Long topicId, String topicTitle, int totalVoteCount) {
-        super(VOTE_COUNT_ON_TOPIC_NOTIFICATION, checked);
-        this.topicId = topicId;
-        this.topicTitle = topicTitle;
-        this.totalVoteCount = totalVoteCount;
+    public VoteCountOnTopicNoticeMessage(VoteCountOnTopicNotification notification) {
+        super(VOTE_COUNT_ON_TOPIC_TITLE.formatted(notification.getTopic().getVoteCount()),
+                notification.getTopic().getTitle());
+
+        this.topicId = notification.getTopic()
+                                   .getId();
     }
 }
