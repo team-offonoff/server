@@ -5,7 +5,7 @@ import life.offonoff.ab.domain.notification.DefaultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
-import life.offonoff.ab.repository.notice.NotificationRepository;
+import life.offonoff.ab.repository.notfication.NotificationRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

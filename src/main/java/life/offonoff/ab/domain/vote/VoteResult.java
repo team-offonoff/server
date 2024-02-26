@@ -2,9 +2,14 @@ package life.offonoff.ab.domain.vote;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
+import life.offonoff.ab.domain.notification.Notification;
+import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -14,7 +19,8 @@ public class VoteResult extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 
     private int totalVoteCount;

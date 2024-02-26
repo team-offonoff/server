@@ -6,6 +6,7 @@ import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
+import life.offonoff.ab.exception.IllegalAuthorException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

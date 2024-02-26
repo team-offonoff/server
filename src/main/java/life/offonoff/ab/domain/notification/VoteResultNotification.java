@@ -16,6 +16,7 @@ import static life.offonoff.ab.domain.notification.NotificationType.*;
 public class VoteResultNotification extends Notification {
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "vote_result_id")
     private VoteResult voteResult;
 
     public VoteResultNotification(Member member, VoteResult voteResult) {
