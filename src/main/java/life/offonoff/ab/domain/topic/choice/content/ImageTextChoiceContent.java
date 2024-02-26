@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue(ChoiceContentType.IMAGE_WITH_TEXT_CHOICE_CONTENT)
 public class ImageTextChoiceContent extends ChoiceContent {
     private String imageUrl;
-    @Column(length = 40)
+    @Column(length = 255)
     private String text;
 
     public ImageTextChoiceContent(String imageUrl, String text) {
