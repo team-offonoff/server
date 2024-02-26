@@ -1,4 +1,4 @@
-package life.offonoff.ab.repository.notice;
+package life.offonoff.ab.repository.notfication;
 
 import life.offonoff.ab.domain.notification.VoteResultNotification;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +10,10 @@ import java.util.List;
 @Repository
 public class NotificationRepositoryImpl implements NotificationRepositoryCustom {
 
-    private final NotificationJdbcRepository notificationJdbcRepository;
+    private final NotificationJdbcRepositoryImpl notificationJdbcRepository;
 
     @Override
     public void saveAll(List<VoteResultNotification> notifications) {
-        notificationJdbcRepository.batchInsertVoteResultNotifications(notifications);
+        notificationJdbcRepository.saveVoteResultNotificationsInBatch(notifications);
     }
 }
