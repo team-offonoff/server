@@ -6,7 +6,7 @@ import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTop
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.repository.member.MemberRepository;
-import life.offonoff.ab.repository.notice.NotificationRepository;
+import life.offonoff.ab.repository.notfication.NotificationRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package life.offonoff.ab.repository.notice;
+package life.offonoff.ab.repository.notfication;
 
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.configuration.TestJPAConfig;

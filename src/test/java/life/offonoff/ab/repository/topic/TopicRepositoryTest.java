@@ -9,6 +9,7 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
+import life.offonoff.ab.domain.vote.VoteResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -289,6 +290,34 @@ class TopicRepositoryTest {
 
         // then
         assertThat(topics.getContent()).containsExactly(topic);
+    }
+
+    @Test
+    void delete_topic() {
+        // given
+        Member author = TestMember.builder()
+                .build().buildMember();
+        em.persist(author);
+
+        Topic topic = TestTopic.builder()
+                .author(author)
+                .side(TopicSide.TOPIC_B)
+                .build().buildTopic();
+
+        topicRepository.save(topic);
+
+        VoteResult voteResult = new VoteResult();
+        voteResult.setTopic(topic);
+        em.persist(voteResult);
+
+        // when
+        topicRepository.delete(topic);
+
+        // then
+        assertAll(
+                () -> assertThat(topicRepository.findById(topic.getId())).isEmpty(),
+                () -> assertThat(em.find(VoteResult.class, voteResult.getId())).isNull()
+        );
     }
 
     Pageable createVoteCountDescPageable(int page, int size) {

@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.comment;
+package life.offonoff.ab.exception;
 
 import life.offonoff.ab.exception.AbCode;
 import life.offonoff.ab.exception.IllegalArgumentException;

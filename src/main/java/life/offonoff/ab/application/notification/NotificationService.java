@@ -6,7 +6,7 @@ import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
-import life.offonoff.ab.repository.notice.NotificationRepository;
+import life.offonoff.ab.repository.notfication.NotificationRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class NotificationService {
         // author's notification
         addAuthorsNotificationIfAuthorListeningVoteResult(result, notifications);
 
-        notificationRepository.saveAll(notifications);
+        notificationRepository.saveVoteResultNotificationsInBatch(notifications);
     }
 
     private List<VoteResultNotification> createVotersNotifications(VoteResult result, List<Member> voters) {
@@ -89,6 +89,11 @@ public class NotificationService {
     public boolean shouldNoticeVoteCountForTopic(Topic topic) {
         // TODO : 투표 취소 후 다시 100단위를 넘었을 때 중복 알림 처리 && 추상화
         return topic.getVoteCount() % voteCountUnit == 0;
+    }
+
+    @Transactional
+    public void removeAllByTopicId(Long topicId) {
+        notificationRepository.deleteAllByTopicId(topicId);
     }
 }
 

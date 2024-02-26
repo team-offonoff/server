@@ -1,4 +1,4 @@
-package life.offonoff.ab.repository.notice;
+package life.offonoff.ab.repository.notfication;
 
 import life.offonoff.ab.domain.notification.VoteResultNotification;
 

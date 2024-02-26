@@ -2,6 +2,7 @@ package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.report.TopicReportEvent;
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
+import life.offonoff.ab.application.event.topic.TopicDeleteEvent;
 import life.offonoff.ab.application.event.topic.VotedEvent;
 import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
@@ -97,6 +98,12 @@ public class TopicService {
 
         checkMemberCanTouchTopic(member, topic);
 
+        deleteTopic(topic);
+    }
+
+    private void deleteTopic(Topic topic) {
+        eventPublisher.publishEvent(new TopicDeleteEvent(topic));
+
         topicRepository.delete(topic);
     }
 
@@ -140,15 +147,16 @@ public class TopicService {
      * @param pageable
      * @return
      */
-    public Slice<TopicResponse> findAll(final Long memberId, final TopicSearchRequest request, final Pageable pageable) {
+    public Slice<TopicResponse> findAll(final Long retrieverId, final TopicSearchRequest request, final Pageable pageable) {
 
-        Slice<Topic> topics = topicRepository.findAll(memberId, request, pageable);
+        Slice<Topic> topics = topicRepository.findAll(retrieverId, request, pageable);
 
-        if (memberId == null) {
+        if (retrieverId == null) {
             return topics.map(TopicResponse::from);
         }
 
-        return topics.map(topic -> TopicResponse.from(topic, findMember(memberId)));
+        Member retriever = findMember(retrieverId);
+        return topics.map(topic -> TopicResponse.from(topic, retriever));
     }
 
     public TopicResponse findById(Long memberId, Long topicId) {

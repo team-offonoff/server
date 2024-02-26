@@ -58,8 +58,7 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TopicReport> reports = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "vote_result_id")
+    @OneToOne(mappedBy = "topic", cascade = CascadeType.ALL)
     private VoteResult voteResult;
 
     @Enumerated(EnumType.STRING)
