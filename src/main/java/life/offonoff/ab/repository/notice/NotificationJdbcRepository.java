@@ -1,6 +1,6 @@
 package life.offonoff.ab.repository.notice;
 
-import life.offonoff.ab.domain.notice.VoteResultNotification;
+import life.offonoff.ab.domain.notification.VoteResultNotification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static life.offonoff.ab.domain.notice.NotificationType.*;
+import static life.offonoff.ab.domain.notification.NotificationType.*;
 
 @Repository
 public class NotificationJdbcRepository {

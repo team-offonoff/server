@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.notice;
+package life.offonoff.ab.domain.notification;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
@@ -34,4 +34,6 @@ public abstract class Notification extends BaseEntity {
     public void check() {
         this.checked = true;
     }
+
+    public abstract String getType();
 }

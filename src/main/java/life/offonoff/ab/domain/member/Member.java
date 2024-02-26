@@ -5,7 +5,7 @@ import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.comment.HatedComment;
 import life.offonoff.ab.domain.comment.LikedComment;
-import life.offonoff.ab.domain.notice.Notification;
+import life.offonoff.ab.domain.notification.Notification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;

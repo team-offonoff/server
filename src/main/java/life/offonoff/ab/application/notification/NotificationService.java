@@ -1,16 +1,16 @@
-package life.offonoff.ab.application.notice;
+package life.offonoff.ab.application.notification;
 
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.notice.VoteCountOnTopicNotification;
-import life.offonoff.ab.domain.notice.VoteResultNotification;
+import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
+import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notice.NotificationRepository;
-import life.offonoff.ab.web.response.notice.NoticeResponse;
-import life.offonoff.ab.web.response.notice.NoticeResponseFactory;
+import life.offonoff.ab.web.response.notification.NotificationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +20,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NoticeService {
+public class NotificationService {
 
-    public static final int VOTE_COUNT_MODULO = 100;
+    @Value("${ab.notification.vote_on_topic.count_unit}")
+    public int voteCountUnit;
 
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
@@ -77,17 +78,17 @@ public class NoticeService {
         notificationRepository.save(notification);
     }
 
-    public List<NoticeResponse> findAllByReceiverId(Long memberId) {
+    public List<NotificationResponse> findAllByReceiverId(Long memberId) {
 
         return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId)
                                      .stream()
-                                     .map(NoticeResponseFactory::createNoticeResponse)
+                                     .map(NotificationResponse::new)
                                      .toList();
     }
 
     public boolean shouldNoticeVoteCountForTopic(Topic topic) {
         // TODO : 투표 취소 후 다시 100단위를 넘었을 때 중복 알림 처리 && 추상화
-        return topic.getVoteCount() % VOTE_COUNT_MODULO == 0;
+        return topic.getVoteCount() % voteCountUnit == 0;
     }
 }
 
