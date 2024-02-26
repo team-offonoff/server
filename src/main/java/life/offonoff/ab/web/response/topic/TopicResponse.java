@@ -39,6 +39,7 @@ public class TopicResponse {
         this.topicSide = topic.getSide();
         this.topicTitle = topic.getTitle();
         this.deadline = topic.getDeadlineSecond();
+        this.commentCount = topic.getCommentCount();
         this.voteCount = topic.getVoteCount();
         this.topicContent = TopicContentResponseFactory.create(topic.getContent());
         this.keyword = KeywordResponse.from(topic.getKeyword());
