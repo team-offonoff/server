@@ -147,15 +147,16 @@ public class TopicService {
      * @param pageable
      * @return
      */
-    public Slice<TopicResponse> findAll(final Long memberId, final TopicSearchRequest request, final Pageable pageable) {
+    public Slice<TopicResponse> findAll(final Long retrieverId, final TopicSearchRequest request, final Pageable pageable) {
 
-        Slice<Topic> topics = topicRepository.findAll(memberId, request, pageable);
+        Slice<Topic> topics = topicRepository.findAll(retrieverId, request, pageable);
 
-        if (memberId == null) {
+        if (retrieverId == null) {
             return topics.map(TopicResponse::from);
         }
 
-        return topics.map(topic -> TopicResponse.from(topic, findMember(memberId)));
+        Member retriever = findMember(retrieverId);
+        return topics.map(topic -> TopicResponse.from(topic, retriever));
     }
 
     //== Hide ==//
