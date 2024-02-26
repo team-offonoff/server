@@ -1,21 +1,21 @@
-package life.offonoff.ab.web.response.notice.message;
+package life.offonoff.ab.web.response.notification.message;
 
-import life.offonoff.ab.domain.notice.VoteResultNotification;
+import life.offonoff.ab.domain.notification.VoteResultNotification;
 import lombok.Getter;
 
-import static life.offonoff.ab.web.response.notice.message.NoticeMessageTemplate.VOTE_RESULT_TITLE;
+import static life.offonoff.ab.web.response.notification.message.NotificationMessageTemplate.VOTE_RESULT_TITLE;
 
 @Getter
-public class VoteResultNoticeMessage extends NoticeMessage {
+public class VoteResultNotificationMessage extends NotificationMessage {
 
     private Long topicId;
 
-    public VoteResultNoticeMessage(String content, Long topicId) {
+    public VoteResultNotificationMessage(String content, Long topicId) {
         super(VOTE_RESULT_TITLE, content);
         this.topicId = topicId;
     }
 
-    public VoteResultNoticeMessage(VoteResultNotification notification) {
+    public VoteResultNotificationMessage(VoteResultNotification notification) {
         super(VOTE_RESULT_TITLE, notification.getVoteResult()
                                              .getTopic()
                                              .getTitle());

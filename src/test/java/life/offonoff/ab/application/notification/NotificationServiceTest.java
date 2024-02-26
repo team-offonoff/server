@@ -1,12 +1,12 @@
-package life.offonoff.ab.application.notice;
+package life.offonoff.ab.application.notification;
 
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.notice.DefaultNotification;
+import life.offonoff.ab.domain.notification.DefaultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notice.NotificationRepository;
-import life.offonoff.ab.web.response.notice.NoticeResponse;
+import life.offonoff.ab.web.response.notification.NotificationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,10 +22,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NoticeServiceTest {
+class NotificationServiceTest {
 
     @InjectMocks
-    NoticeService noticeService;
+    NotificationService notificationService;
     @Mock
     MemberRepository memberRepository;
     @Mock
@@ -52,7 +52,7 @@ class NoticeServiceTest {
         when(memberRepository.findAllListeningVoteResultAndVotedTopicId(anyLong())).thenReturn(voteMembers);
 
         // when
-        noticeService.noticeVoteResult(result);
+        notificationService.noticeVoteResult(result);
 
         // then
         assertThat(voter.getNotifications().size()).isGreaterThan(0);
@@ -78,7 +78,7 @@ class NoticeServiceTest {
         when(memberRepository.findAllListeningVoteResultAndVotedTopicId(anyLong())).thenReturn(Collections.emptyList());
 
         // when
-        noticeService.noticeVoteResult(result);
+        notificationService.noticeVoteResult(result);
 
         // then
         assertThat(author.getNotifications().size()).isGreaterThan(0);
@@ -96,7 +96,7 @@ class NoticeServiceTest {
                 .thenReturn(List.of(notification));
 
         // when
-        List<NoticeResponse> responses = noticeService.findAllByReceiverId(receiver.getId());
+        List<NotificationResponse> responses = notificationService.findAllByReceiverId(receiver.getId());
 
         // then
         assertThat(responses.size()).isGreaterThan(0);

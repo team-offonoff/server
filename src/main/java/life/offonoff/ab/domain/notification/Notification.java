@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.notice;
+package life.offonoff.ab.domain.notification;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;

@@ -1,8 +1,7 @@
 package life.offonoff.ab.application.service.event.topic;
 
 import life.offonoff.ab.application.event.topic.*;
-import life.offonoff.ab.application.notice.NoticeService;
-import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
@@ -22,7 +21,7 @@ class TopicEventHandlerTest {
     @Autowired
     private TopicEventHandler topicEventHandler;
     @MockBean
-    private NoticeService noticeService;
+    private NotificationService notificationService;
 
     @Test
     @DisplayName("Voting End 시에 Notice Service 호출")
@@ -34,13 +33,13 @@ class TopicEventHandlerTest {
         VoteResult result = new VoteResult();
         result.setTopic(topic);
 
-        doNothing().when(noticeService).noticeVoteResult(any(VoteResult.class));
+        doNothing().when(notificationService).noticeVoteResult(any(VoteResult.class));
 
         // when
         topicEventHandler.voteClosed(new VoteClosedEvent(topic, result));
 
         // then
-        verify(noticeService).noticeVoteResult(any(VoteResult.class));
+        verify(notificationService).noticeVoteResult(any(VoteResult.class));
     }
 
     @Test
@@ -49,13 +48,13 @@ class TopicEventHandlerTest {
         // given
         Vote vote = createVote(ChoiceOption.CHOICE_A);
 
-        when(noticeService.shouldNoticeVoteCountForTopic(any()))
+        when(notificationService.shouldNoticeVoteCountForTopic(any()))
                 .thenReturn(true);
 
         // when
         topicEventHandler.voted(new VotedEvent(vote));
 
         // then
-        verify(noticeService).noticeVoteCountOnTopic(any());
+        verify(notificationService).noticeVoteCountOnTopic(any());
     }
 }

@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.notice;
+package life.offonoff.ab.domain.notification;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.member.Member;
@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static life.offonoff.ab.domain.notice.NotificationType.*;
+import static life.offonoff.ab.domain.notification.NotificationType.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

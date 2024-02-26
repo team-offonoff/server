@@ -1,11 +1,11 @@
-package life.offonoff.ab.application.notice;
+package life.offonoff.ab.application.notification;
 
 import jakarta.persistence.EntityManager;
 import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.web.response.notice.NoticeResponse;
-import life.offonoff.ab.web.response.notice.message.VoteCountOnTopicNoticeMessage;
+import life.offonoff.ab.web.response.notification.NotificationResponse;
+import life.offonoff.ab.web.response.notification.message.VoteCountOnTopicNotificationMessage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 @DisplayName("NoticeService 스프링 컨테이너 통합테스트")
-public class NoticeServiceIntegrationTest {
+public class NotificationServiceIntegrationTest {
 
     @Autowired
-    NoticeService noticeService;
+    NotificationService notificationService;
     @Value("${ab.notification.vote_on_topic.count_unit}")
     int voteCountUnit;
 
@@ -42,7 +42,7 @@ public class NoticeServiceIntegrationTest {
                 .build().buildTopic();
 
         // when
-        boolean shouldNotice = noticeService.shouldNoticeVoteCountForTopic(topic);
+        boolean shouldNotice = notificationService.shouldNoticeVoteCountForTopic(topic);
 
         // then
         assertThat(shouldNotice).isTrue();
@@ -61,12 +61,12 @@ public class NoticeServiceIntegrationTest {
                 .build().buildTopic();
         em.persist(topic);
 
-        noticeService.noticeVoteCountOnTopic(topic);
+        notificationService.noticeVoteCountOnTopic(topic);
 
         // when
-        List<NoticeResponse> responses = noticeService.findAllByReceiverId(author.getId());
+        List<NotificationResponse> responses = notificationService.findAllByReceiverId(author.getId());
 
         // then
-        assertThat(responses.get(0).getMessage()).isInstanceOf(VoteCountOnTopicNoticeMessage.class);
+        assertThat(responses.get(0).getMessage()).isInstanceOf(VoteCountOnTopicNotificationMessage.class);
     }
 }

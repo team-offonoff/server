@@ -1,4 +1,4 @@
-package life.offonoff.ab.domain.notice;
+package life.offonoff.ab.domain.notification;
 
 public class NotificationType {
     public static final String DEFAULT = "DEFAULT";

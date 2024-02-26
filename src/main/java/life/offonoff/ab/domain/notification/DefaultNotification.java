@@ -1,15 +1,13 @@
-package life.offonoff.ab.domain.notice;
+package life.offonoff.ab.domain.notification;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.topic.Topic;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static life.offonoff.ab.domain.notice.NotificationType.DEFAULT;
-import static life.offonoff.ab.domain.notice.NotificationType.VOTE_COUNT_ON_TOPIC_NOTIFICATION;
+import static life.offonoff.ab.domain.notification.NotificationType.DEFAULT;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

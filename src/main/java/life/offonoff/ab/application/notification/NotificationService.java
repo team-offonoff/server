@@ -1,15 +1,13 @@
-package life.offonoff.ab.application.notice;
+package life.offonoff.ab.application.notification;
 
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.notice.VoteCountOnTopicNotification;
-import life.offonoff.ab.domain.notice.VoteResultNotification;
+import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
+import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notice.NotificationRepository;
-import life.offonoff.ab.web.response.notice.NoticeResponse;
-import life.offonoff.ab.web.response.notice.message.NoticeMessage;
-import life.offonoff.ab.web.response.notice.message.NoticeMessageFactory;
+import life.offonoff.ab.web.response.notification.NotificationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NoticeService {
+public class NotificationService {
 
     @Value("${ab.notification.vote_on_topic.count_unit}")
     public int voteCountUnit;
@@ -80,11 +78,11 @@ public class NoticeService {
         notificationRepository.save(notification);
     }
 
-    public List<NoticeResponse> findAllByReceiverId(Long memberId) {
+    public List<NotificationResponse> findAllByReceiverId(Long memberId) {
 
         return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId)
                                      .stream()
-                                     .map(NoticeResponse::new)
+                                     .map(NotificationResponse::new)
                                      .toList();
     }
 

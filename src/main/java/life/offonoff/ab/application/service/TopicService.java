@@ -171,8 +171,8 @@ public class TopicService {
     private void cancelHide(final Member member, final Topic topic) {
         member.cancelHideIfExists(topic);
     }
-
     //== Vote ==//
+
     @Transactional
     public VoteResponse voteForTopicByMember(final Long topicId, final Long memberId, final VoteRequest request) {
         Member member = findMember(memberId);

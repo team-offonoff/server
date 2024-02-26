@@ -1,6 +1,6 @@
 package life.offonoff.ab.application.event.topic;
 
-import life.offonoff.ab.application.notice.NoticeService;
+import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.application.service.vote.VotingTopicService;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.domain.topic.Topic;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class TopicEventHandler {
 
     private final VotingTopicService votingTopicService;
-    private final NoticeService noticeService;
+    private final NotificationService notificationService;
 
     /**
      * 투표 생성 이벤트 -> VotingTopicContainer에서 관리 추가
@@ -42,7 +42,7 @@ public class TopicEventHandler {
     public void voteClosed(VoteClosedEvent event) {
         log.info("# Topic Vote Closed / topic-id : {}, deadline : {}", event.topic().getId(), event.topic().getDeadline());
 
-        noticeService.noticeVoteResult(event.result());
+        notificationService.noticeVoteResult(event.result());
     }
 
     /**
@@ -53,8 +53,8 @@ public class TopicEventHandler {
         Topic topic = event.getVote()
                            .getTopic();
 
-        if (noticeService.shouldNoticeVoteCountForTopic(topic)) {
-            noticeService.noticeVoteCountOnTopic(topic);
+        if (notificationService.shouldNoticeVoteCountForTopic(topic)) {
+            notificationService.noticeVoteCountOnTopic(topic);
         }
     }
 }
