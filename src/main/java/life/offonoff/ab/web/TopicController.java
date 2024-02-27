@@ -54,6 +54,15 @@ public class TopicController {
         return ResponseEntity.ok(PageResponse.of(topicService.findAll(memberId, request, pageable)));
     }
 
+    /**
+     * 단 건 Topic 조회
+     */
+    @GetMapping("/{topicId}")
+    public ResponseEntity<TopicResponse> getTopic(@Authorized(nullable = true) Long memberId,
+                                                  @PathVariable Long topicId) {
+        return ResponseEntity.ok(topicService.findById(memberId, topicId));
+    }
+
     @PatchMapping("/{topicId}/hide")
     public ResponseEntity<Void> hideTopic(
             @Authorized Long memberId,

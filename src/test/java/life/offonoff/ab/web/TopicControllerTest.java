@@ -16,20 +16,19 @@ import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
+import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ImageTextChoiceContent;
-import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.*;
 import life.offonoff.ab.repository.pagination.PagingUtil;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
-import life.offonoff.ab.web.response.topic.choice.ChoiceResponseWithCount;
 import life.offonoff.ab.web.response.CommentResponse;
 import life.offonoff.ab.web.response.VoteResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
-import life.offonoff.ab.web.response.topic.choice.ChoiceResponsesFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -44,7 +43,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -106,7 +104,7 @@ public class TopicControllerTest extends RestDocsTest {
                 .thenReturn(topicResponseSlice);
 
         mvc.perform(
-                        get(TopicUri.RETRIEVE)
+                        get(TopicUri.RETRIEVE_PAGE)
                                 .header("AUTHORIZATION", "Bearer ACCESS_TOKEN"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(queryParameters(
@@ -126,7 +124,7 @@ public class TopicControllerTest extends RestDocsTest {
                 .thenReturn(topicSlice);
 
         mvc.perform(
-                get(TopicUri.RETRIEVE)
+                get(TopicUri.RETRIEVE_PAGE)
                         .header("AUTHORIZATION", "Bearer ACCESS_TOKEN")
                         .param("keyword_id", String.valueOf(1L)))
                         .andExpect(status().isOk());
@@ -141,7 +139,7 @@ public class TopicControllerTest extends RestDocsTest {
         when(topicService.findAll(isNull(Long.class), any(TopicSearchRequest.class), any(Pageable.class)))
                 .thenReturn(topicResponseSlice);
 
-        mvc.perform(get(TopicUri.RETRIEVE)
+        mvc.perform(get(TopicUri.RETRIEVE_PAGE)
                 .header("side", TopicSide.TOPIC_A))
                 .andExpect(status().isOk());
     }
@@ -155,7 +153,7 @@ public class TopicControllerTest extends RestDocsTest {
                 .thenReturn(topicResponseSlice);
 
         mvc.perform(
-                        get(TopicUri.RETRIEVE)
+                        get(TopicUri.RETRIEVE_PAGE)
                                 .header("AUTHORIZATION", "Bearer ACCESS_TOKEN")
                                 .param("status", String.valueOf(CLOSED)))
                 .andExpect(status().isOk());
@@ -490,12 +488,48 @@ public class TopicControllerTest extends RestDocsTest {
                 pageable);
     }
 
+    @Test
+    void get_single_topic() throws Exception {
+        // create author
+        Member author = TestMember.builder()
+                .id(1L)
+                .nickname("nicknameA")
+                .build().buildMember();
 
+        // create keyword
+        Keyword keyword = TestKeyword.builder()
+                .id(1L)
+                .name("key")
+                .build().buildKeyword();
+
+        // create Topic
+        Topic topic = TestTopic.builder()
+                .id(1L)
+                .title("title" + 1L)
+                .side(TopicSide.TOPIC_B)
+                .author(author)
+                .keyword(keyword)
+                .voteCount(1000)
+                .status(TopicStatus.VOTING)
+                .build().buildTopic();
+
+        when(topicService.findById(any(), any()))
+                .thenReturn(TopicResponse.from(topic, author));
+
+        mvc.perform(get(TopicUri.RETRIEVE, topic.getId())
+                        .header("AUTHORIZATION", "Bearer ACCESS_TOKEN"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.topicId").value(topic.getId()))
+                .andDo(print());
+
+    }
     private static class TopicUri {
         private static final String BASE = "/topics";
         private static final String INFO = "/info";
-        private static final String RETRIEVE = BASE + INFO;
-        private static final String RETRIEVE_IN_STATUS = BASE + INFO + "?status={}";
+        private static final String GET = "/{topicId}";
+        private static final String RETRIEVE = BASE + GET;
+        private static final String RETRIEVE_PAGE = BASE + INFO;
+        private static final String RETRIEVE_PAGE_IN_STATUS = BASE + INFO + "?status={}";
         private static final String REPORT = BASE + "/{topicId}/report";
         private static final String STATUS = BASE + "/{topicId}/status?active={active}";
         private static final String VOTE = BASE + "/{topicId}/vote";

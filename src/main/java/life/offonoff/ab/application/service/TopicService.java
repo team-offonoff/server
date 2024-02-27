@@ -159,6 +159,13 @@ public class TopicService {
         return topics.map(topic -> TopicResponse.from(topic, retriever));
     }
 
+    public TopicResponse findById(Long memberId, Long topicId) {
+        Member retriever = findMember(memberId);
+        Topic topic = findTopic(topicId);
+
+        return TopicResponse.from(topic, retriever);
+    }
+
     //== Hide ==//
     @Transactional
     public void hideTopicForMember(final Long memberId, final Long topicId, final Boolean hide) {
@@ -179,8 +186,8 @@ public class TopicService {
     private void cancelHide(final Member member, final Topic topic) {
         member.cancelHideIfExists(topic);
     }
-    //== Vote ==//
 
+    //== Vote ==//
     @Transactional
     public VoteResponse voteForTopicByMember(final Long topicId, final Long memberId, final VoteRequest request) {
         Member member = findMember(memberId);
