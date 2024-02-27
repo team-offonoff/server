@@ -9,6 +9,8 @@ import life.offonoff.ab.domain.topic.Topic;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import static life.offonoff.ab.domain.notification.NotificationType.VOTE_COUNT_ON_TOPIC_NOTIFICATION;
 
@@ -19,6 +21,7 @@ import static life.offonoff.ab.domain.notification.NotificationType.VOTE_COUNT_O
 public class VoteCountOnTopicNotification extends Notification {
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Topic topic;
     private int totalVoteCount;
 

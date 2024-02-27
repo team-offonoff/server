@@ -90,10 +90,5 @@ public class NotificationService {
         // TODO : 투표 취소 후 다시 100단위를 넘었을 때 중복 알림 처리 && 추상화
         return topic.getVoteCount() % voteCountUnit == 0;
     }
-
-    @Transactional
-    public void removeAllByTopicId(Long topicId) {
-        notificationRepository.deleteAllByTopicId(topicId);
-    }
 }
 

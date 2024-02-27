@@ -36,16 +36,6 @@ public class TopicEventHandler {
     }
 
     /**
-     * 투표 생성 이벤트 -> VotingTopicContainer에서 관리 추가
-     */
-    @EventListener
-    public void removeTopic(TopicDeleteEvent event) {
-        log.info("# Topic Delete / topic-id : {}, deadline : {}", event.getTopic().getId(), event.getTopic().getDeadline());
-
-        notificationService.removeAllByTopicId(event.getTopic().getId());
-    }
-
-    /**
      * 투표 종료 이벤트 -> 투표 결과 만들어서 NoticeService로 공지
      */
     @EventListener
