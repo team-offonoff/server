@@ -2,7 +2,6 @@ package life.offonoff.ab.application.service;
 
 import life.offonoff.ab.application.event.report.TopicReportEvent;
 import life.offonoff.ab.application.event.topic.TopicCreateEvent;
-import life.offonoff.ab.application.event.topic.TopicDeleteEvent;
 import life.offonoff.ab.application.event.topic.VotedEvent;
 import life.offonoff.ab.application.service.request.*;
 import life.offonoff.ab.domain.keyword.Keyword;
@@ -102,8 +101,6 @@ public class TopicService {
     }
 
     private void deleteTopic(Topic topic) {
-        eventPublisher.publishEvent(new TopicDeleteEvent(topic));
-
         topicRepository.delete(topic);
     }
 

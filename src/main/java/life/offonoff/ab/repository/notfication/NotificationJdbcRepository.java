@@ -7,6 +7,4 @@ import java.util.List;
 public interface NotificationJdbcRepository {
 
     void saveVoteResultNotificationsInBatch(List<VoteResultNotification> notifications);
-
-    void deleteAllByTopicId(Long topicId);
 }

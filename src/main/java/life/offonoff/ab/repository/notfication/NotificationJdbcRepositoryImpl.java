@@ -40,12 +40,4 @@ public class NotificationJdbcRepositoryImpl implements NotificationJdbcRepositor
                                      pstmt.setTimestamp(6, curTimeStamp);
                                  });
     }
-
-    @Override
-    public void deleteAllByTopicId(Long topicId) {
-        String query = "delete from notification where topic_id = ?";
-
-        jdbcTemplate.update(query, topicId);
-    }
-
 }

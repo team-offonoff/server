@@ -6,6 +6,8 @@ import life.offonoff.ab.domain.vote.VoteResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import static life.offonoff.ab.domain.notification.NotificationType.*;
 
@@ -17,6 +19,7 @@ public class VoteResultNotification extends Notification {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vote_result_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private VoteResult voteResult;
 
     public VoteResultNotification(Member member, VoteResult voteResult) {
