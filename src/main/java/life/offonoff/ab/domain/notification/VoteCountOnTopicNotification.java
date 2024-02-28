@@ -25,8 +25,8 @@ public class VoteCountOnTopicNotification extends Notification {
     private Topic topic;
     private int totalVoteCount;
 
-    public VoteCountOnTopicNotification(Member receiver, Topic topic) {
-        super(receiver);
+    public VoteCountOnTopicNotification(Topic topic) {
+        super(topic.getAuthor());
 
         this.topic = topic;
         this.totalVoteCount = topic.getVoteCount();

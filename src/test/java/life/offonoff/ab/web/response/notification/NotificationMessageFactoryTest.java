@@ -18,9 +18,8 @@ class NotificationMessageFactoryTest {
     void create_NoticeMessage() {
         // given
         Topic topic = createRandomTopic();
-        Member member = createRandomMember();
 
-        VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(member, topic);
+        VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(topic);
 
         // when
         NotificationMessage notificationMessage = NotificationMessageFactory.createNoticeMessage(notification);
