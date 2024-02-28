@@ -1,9 +1,6 @@
 package life.offonoff.ab.web.response.notification.message;
 
-import life.offonoff.ab.domain.notification.DefaultNotification;
-import life.offonoff.ab.domain.notification.Notification;
-import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
-import life.offonoff.ab.domain.notification.VoteResultNotification;
+import life.offonoff.ab.domain.notification.*;
 
 public class NotificationMessageFactory {
 
@@ -18,6 +15,10 @@ public class NotificationMessageFactory {
 
         if (notification instanceof VoteCountOnTopicNotification) {
             return new VoteCountOnTopicNotificationMessage((VoteCountOnTopicNotification) notification);
+        }
+
+        if (notification instanceof CommentOnTopicNotification) {
+            return new CommentOnTopicNotificationMessage((CommentOnTopicNotification) notification);
         }
 
         throw new RuntimeException();
