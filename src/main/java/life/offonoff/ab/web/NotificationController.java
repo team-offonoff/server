@@ -22,4 +22,9 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponse>> getNotifications(@Authorized Long memberId) {
         return ResponseEntity.ok(notificationService.findAllByReceiverId(memberId));
     }
+
+    @GetMapping("/counts/unchecked")
+    public ResponseEntity<Integer> getNotificationCounts(@Authorized Long memberId) {
+        return ResponseEntity.ok(notificationService.countUncheckedByReceiverId(memberId));
+    }
 }
