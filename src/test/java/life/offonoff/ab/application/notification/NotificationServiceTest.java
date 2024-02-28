@@ -52,7 +52,7 @@ class NotificationServiceTest {
         when(memberRepository.findAllListeningVoteResultAndVotedTopicId(anyLong())).thenReturn(voteMembers);
 
         // when
-        notificationService.noticeVoteResult(result);
+        notificationService.notifyVoteResult(result);
 
         // then
         assertThat(voter.getNotifications().size()).isGreaterThan(0);
@@ -78,7 +78,7 @@ class NotificationServiceTest {
         when(memberRepository.findAllListeningVoteResultAndVotedTopicId(anyLong())).thenReturn(Collections.emptyList());
 
         // when
-        notificationService.noticeVoteResult(result);
+        notificationService.notifyVoteResult(result);
 
         // then
         assertThat(author.getNotifications().size()).isGreaterThan(0);
