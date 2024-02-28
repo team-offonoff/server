@@ -1,6 +1,8 @@
 package life.offonoff.ab.application.notification;
 
+import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
+import life.offonoff.ab.domain.notification.CommentOnTopicNotification;
 import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
 import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class NotificationService {
 
@@ -29,7 +32,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional
-    public void noticeVoteResult(VoteResult result) {
+    public void notifyVoteResult(VoteResult result) {
         // voters' notifications
         List<Member> voters = memberRepository.findAllListeningVoteResultAndVotedTopicId(result.getTopicId());
         List<VoteResultNotification> notifications = createVotersNotifications(result, voters);
@@ -42,6 +45,7 @@ public class NotificationService {
 
     private List<VoteResultNotification> createVotersNotifications(VoteResult result, List<Member> voters) {
         return voters.stream()
+                .filter(Member::listenVoteResult)
                 .map(receiver -> {
                             log.info("# Notification send / Topic(id = {}, total_vote_count = {}) Member(id = {})",
                                     result.getTopicId(), result.getTotalVoteCount(), receiver.getId());
@@ -61,21 +65,46 @@ public class NotificationService {
     }
 
     @Transactional
-    public void noticeLikeInComment() {
+    public void notifyLikeInComment() {
 
     }
 
     @Transactional
-    public void noticeCommentOnTopic() {
+    public void notifyCommentOnTopic(Comment comment) {
+        if (shouldNotifyCommentOnTopic(comment)) {
+            CommentOnTopicNotification notification = new CommentOnTopicNotification(comment);
 
+            notificationRepository.save(notification);
+        }
+    }
+
+    private boolean shouldNotifyCommentOnTopic(Comment comment) {
+        Member commenter = comment.getWriter();
+        Topic topic = comment.getTopic();
+
+        boolean commenterIsNotAuthor = !topic.isWrittenBy(commenter);
+        boolean authorListenCommentOnTopic = topic.getAuthor()
+                                                  .listenCommentOnTopic();
+
+        return commenterIsNotAuthor && authorListenCommentOnTopic;
     }
 
     @Transactional
-    public void noticeVoteCountOnTopic(Topic topic) {
-        Member author = topic.getAuthor();
-        VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(author, topic);
+    public void notifyVoteCountOnTopic(Topic topic) {
+        if (shouldNotifyVoteCountForTopic(topic)) {
+            VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(topic);
 
-        notificationRepository.save(notification);
+            notificationRepository.save(notification);
+        }
+    }
+
+    private boolean shouldNotifyVoteCountForTopic(Topic topic) {
+        // TODO : 투표 취소 후 다시 100단위를 넘었을 때 중복 알림 처리 && 추상화
+        boolean voteCountDividedByUnit = (topic.getVoteCount() % voteCountUnit) == 0;
+        boolean authorListenVoteCountOnTopic = topic.getAuthor()
+                                                    .listenVoteCountOnTopic();
+
+        return voteCountDividedByUnit && authorListenVoteCountOnTopic;
     }
 
     public List<NotificationResponse> findAllByReceiverId(Long memberId) {
@@ -86,9 +115,8 @@ public class NotificationService {
                                      .toList();
     }
 
-    public boolean shouldNoticeVoteCountForTopic(Topic topic) {
-        // TODO : 투표 취소 후 다시 100단위를 넘었을 때 중복 알림 처리 && 추상화
-        return topic.getVoteCount() % voteCountUnit == 0;
+    public Integer countUncheckedByReceiverId(Long memberId) {
+        return notificationRepository.countByCheckedFalseAndReceiverId(memberId);
     }
 }
 
