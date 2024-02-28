@@ -2,7 +2,6 @@ package life.offonoff.ab.domain.member;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -10,13 +9,13 @@ import lombok.NoArgsConstructor;
 public class NotificationEnabled {
     private boolean voteResult;
     private boolean likeInComment;
-    private boolean voteOnTopic;
+    private boolean voteCountOnTopic;
     private boolean commentOnTopic;
 
-    public NotificationEnabled(boolean voteResult, boolean likeInComment, boolean voteOnTopic, boolean commentOnTopic) {
+    public NotificationEnabled(boolean voteResult, boolean likeInComment, boolean voteCountOnTopic, boolean commentOnTopic) {
         this.voteResult = voteResult;
         this.likeInComment = likeInComment;
-        this.voteOnTopic = voteOnTopic;
+        this.voteCountOnTopic = voteCountOnTopic;
         this.commentOnTopic = commentOnTopic;
     }
 
@@ -32,8 +31,8 @@ public class NotificationEnabled {
         return this.likeInComment;
     }
 
-    public boolean listeningVoteOnTopic() {
-        return this.voteOnTopic;
+    public boolean listeningVoteCountOnTopic() {
+        return this.voteCountOnTopic;
     }
 
     public boolean listeningCommentOnTopic() {
