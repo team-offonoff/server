@@ -1,0 +1,9 @@
+== 8. 알림 API
+### 1.1. 알림 조회
+
+[source.html]
+GET /notifications
+
+OK
+
+operation::notification-controller-test/get_members_notifications[snippets="http-request,http-response"]

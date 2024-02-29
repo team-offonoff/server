@@ -275,6 +275,19 @@ public class Member extends BaseEntity {
     public boolean listenVoteResult() {
         return this.notificationEnabled.listeningVoteResult();
     }
+
+    public boolean listenVoteCountOnTopic() {
+        return this.notificationEnabled.listeningVoteCountOnTopic();
+    }
+
+    public boolean listenLikeInComment() {
+        return this.notificationEnabled.listeningLikeInComment();
+    }
+
+    public boolean listenCommentOnTopic() {
+        return this.notificationEnabled.listeningCommentOnTopic();
+    }
+
     public void removeProfileImageUrl() {
         this.profileImageUrl = null;
     }

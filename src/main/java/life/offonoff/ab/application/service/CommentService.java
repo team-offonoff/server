@@ -1,5 +1,6 @@
 package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.topic.CommentedEvent;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
@@ -15,6 +16,7 @@ import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final TopicRepository topicRepository;
     private final VoteRepository voteRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     //== find ==//
     public Comment findById(Long commentId) {
@@ -90,6 +94,8 @@ public class CommentService {
         Comment comment = createComment(memberId, request);
 
         commentRepository.save(comment);
+
+        eventPublisher.publishEvent(new CommentedEvent(comment));
 
         return CommentResponse.from(comment);
     }
@@ -175,7 +181,6 @@ public class CommentService {
         comment.remove();
         // 명시적 삭제
         commentRepository.delete(comment);
-        // commentRepository.deleteIfMemberCanTouchComment(memberId, commentId);
     }
 
     @Transactional

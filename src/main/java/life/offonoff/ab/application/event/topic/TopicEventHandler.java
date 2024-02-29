@@ -42,7 +42,7 @@ public class TopicEventHandler {
     public void voteClosed(VoteClosedEvent event) {
         log.info("# Topic Vote Closed / topic-id : {}, deadline : {}", event.topic().getId(), event.topic().getDeadline());
 
-        notificationService.noticeVoteResult(event.result());
+        notificationService.notifyVoteResult(event.result());
     }
 
     /**
@@ -53,8 +53,14 @@ public class TopicEventHandler {
         Topic topic = event.getVote()
                            .getTopic();
 
-        if (notificationService.shouldNoticeVoteCountForTopic(topic)) {
-            notificationService.noticeVoteCountOnTopic(topic);
-        }
+        notificationService.notifyVoteCountOnTopic(topic);
+    }
+
+    /**
+     * 댓글 이벤트
+     */
+    @EventListener
+    public void commented(CommentedEvent event) {
+        notificationService.notifyCommentOnTopic(event.getComment());
     }
 }
