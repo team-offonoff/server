@@ -6,7 +6,6 @@ import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicStatus;
-import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.repository.topic.TopicSearchCond;
 import lombok.RequiredArgsConstructor;
@@ -40,10 +39,9 @@ public class VotingTopicReadableService implements VotingTopicService {
         ended.forEach(
                 topic -> {
                     topic.closeVote();
-                    VoteResult result = aggregateVote(topic);
 
                     // 투표 종료 이벤트 발행
-                    eventPublisher.publishEvent(new VoteClosedEvent(topic, result));
+                    eventPublisher.publishEvent(new VoteClosedEvent(topic));
                 }
         );
     }

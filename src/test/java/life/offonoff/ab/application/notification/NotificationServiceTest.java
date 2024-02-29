@@ -3,7 +3,6 @@ package life.offonoff.ab.application.notification;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.notification.DefaultNotification;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notfication.NotificationRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
@@ -44,15 +43,12 @@ class NotificationServiceTest {
                 .voteCount(1000)
                 .build().buildTopic();
 
-        VoteResult result = new VoteResult();
-        result.setTopic(topic);
-
         List<Member> voteMembers = List.of(voter);
 
         when(memberRepository.findAllListeningVoteResultAndVotedTopicId(anyLong())).thenReturn(voteMembers);
 
         // when
-        notificationService.notifyVoteResult(result);
+        notificationService.notifyVoteResult(topic);
 
         // then
         assertThat(voter.getNotifications().size()).isGreaterThan(0);
@@ -72,13 +68,10 @@ class NotificationServiceTest {
                 .voteCount(1000)
                 .build().buildTopic();
 
-        VoteResult result = new VoteResult();
-        result.setTopic(topic);
-
         when(memberRepository.findAllListeningVoteResultAndVotedTopicId(anyLong())).thenReturn(Collections.emptyList());
 
         // when
-        notificationService.notifyVoteResult(result);
+        notificationService.notifyVoteResult(topic);
 
         // then
         assertThat(author.getNotifications().size()).isGreaterThan(0);

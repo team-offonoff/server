@@ -3,7 +3,6 @@ package life.offonoff.ab.application.service.event.topic;
 import life.offonoff.ab.application.event.topic.*;
 import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VoteResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +27,14 @@ class TopicEventHandlerTest {
         Topic topic = TestTopic.builder()
                 .id(1L)
                 .build().buildTopic();
-        VoteResult result = new VoteResult();
-        result.setTopic(topic);
 
-        doNothing().when(notificationService).notifyVoteResult(any(VoteResult.class));
+        doNothing().when(notificationService).notifyVoteResult(any());
 
         // when
-        topicEventHandler.voteClosed(new VoteClosedEvent(topic, result));
+        topicEventHandler.voteClosed(new VoteClosedEvent(topic));
 
         // then
-        verify(notificationService).notifyVoteResult(any(VoteResult.class));
+        verify(notificationService).notifyVoteResult(any());
     }
 
 }

@@ -25,8 +25,8 @@ public class NotificationJdbcRepositoryImpl implements NotificationJdbcRepositor
 
         Timestamp curTimeStamp = Timestamp.valueOf(LocalDateTime.now());
 
-        String query = "insert into notification (member_id, notification_type, topic_id, vote_result_id, created_at, updated_at)" +
-                "values (?, ?, ?, ?, ?, ?);";
+        String query = "insert into notification (member_id, notification_type, topic_id, created_at, updated_at)" +
+                "values (?, ?, ?, ?, ?);";
 
         jdbcTemplate.batchUpdate(query,
                                  notifications,
@@ -34,10 +34,9 @@ public class NotificationJdbcRepositoryImpl implements NotificationJdbcRepositor
                                  (pstmt, n) -> {
                                      pstmt.setLong(1, n.getReceiver().getId());
                                      pstmt.setString(2, VOTE_RESULT_NOTIFICATION);
-                                     pstmt.setLong(3, n.getVoteResult().getTopicId());
-                                     pstmt.setLong(4, n.getVoteResult().getId());
+                                     pstmt.setLong(3, n.getTopic().getId());
+                                     pstmt.setTimestamp(4, curTimeStamp);
                                      pstmt.setTimestamp(5, curTimeStamp);
-                                     pstmt.setTimestamp(6, curTimeStamp);
                                  });
     }
 }

@@ -62,10 +62,7 @@ public class VotingTopicContainerServiceIntegrationTest {
         votingTopicContainerService.endVote(criteria);
 
         // then
-        assertAll(
-                () -> assertThat(topic.getStatus()).isEqualTo(CLOSED),
-                () -> assertThat(topic.getVoteResult()).isNotNull()
-        );
+        assertThat(topic.getStatus()).isEqualTo(CLOSED);
     }
 
     @Test
