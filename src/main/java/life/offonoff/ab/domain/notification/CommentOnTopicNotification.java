@@ -18,6 +18,9 @@ import static life.offonoff.ab.domain.notification.NotificationType.COMMENT_ON_T
 @DiscriminatorValue(COMMENT_ON_TOPIC_NOTIFICATION)
 public class CommentOnTopicNotification extends Notification {
 
+    /**
+     * @OneToOne 관계이지만 {@link LikeInCommentNotification}가 {@link Comment}와 @ManyToOne 이기에 @ManyToOne 설정 ({@link Notification} 의 상속 전략 : SINGLE_TABLE)
+     */
     @ManyToOne
     @JoinColumn(name = "comment_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
