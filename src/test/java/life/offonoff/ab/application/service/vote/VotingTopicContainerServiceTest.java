@@ -4,7 +4,6 @@ import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTop
 import life.offonoff.ab.application.service.vote.criteria.VoteClosingCriteria;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopicContainerService;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,28 +29,6 @@ class VotingTopicContainerServiceTest {
     ApplicationEventPublisher eventPublisher;
     @Mock
     VoteClosingCriteria criteria;
-
-    @Test
-    @DisplayName("투표가 끝나면 투표 결과를 집계해 저장")
-    void aggregateVote() {
-        // given
-        int totalVoteCount = 1000;
-
-        Topic topic = TestTopic.builder()
-                .id(1L)
-                .voteCount(totalVoteCount)
-                .build().buildTopic();
-
-        // when
-        VoteResult voteResult = votingTopicContainerService.aggregateVote(topic);
-
-        // then
-        assertAll(
-                () -> assertThat(topic.getVoteResult()).isNotNull(),
-                () -> assertThat(topic.getVoteResult()).isEqualTo(voteResult),
-                () -> assertThat(voteResult.getTotalVoteCount()).isEqualTo(totalVoteCount)
-        );
-    }
 
 //    @Test
 //    @DisplayName("투표가 끝난 토픽 수 만큼 이벤트 발행")

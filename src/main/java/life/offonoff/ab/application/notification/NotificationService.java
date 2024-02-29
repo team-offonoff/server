@@ -1,12 +1,13 @@
 package life.offonoff.ab.application.notification;
 
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.notification.CommentOnTopicNotification;
+import life.offonoff.ab.domain.notification.LikeInCommentNotification;
 import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
 import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notfication.NotificationRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
@@ -32,41 +33,56 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional
-    public void notifyVoteResult(VoteResult result) {
+    public void notifyVoteResult(Topic topic) {
         // voters' notifications
-        List<Member> voters = memberRepository.findAllListeningVoteResultAndVotedTopicId(result.getTopicId());
-        List<VoteResultNotification> notifications = createVotersNotifications(result, voters);
+        List<Member> voters = memberRepository.findAllListeningVoteResultAndVotedTopicId(topic.getId());
+        List<VoteResultNotification> notifications = createVotersNotifications(topic, voters);
 
         // author's notification
-        addAuthorsNotificationIfAuthorListeningVoteResult(result, notifications);
+        addAuthorsNotificationIfAuthorListeningVoteResult(topic, notifications);
 
         notificationRepository.saveVoteResultNotificationsInBatch(notifications);
     }
 
-    private List<VoteResultNotification> createVotersNotifications(VoteResult result, List<Member> voters) {
+    private List<VoteResultNotification> createVotersNotifications(Topic topic, List<Member> voters) {
         return voters.stream()
                 .filter(Member::listenVoteResult)
                 .map(receiver -> {
                             log.info("# Notification send / Topic(id = {}, total_vote_count = {}) Member(id = {})",
-                                    result.getTopicId(), result.getTotalVoteCount(), receiver.getId());
-                            return new VoteResultNotification(receiver, result);
+                                    topic.getId(), topic.getVoteCount(), receiver.getId());
+                            return new VoteResultNotification(receiver, topic);
                         }
                 ).collect(Collectors.toList());
     }
 
-    private void addAuthorsNotificationIfAuthorListeningVoteResult(VoteResult result, List<VoteResultNotification> notifications) {
-        Member author = result.getTopic()
-                              .getAuthor();
+    private void addAuthorsNotificationIfAuthorListeningVoteResult(Topic topic, List<VoteResultNotification> notifications) {
+        Member author = topic.getAuthor();
 
         if (author.listenVoteResult()) {
-            VoteResultNotification authorsNotification = new VoteResultNotification(result.getTopic().getAuthor(), result);
+            VoteResultNotification authorsNotification = new VoteResultNotification(author, topic);
             notifications.add(authorsNotification);
         }
     }
 
     @Transactional
-    public void notifyLikeInComment() {
+    public void notifyLikeInComment(LikedComment likedComment) {
+        if (shouldNotifyLikeInComment(likedComment)) {
+            LikeInCommentNotification notification = new LikeInCommentNotification(likedComment.getComment());
 
+            notificationRepository.save(notification);
+        }
+    }
+
+    private boolean shouldNotifyLikeInComment(LikedComment likedComment) {
+        Member liker = likedComment.getLiker();
+
+        Comment comment = likedComment.getComment();
+        Member writer = comment.getWriter();
+
+        boolean likerIsWriter = comment.isWrittenBy(liker);
+        boolean writerListenLikeInComment = writer.listenLikeInComment();
+
+        return !likerIsWriter && writerListenLikeInComment;
     }
 
     @Transactional

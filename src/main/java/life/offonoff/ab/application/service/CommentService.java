@@ -1,9 +1,11 @@
 package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.topic.CommentLikedEvent;
 import life.offonoff.ab.application.event.topic.CommentedEvent;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.Vote;
@@ -21,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
 
@@ -136,8 +140,19 @@ public class CommentService {
     private CommentReactionResponse doLike(Member liker, Comment comment) {
 
         liker.cancelHateIfExists(comment);
-        liker.likeCommentIfNew(comment);
+        Optional<LikedComment> optionalLikedComment = liker.likeCommentIfNew(comment);
+
+        publishCommentLikedEventIfPresent(optionalLikedComment);
+
         return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), true, false);
+    }
+
+    private void publishCommentLikedEventIfPresent(Optional<LikedComment> optional) {
+        if (optional.isPresent()) {
+            LikedComment likedComment = optional.get();
+
+            eventPublisher.publishEvent(new CommentLikedEvent(likedComment));
+        }
     }
 
     private CommentReactionResponse cancelLike(Member liker, Comment comment) {

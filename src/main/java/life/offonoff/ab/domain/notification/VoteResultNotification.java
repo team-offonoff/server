@@ -2,7 +2,7 @@ package life.offonoff.ab.domain.notification;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.vote.VoteResult;
+import life.offonoff.ab.domain.topic.Topic;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,13 +18,13 @@ import static life.offonoff.ab.domain.notification.NotificationType.*;
 public class VoteResultNotification extends Notification {
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vote_result_id")
+    @JoinColumn(name = "topic_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private VoteResult voteResult;
+    private Topic topic;
 
-    public VoteResultNotification(Member member, VoteResult voteResult) {
+    public VoteResultNotification(Member member, Topic topic) {
         super(member);
-        this.voteResult = voteResult;
+        this.topic = topic;
     }
 
     @Override

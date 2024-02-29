@@ -1,10 +1,9 @@
 package life.offonoff.ab.application.notification;
 
 import jakarta.persistence.EntityManager;
-import life.offonoff.ab.application.service.CommentService;
-import life.offonoff.ab.application.service.TopicService;
 import life.offonoff.ab.domain.TestEntityUtil.TestMember;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Role;
 import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
@@ -12,7 +11,6 @@ import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
-import life.offonoff.ab.domain.vote.VoteResult;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
 import life.offonoff.ab.web.response.notification.message.CommentOnTopicNotificationMessage;
@@ -83,13 +81,8 @@ public class NotificationServiceIntegrationTest {
         Topic topic = createRandomTopic();
         em.persist(topic);
 
-        // vote result
-        VoteResult voteResult = new VoteResult();
-        voteResult.setTopic(topic);
-        em.persist(voteResult);
-
         // notification
-        VoteResultNotification voteResultNotification = new VoteResultNotification(author, voteResult);
+        VoteResultNotification voteResultNotification = new VoteResultNotification(author, topic);
         em.persist(voteResultNotification);
 
         // when
@@ -251,6 +244,182 @@ public class NotificationServiceIntegrationTest {
 
         // then
         List<NotificationResponse> responses = notificationService.findAllByReceiverId(author.getId());
+        assertThat(responses).isEmpty();
+    }
+
+
+    @Test
+    @DisplayName("댓글 좋아요 시 댓글 작성자에게 댓글 좋아요 알림을 생성한다.")
+    void create_LikeInCommentNotification_when_comment_liked_by_liker() {
+        // given
+
+          // member
+        Member liker = TestMember.builder()
+                .nickname("liker")
+                .build().buildMember();
+        em.persist(liker);
+
+        Member author = TestMember.builder()
+                .nickname("author")
+                .build().buildMember();
+        em.persist(author);
+
+        Member commenter = TestMember.builder()
+                .nickname("commenter")
+                .role(Role.USER)
+                .build().buildMember();
+        em.persist(commenter);
+
+          // topic
+        Topic topic = TestTopic.builder()
+                .author(author)
+                .side(TopicSide.TOPIC_B)
+                .build().buildTopic();
+        em.persist(topic);
+
+          // comment
+        Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
+        em.persist(comment);
+
+        LikedComment likedComment = new LikedComment(liker, comment);
+
+        notificationService.notifyLikeInComment(likedComment);
+
+        // when
+        List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
+
+        // then
+        assertThat(responses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Liker == Writer 면 알림을 생성하지 않는다.")
+    void does_not_create_LikeInCommentNotification_when_liker_is_writer() {
+        // given
+
+        // member
+        Member author = TestMember.builder()
+                .nickname("author")
+                .build().buildMember();
+        em.persist(author);
+
+        Member commenter = TestMember.builder()
+                .nickname("commenter")
+                .role(Role.USER)
+                .build().buildMember();
+        em.persist(commenter);
+
+        // topic
+        Topic topic = TestTopic.builder()
+                .author(author)
+                .side(TopicSide.TOPIC_B)
+                .build().buildTopic();
+        em.persist(topic);
+
+        // comment
+        Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
+        em.persist(comment);
+
+        LikedComment likedComment = new LikedComment(commenter, comment);
+
+        notificationService.notifyLikeInComment(likedComment);
+
+        // when
+        List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
+
+        // then
+        assertThat(responses).isEmpty();
+    }
+
+
+    @Test
+    @DisplayName("댓글이 삭제되면 댓글 좋아요 알림은 삭제된다.")
+    void delete_LikeInCommentNotification_when_comment_deleted() {
+        // given
+
+          // member
+        Member liker = TestMember.builder()
+                .nickname("liker")
+                .build().buildMember();
+        em.persist(liker);
+
+        Member author = TestMember.builder()
+                .nickname("author")
+                .build().buildMember();
+        em.persist(author);
+
+        Member commenter = TestMember.builder()
+                .nickname("commenter")
+                .role(Role.USER)
+                .build().buildMember();
+        em.persist(commenter);
+
+          // topic
+        Topic topic = TestTopic.builder()
+                .author(author)
+                .side(TopicSide.TOPIC_B)
+                .build().buildTopic();
+        em.persist(topic);
+
+          // comment
+        Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
+        em.persist(comment);
+
+        LikedComment likedComment = new LikedComment(commenter, comment);
+
+        notificationService.notifyLikeInComment(likedComment);
+
+        // when
+        comment.remove();
+        em.remove(comment);
+
+        // then
+        List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
+        assertThat(responses).isEmpty();
+    }
+
+    @Test
+    @DisplayName("토픽이 삭제되면 토픽에 달린 댓글들의 좋아요 알림은 삭제된다.")
+    void delete_LikeInCommentNotification_when_topic_deleted() {
+        // given
+
+        // member
+        Member liker = TestMember.builder()
+                .nickname("liker")
+                .build().buildMember();
+        em.persist(liker);
+
+        Member author = TestMember.builder()
+                .nickname("author")
+                .build().buildMember();
+        em.persist(author);
+
+        Member commenter = TestMember.builder()
+                .nickname("commenter")
+                .role(Role.USER)
+                .build().buildMember();
+        em.persist(commenter);
+
+        // topic
+        Topic topic = TestTopic.builder()
+                .author(author)
+                .side(TopicSide.TOPIC_B)
+                .build().buildTopic();
+        em.persist(topic);
+
+        // comment
+        Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
+        em.persist(comment);
+
+        LikedComment likedComment = new LikedComment(commenter, comment);
+
+        notificationService.notifyLikeInComment(likedComment);
+
+        // when
+        em.remove(topic);
+
+        // then
+        List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
         assertThat(responses).isEmpty();
     }
 }

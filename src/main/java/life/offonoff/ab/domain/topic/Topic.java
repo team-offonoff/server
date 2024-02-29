@@ -9,7 +9,6 @@ import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.content.TopicContent;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
 import life.offonoff.ab.domain.vote.Vote;
-import life.offonoff.ab.domain.vote.VoteResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,9 +56,6 @@ public class Topic extends BaseEntity {
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TopicReport> reports = new ArrayList<>();
-
-    @OneToOne(mappedBy = "topic", cascade = CascadeType.ALL)
-    private VoteResult voteResult;
 
     @Enumerated(EnumType.STRING)
     private TopicStatus status = TopicStatus.VOTING;
@@ -141,10 +137,6 @@ public class Topic extends BaseEntity {
 
     public void addChoice(Choice choice) {
         this.choices.add(choice);
-    }
-
-    public void setVoteResult(VoteResult voteResult) {
-        this.voteResult = voteResult;
     }
 
     public boolean isBeforeDeadline(LocalDateTime requestTime) {

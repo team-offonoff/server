@@ -3,6 +3,9 @@ package life.offonoff.ab.application.event.topic;
 import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.application.service.vote.VotingTopicService;
 import life.offonoff.ab.application.service.vote.votingtopic.container.VotingTopic;
+import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.LikedComment;
+import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +45,7 @@ public class TopicEventHandler {
     public void voteClosed(VoteClosedEvent event) {
         log.info("# Topic Vote Closed / topic-id : {}, deadline : {}", event.topic().getId(), event.topic().getDeadline());
 
-        notificationService.notifyVoteResult(event.result());
+        notificationService.notifyVoteResult(event.topic());
     }
 
     /**
@@ -63,4 +66,16 @@ public class TopicEventHandler {
     public void commented(CommentedEvent event) {
         notificationService.notifyCommentOnTopic(event.getComment());
     }
+
+    /**
+     * 댓글 좋아요 이벤트
+     */
+    @EventListener
+    public void commentLiked(CommentLikedEvent event) {
+        LikedComment likedComment = event.getLikedComment();
+
+        notificationService.notifyLikeInComment(likedComment);
+    }
+
+
 }

@@ -16,11 +16,9 @@ public class VoteResultNotificationMessage extends NotificationMessage {
     }
 
     public VoteResultNotificationMessage(VoteResultNotification notification) {
-        super(VOTE_RESULT_TITLE, notification.getVoteResult()
-                                             .getTopic()
+        super(VOTE_RESULT_TITLE, notification.getTopic()
                                              .getTitle());
-        this.topicId = notification.getVoteResult()
-                                   .getTopic()
+        this.topicId = notification.getTopic()
                                    .getId();
     }
 }
