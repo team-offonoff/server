@@ -150,8 +150,8 @@ public class CommentService {
     private void publishCommentLikedEventIfPresent(Optional<LikedComment> optional) {
         if (optional.isPresent()) {
             LikedComment likedComment = optional.get();
-            
-            eventPublisher.publishEvent(new CommentLikedEvent(likedComment);
+
+            eventPublisher.publishEvent(new CommentLikedEvent(likedComment));
         }
     }
 
