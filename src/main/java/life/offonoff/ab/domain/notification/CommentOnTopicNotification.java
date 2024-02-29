@@ -1,9 +1,6 @@
 package life.offonoff.ab.domain.notification;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
@@ -21,7 +18,7 @@ import static life.offonoff.ab.domain.notification.NotificationType.COMMENT_ON_T
 @DiscriminatorValue(COMMENT_ON_TOPIC_NOTIFICATION)
 public class CommentOnTopicNotification extends Notification {
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "comment_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment comment;
