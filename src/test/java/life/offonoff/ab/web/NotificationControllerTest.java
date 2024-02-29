@@ -2,11 +2,13 @@ package life.offonoff.ab.web;
 
 import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.config.WebConfig;
+import life.offonoff.ab.domain.notification.LikeInCommentNotification;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
 import life.offonoff.ab.web.response.notification.message.CommentOnTopicNotificationMessage;
+import life.offonoff.ab.web.response.notification.message.LikeInCommentNotificationMessage;
 import life.offonoff.ab.web.response.notification.message.VoteCountOnTopicNotificationMessage;
 import life.offonoff.ab.web.response.notification.message.VoteResultNotificationMessage;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,7 @@ import org.springframework.context.annotation.FilterType;
 import java.util.List;
 
 import static life.offonoff.ab.domain.notification.NotificationType.*;
-import static life.offonoff.ab.web.response.notification.message.NotificationMessageTemplate.COMMENT_ON_TOPIC_TITLE;
-import static life.offonoff.ab.web.response.notification.message.NotificationMessageTemplate.VOTE_COUNT_ON_TOPIC_TITLE;
+import static life.offonoff.ab.web.response.notification.message.NotificationMessageTemplate.*;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -55,8 +56,14 @@ class NotificationControllerTest extends RestDocsTest {
                 new CommentOnTopicNotificationMessage(COMMENT_ON_TOPIC_TITLE, "test_title3", 3L, 1L)
         );
 
+        NotificationResponse likeInCommentResponse = new NotificationResponse(
+                LIKE_IN_COMMENT_NOTIFICATION,
+                false,
+                new LikeInCommentNotificationMessage(LIKE_ON_COMMENT_TITLE, "test_title4", 4L, 2L)
+        );
+
         when(notificationService.findAllByReceiverId(nullable(Long.class)))
-                .thenReturn(List.of(voteResultResponse, voteCountResponse, commentOnTopicResponse));
+                .thenReturn(List.of(voteResultResponse, voteCountResponse, commentOnTopicResponse, likeInCommentResponse));
 
         // then
         mvc.perform(get(NoticeUri.BASE)

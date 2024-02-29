@@ -12,6 +12,12 @@ public class LikeInCommentNotificationMessage extends NotificationMessage {
     private final Long topicId;
     private final Long commentId;
 
+    public LikeInCommentNotificationMessage(String title, String content, Long topicId, Long commentId) {
+        super(title, content);
+        this.topicId = topicId;
+        this.commentId = commentId;
+    }
+
     public LikeInCommentNotificationMessage(LikeInCommentNotification notification) {
         super(LIKE_ON_COMMENT_TITLE, notification.getComment()
                                                  .getTopic()
