@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -113,16 +114,17 @@ public class Member extends BaseEntity {
         comments.add(comment);
     }
 
-    public LikedComment likeCommentIfNew(Comment comment) {
+    public Optional<LikedComment> likeCommentIfNew(Comment comment) {
         if (likeAlready(comment)) {
-            return null;
+            return Optional.empty();
         }
 
         LikedComment likedComment = new LikedComment(this, comment);
         comment.increaseLikeCount();
 
         likedComments.add(likedComment);
-        return likedComment;
+
+        return Optional.of(likedComment);
     }
 
     public void hateCommentIfNew(Comment comment) {
