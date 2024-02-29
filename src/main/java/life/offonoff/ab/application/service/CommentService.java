@@ -1,9 +1,11 @@
 package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.topic.CommentLikedEvent;
 import life.offonoff.ab.application.event.topic.CommentedEvent;
 import life.offonoff.ab.application.service.common.TextUtils;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.vote.Vote;
@@ -136,8 +138,18 @@ public class CommentService {
     private CommentReactionResponse doLike(Member liker, Comment comment) {
 
         liker.cancelHateIfExists(comment);
-        liker.likeCommentIfNew(comment);
+        LikedComment likedComment = liker.likeCommentIfNew(comment);
+
+        publishCommentLikedEventIfNotNull(likedComment);
+
         return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), true, false);
+    }
+
+    private void publishCommentLikedEventIfNotNull(LikedComment likedComment) {
+        if (likedComment == null) {
+            return;
+        }
+        eventPublisher.publishEvent(new CommentLikedEvent(likedComment));
     }
 
     private CommentReactionResponse cancelLike(Member liker, Comment comment) {

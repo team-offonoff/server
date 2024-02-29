@@ -113,15 +113,16 @@ public class Member extends BaseEntity {
         comments.add(comment);
     }
 
-    public void likeCommentIfNew(Comment comment) {
+    public LikedComment likeCommentIfNew(Comment comment) {
         if (likeAlready(comment)) {
-            return;
+            return null;
         }
 
         LikedComment likedComment = new LikedComment(this, comment);
         comment.increaseLikeCount();
 
         likedComments.add(likedComment);
+        return likedComment;
     }
 
     public void hateCommentIfNew(Comment comment) {

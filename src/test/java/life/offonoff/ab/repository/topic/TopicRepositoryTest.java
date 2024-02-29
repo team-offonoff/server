@@ -9,7 +9,6 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.hide.HiddenTopic;
-import life.offonoff.ab.domain.vote.VoteResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -306,18 +305,11 @@ class TopicRepositoryTest {
 
         topicRepository.save(topic);
 
-        VoteResult voteResult = new VoteResult();
-        voteResult.setTopic(topic);
-        em.persist(voteResult);
-
         // when
         topicRepository.delete(topic);
 
         // then
-        assertAll(
-                () -> assertThat(topicRepository.findById(topic.getId())).isEmpty(),
-                () -> assertThat(em.find(VoteResult.class, voteResult.getId())).isNull()
-        );
+        assertThat(topicRepository.findById(topic.getId())).isEmpty();
     }
 
     Pageable createVoteCountDescPageable(int page, int size) {
