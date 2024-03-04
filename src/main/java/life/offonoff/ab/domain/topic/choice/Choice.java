@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import life.offonoff.ab.domain.BaseEntity;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.web.response.topic.choice.content.ChoiceContentResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,5 +50,12 @@ public class Choice extends BaseEntity {
 
     public void decreaseVoteCount() {
         this.voteCount--;
+    }
+
+    public ChoiceContentResponse generateContentResponse() {
+        if (content == null) {
+            return null;
+        }
+        return content.toResponse();
     }
 }

@@ -14,15 +14,15 @@ import life.offonoff.ab.domain.vote.Vote;
 import life.offonoff.ab.exception.DuplicateVoteOptionException;
 import life.offonoff.ab.exception.LengthInvalidException;
 import life.offonoff.ab.repository.ChoiceRepository;
-import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.VoteRepository;
 import life.offonoff.ab.repository.comment.CommentRepository;
+import life.offonoff.ab.repository.keyword.KeywordRepository;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.topic.TopicRepository;
-import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
-import life.offonoff.ab.web.response.topic.choice.content.ImageTextChoiceContentResponse;
 import life.offonoff.ab.web.response.KeywordResponse;
 import life.offonoff.ab.web.response.topic.TopicResponse;
+import life.offonoff.ab.web.response.topic.choice.ChoiceResponse;
+import life.offonoff.ab.web.response.topic.choice.content.ChoiceContentResponse.ImageTextChoiceContentResponse;
 import lombok.Builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static life.offonoff.ab.domain.TestEntityUtil.TestKeyword;
-import static life.offonoff.ab.domain.TestEntityUtil.TestMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -457,8 +455,8 @@ public class TopicServiceTest {
                 choiceResponses.add(new ChoiceResponse(
                         (long) i,
                         new ImageTextChoiceContentResponse(
-                                ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).text(),
-                                ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).imageUrl()),
+                                ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).imageUrl(),
+                                ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).text()),
                         choice.choiceOption()));
             }
 
