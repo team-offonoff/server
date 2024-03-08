@@ -382,7 +382,7 @@ class CommentServiceTest {
     }
 
     private Long createRandomTopic() {
-        Topic topic = createTopic(0, TopicSide.TOPIC_B);
+        Topic topic = createRandomTopicByRandomMember(TopicSide.TOPIC_B);
         em.persist(topic);
         return topic.getId();
     }
