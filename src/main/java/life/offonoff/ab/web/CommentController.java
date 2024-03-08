@@ -45,7 +45,7 @@ public class CommentController {
             @PathVariable Long commentId,
             @RequestParam Boolean enable
     ) {
-        return ResponseEntity.ok(commentService.likeCommentForMember(memberId, commentId, enable));
+        return ResponseEntity.ok(commentService.likeCommentByMember(memberId, commentId, enable));
     }
 
     @PostMapping("/{commentId}/hate")

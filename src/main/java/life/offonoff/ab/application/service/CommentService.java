@@ -125,8 +125,8 @@ public class CommentService {
 
     //== like ==//
     @Transactional
-    public CommentReactionResponse likeCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
-        Member liker = findMember(memberId);
+    public CommentReactionResponse likeCommentByMember(final Long likerId, final Long commentId, final Boolean enable) {
+        Member liker = findMember(likerId);
         Comment comment = findById(commentId);
 
         if (enable) {

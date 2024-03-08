@@ -289,7 +289,7 @@ class CommentServiceTest {
         liker.hateCommentIfNew(comment);
 
         // when
-        commentService.likeCommentForMember(liker.getId(), comment.getId(), true);
+        commentService.likeCommentByMember(liker.getId(), comment.getId(), true);
 
         // then
         assertAll(
