@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@EqualsAndHashCode(of = {"name", "side"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(uniqueConstraints = {
@@ -36,10 +38,5 @@ public class Keyword {
 
     public void addTopic(Topic topic) {
         this.topics.add(topic);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return id.equals(((Keyword) obj).getId());
     }
 }
