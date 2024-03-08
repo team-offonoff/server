@@ -1,7 +1,8 @@
 package life.offonoff.ab.domain;
 
-import life.offonoff.ab.domain.keyword.Keyword;
+import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.domain.comment.Comment;
+import life.offonoff.ab.domain.keyword.Keyword;
 import life.offonoff.ab.domain.member.*;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
@@ -9,6 +10,7 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
+import life.offonoff.ab.domain.topic.choice.content.ImageTextChoiceContent;
 import life.offonoff.ab.domain.vote.Vote;
 import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
@@ -19,15 +21,26 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 public class TestEntityUtil {
 
+    private static final Random random =  new Random();
+
     //== Member ==//
     public static Member createRandomMember() {
-        return createCompletelyJoinedMember(UUID.randomUUID().toString(), "pass", "nickname");
+        String email = generateRandomAlphabetic(20);
+        String nickname = generateRandomAlphabetic(LengthInfo.NICKNAME.getMaxLength());
+        return createCompletelyJoinedMember(email, "pass", nickname);
+    }
+
+    public static String generateRandomAlphabetic(int length) {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        return random.ints(leftLimit, rightLimit)
+                .limit(length)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
     }
 
     public static Member createMember(String email, String password) {
@@ -47,7 +60,7 @@ public class TestEntityUtil {
 
     //== Topic ==//
     public static Topic createRandomTopic() {
-        return createTopic(1, TopicSide.TOPIC_B);
+        return createRandomTopicByRandomMember(TopicSide.TOPIC_B);
     }
 
     public static Topic createRandomTopicHavingChoices(ChoiceOption... options) {
@@ -60,10 +73,13 @@ public class TestEntityUtil {
         return topic;
     }
 
-    public static Topic createTopic(int seq, TopicSide side) {
-        String topicTitle = "TITLE_" + seq;
-        Member member = createRandomMember();
-        return new Topic(member, topicTitle, side);
+    public static Topic createRandomTopicByRandomMember(TopicSide side) {
+        return createRandomTopicByMember(createRandomMember(), side);
+    }
+
+    public static Topic createRandomTopicByMember(Member author, TopicSide side) {
+        String topicTitle = "TITLE_" + generateRandomAlphabetic(10);
+        return new Topic(author, topicTitle, side);
     }
 
     //== Keyword ==//

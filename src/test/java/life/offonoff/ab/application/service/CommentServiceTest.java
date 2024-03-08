@@ -289,7 +289,7 @@ class CommentServiceTest {
         liker.hateCommentIfNew(comment);
 
         // when
-        commentService.likeCommentForMember(liker.getId(), comment.getId(), true);
+        commentService.likeCommentByMember(liker.getId(), comment.getId(), true);
 
         // then
         assertAll(
@@ -382,7 +382,7 @@ class CommentServiceTest {
     }
 
     private Long createRandomTopic() {
-        Topic topic = createTopic(0, TopicSide.TOPIC_B);
+        Topic topic = createRandomTopicByRandomMember(TopicSide.TOPIC_B);
         em.persist(topic);
         return topic.getId();
     }

@@ -37,7 +37,7 @@ public class Topic extends BaseEntity {
     @JoinColumn(name = "topic_content_id")
     private TopicContent content;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
     private List<Choice> choices = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
