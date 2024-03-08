@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static life.offonoff.ab.domain.TestEntityUtil.createPageableDesc;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 @SpringBootTest
 class KeywordRepositoryTest {
 

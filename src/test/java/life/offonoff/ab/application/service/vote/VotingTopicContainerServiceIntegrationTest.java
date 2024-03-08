@@ -14,17 +14,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static life.offonoff.ab.domain.topic.TopicStatus.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static life.offonoff.ab.domain.TestEntityUtil.TestMember;
+import static life.offonoff.ab.domain.TestEntityUtil.TestTopic;
+import static life.offonoff.ab.domain.topic.TopicStatus.CLOSED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 
+@Transactional
 @SpringBootTest
 @Import(TestVoteConfig.TestContainerVotingTopicConfig.class)
 public class VotingTopicContainerServiceIntegrationTest {
@@ -45,7 +51,7 @@ public class VotingTopicContainerServiceIntegrationTest {
 
     @Test
     @DisplayName("투표가 끝난 토픽은 status 수정 & Voting Result 매핑")
-    void endVote_then_status_voting_result() {
+    void endVote_then_status_voting_result() throws InterruptedException {
         // given
         LocalDateTime deadline = LocalDateTime.now();
         Topic topic = TestTopic.builder()
@@ -59,7 +65,19 @@ public class VotingTopicContainerServiceIntegrationTest {
         when(container.getVotingEnded(criteria)).thenReturn(votingTopics);
 
         // when
-        votingTopicContainerService.endVote(criteria);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        CountDownLatch latch = new CountDownLatch(2);
+
+        executorService.execute(() -> {
+            votingTopicContainerService.endVote(criteria);
+            latch.countDown();
+        });
+
+        executorService.execute(() -> {
+            votingTopicContainerService.endVote(criteria);
+            latch.countDown();
+        });
+        latch.await();
 
         // then
         assertThat(topic.getStatus()).isEqualTo(CLOSED);
