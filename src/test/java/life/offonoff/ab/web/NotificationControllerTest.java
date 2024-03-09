@@ -3,6 +3,7 @@ package life.offonoff.ab.web;
 import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.config.WebConfig;
 import life.offonoff.ab.domain.notification.ReceiverType;
+import life.offonoff.ab.exception.IllegalReceiverException;
 import life.offonoff.ab.restdocs.RestDocsTest;
 import life.offonoff.ab.util.token.JwtProvider;
 import life.offonoff.ab.web.common.aspect.auth.AuthorizedArgumentResolver;
@@ -25,6 +26,7 @@ import static life.offonoff.ab.domain.notification.ReceiverType.VOTER;
 import static life.offonoff.ab.web.response.notification.message.NotificationMessageTemplate.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -109,8 +111,39 @@ class NotificationControllerTest extends RestDocsTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void read_notification_by_receiver() throws Exception {
+        mvc.perform(post(NotificationUri.READ, 1L)
+                        .header("Authorization", "Bearer Access_Token"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void read_notification_exception_by_non_receiver() throws Exception {
+        doThrow(new IllegalReceiverException(1L, 1L))
+                .when(notificationService).readNotification(any(), any());
+
+        mvc.perform(post(NotificationUri.READ, 1L)
+                        .header("Authorization", "Bearer Access_Token"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void count_unread_notifications() throws Exception {
+        // given
+        when(notificationService.countUncheckedByReceiverId(any()))
+                .thenReturn(12);
+
+        // then
+        mvc.perform(get(NotificationUri.COUNT_UNREAD)
+                        .header("Authorization", "Bearer Access_Token"))
+                .andExpect(status().isOk());
+    }
+
     private static class NotificationUri {
         public static String BASE = "/notifications";
         public static String RECEIVER_PARAM = BASE + "?receiver={}";
+        public static String READ = BASE + "/{notificationId}" + "/read";
+        public static String COUNT_UNREAD = BASE + "/counts/unread";
     }
 }

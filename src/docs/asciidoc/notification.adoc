@@ -1,9 +1,29 @@
 == 8. 알림 API
-### 1.1. 알림 조회
+### 8.1 미확인 알림 수 조회
+
+OK
+
+operation::notification-controller-test/
+
+### 8.2. 알림 조회
 
 [source.html]
 GET /notifications
 
-OK
+OK. `receiver` 설정 X
 
-operation::notification-controller-test/get_members_notifications[snippets="http-request,http-response"]
+operation::notification-controller-test/get_members_all_notifications[snippets="http-request,http-response"]
+
+OK. `receiver=VOTER`
+
+operation::notification-controller-test/get_members_notifications_receiver_voter[snippets="http-request,http-response"]
+
+### 8.2. 알림 읽기
+
+OK. 해당 알림의 수신자와 요청자가 일치
+
+operation::notification-controller-test/read_notification_by_receiver[snippets="http-request,http-response"]
+
+E1. 해당 알림의 수신자와 요청자가 불일치
+
+operation::notification-controller-test/read_notification_exception_by_non_receiver[snippets="http-request,http-response"]
