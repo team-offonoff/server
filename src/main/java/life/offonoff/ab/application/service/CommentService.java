@@ -24,8 +24,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
 
 @RequiredArgsConstructor
@@ -127,8 +125,8 @@ public class CommentService {
 
     //== like ==//
     @Transactional
-    public CommentReactionResponse likeCommentForMember(final Long memberId, final Long commentId, final Boolean enable) {
-        Member liker = findMember(memberId);
+    public CommentReactionResponse likeCommentByMember(final Long likerId, final Long commentId, final Boolean enable) {
+        Member liker = findMember(likerId);
         Comment comment = findById(commentId);
 
         if (enable) {
@@ -138,21 +136,15 @@ public class CommentService {
     }
 
     private CommentReactionResponse doLike(Member liker, Comment comment) {
-
         liker.cancelHateIfExists(comment);
-        Optional<LikedComment> optionalLikedComment = liker.likeCommentIfNew(comment);
-
-        publishCommentLikedEventIfPresent(optionalLikedComment);
-
-        return new CommentReactionResponse(comment.getLikeCount(), comment.getHateCount(), true, false);
+        liker.likeCommentIfNew(comment)
+                .ifPresent(this::afterLike);
+        return new CommentReactionResponse(
+                comment.getLikeCount(), comment.getHateCount(), true, false);
     }
 
-    private void publishCommentLikedEventIfPresent(Optional<LikedComment> optional) {
-        if (optional.isPresent()) {
-            LikedComment likedComment = optional.get();
-
-            eventPublisher.publishEvent(new CommentLikedEvent(likedComment));
-        }
+    private void afterLike(LikedComment likedComment) {
+        eventPublisher.publishEvent(new CommentLikedEvent(likedComment));
     }
 
     private CommentReactionResponse cancelLike(Member liker, Comment comment) {

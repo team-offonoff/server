@@ -20,9 +20,12 @@ public record ImageTextChoiceContentCreateRequest(
     }
 
     public ImageTextChoiceContentCreateRequest {
-        int length = TextUtils.countGraphemeClusters(text);
-        if (length < TOPIC_CHOICE_TEXT.getMinLength() || length > TOPIC_CHOICE_TEXT.getMaxLength()) {
-            throw new LengthInvalidException("토픽 선택지 텍스트", TOPIC_CHOICE_TEXT);
+        boolean shouldHaveTextContent = (imageUrl == null) || (imageUrl.isEmpty());
+        if (shouldHaveTextContent) {
+            int length = TextUtils.countGraphemeClusters(text);
+            if (length < TOPIC_CHOICE_TEXT.getMinLength() || length > TOPIC_CHOICE_TEXT.getMaxLength()) {
+                throw new LengthInvalidException("토픽 선택지 텍스트", TOPIC_CHOICE_TEXT);
+            }
         }
     }
 }

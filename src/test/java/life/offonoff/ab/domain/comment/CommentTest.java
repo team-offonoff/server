@@ -1,6 +1,5 @@
 package life.offonoff.ab.domain.comment;
 
-import life.offonoff.ab.domain.TestEntityUtil;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.TopicSide;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +17,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_B))
+                .topic(createRandomTopicByRandomMember(TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member liker = createMember("email", "password");
@@ -38,7 +37,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_B))
+                .topic(createRandomTopicByRandomMember(TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member liker = createMember("email", "password");
@@ -58,7 +57,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_B))
+                .topic(createRandomTopicByRandomMember(TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member hater = createMember("email", "password");
@@ -77,7 +76,7 @@ class CommentTest {
         Comment comment = TestComment.builder()
                 .id(1L)
                 .writer(createMember("writer", "password"))
-                .topic(createTopic(0, TopicSide.TOPIC_B))
+                .topic(createRandomTopicByRandomMember(TopicSide.TOPIC_B))
                 .build().buildComment();
 
         Member hater = createMember("email", "password");
