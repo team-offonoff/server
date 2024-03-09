@@ -12,17 +12,20 @@ public class ChoiceResponse {
     private Long choiceId;
     private ChoiceContentResponse content;
     private ChoiceOption choiceOption;
+    private int voteCount;
 
-    public ChoiceResponse(Long choiceId, ChoiceContentResponse content, ChoiceOption choiceOption) {
+    public ChoiceResponse(Long choiceId, ChoiceContentResponse content, ChoiceOption choiceOption, int voteCount) {
         this.choiceId = choiceId;
         this.content = content;
         this.choiceOption = choiceOption;
+        this.voteCount = voteCount;
     }
 
     public static ChoiceResponse from(Choice choice) {
         return new ChoiceResponse(
                 choice.getId(),
                 ChoiceContentResponseFactory.create(choice.getContent()),
-                choice.getChoiceOption());
+                choice.getChoiceOption(),
+                choice.getVoteCount());
     }
 }
