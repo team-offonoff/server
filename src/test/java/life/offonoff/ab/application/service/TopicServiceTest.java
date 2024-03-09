@@ -459,7 +459,8 @@ public class TopicServiceTest {
                         new ImageTextChoiceContentResponse(
                                 ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).text(),
                                 ((ImageTextChoiceContentCreateRequest) choice.choiceContentRequest()).imageUrl()),
-                        choice.choiceOption()));
+                        choice.choiceOption(),
+                        0));
             }
 
             Long keywordId = keyword.getId();

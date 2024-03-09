@@ -85,7 +85,7 @@ class NotificationServiceTest {
                 .build().buildMember();
         DefaultNotification notification = new DefaultNotification(receiver, "title", "content");
 
-        when(notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(anyLong()))
+        when(notificationRepository.findAllOrderByCreatedAtDesc(anyLong(), any()))
                 .thenReturn(List.of(notification));
 
         // when
