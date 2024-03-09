@@ -13,6 +13,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import static life.offonoff.ab.domain.notification.NotificationType.VOTE_COUNT_ON_TOPIC_NOTIFICATION;
+import static life.offonoff.ab.domain.notification.ReceiverType.AUTHOR;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +27,7 @@ public class VoteCountOnTopicNotification extends Notification {
     private int totalVoteCount;
 
     public VoteCountOnTopicNotification(Topic topic) {
-        super(topic.getAuthor());
+        super(AUTHOR, topic.getAuthor());
 
         this.topic = topic;
         this.totalVoteCount = topic.getVoteCount();

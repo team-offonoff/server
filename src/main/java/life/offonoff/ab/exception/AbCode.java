@@ -30,6 +30,10 @@ public enum AbCode {
     // COMMENT
     UNABLE_TO_VIEW_COMMENTS,
 
+    // Notification
+    NOTIFICATION_NOT_FOUND,
+    ILLEGAL_RECEIVER,
+
     // Mapping
     INVALID_KAKAO_OAUTH_MAPPING,
     ILLEGAL_PASSWORD,

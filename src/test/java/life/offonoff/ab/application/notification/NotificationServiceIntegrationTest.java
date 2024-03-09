@@ -6,11 +6,13 @@ import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.member.Role;
+import life.offonoff.ab.domain.notification.DefaultNotification;
 import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
 import life.offonoff.ab.domain.notification.VoteResultNotification;
 import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.exception.IllegalReceiverException;
 import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
 import life.offonoff.ab.web.response.notification.message.CommentOnTopicNotificationMessage;
@@ -28,6 +30,7 @@ import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static life.offonoff.ab.domain.TestEntityUtil.createRandomMember;
 import static life.offonoff.ab.domain.TestEntityUtil.createRandomTopic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest
@@ -82,7 +85,7 @@ public class NotificationServiceIntegrationTest {
         em.persist(topic);
 
         // notification
-        VoteResultNotification voteResultNotification = new VoteResultNotification(author, topic);
+        VoteResultNotification voteResultNotification = VoteResultNotification.createForAuthor(topic);
         em.persist(voteResultNotification);
 
         // when
@@ -421,5 +424,46 @@ public class NotificationServiceIntegrationTest {
         // then
         List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
         assertThat(responses).isEmpty();
+    }
+
+    @Test
+    @DisplayName("수신자가 알림을 읽게 되면 is_read -> true가 된다.")
+    void read_notification() {
+        // given
+        Member receiver = TestMember.builder()
+                .nickname("receiver")
+                .build().buildMember();
+        em.persist(receiver);
+
+        DefaultNotification notification = new DefaultNotification(receiver, "title", "content");
+        em.persist(notification);
+
+        // when
+        notificationService.readNotification(receiver.getId(), notification.getId());
+
+        // then
+        assertThat(notification.getIsRead()).isTrue();
+    }
+
+    @Test
+    @DisplayName("수신자가 아닌 회원이 알림을 읽게 되면 예외가 발생한다.")
+    void read_notification_exception_read_by_non_receiver() {
+        // given
+        Member receiver = TestMember.builder()
+                .nickname("receiver")
+                .build().buildMember();
+        em.persist(receiver);
+
+        Member nonReceiver = TestMember.builder()
+                .nickname("nonReceiver")
+                .build().buildMember();
+        em.persist(nonReceiver);
+
+        DefaultNotification notification = new DefaultNotification(receiver, "title", "content");
+        em.persist(notification);
+
+        // when
+        assertThatThrownBy(() -> notificationService.readNotification(nonReceiver.getId(), notification.getId()))
+                .isInstanceOf(IllegalReceiverException.class);
     }
 }

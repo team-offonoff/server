@@ -8,20 +8,23 @@ import lombok.Getter;
 @Getter
 public class ChoiceResponse {
 
-    private final Long choiceId;
-    private final ChoiceContentResponse content;
-    private final ChoiceOption choiceOption;
+    private Long choiceId;
+    private ChoiceContentResponse content;
+    private ChoiceOption choiceOption;
+    private int voteCount;
 
-    public ChoiceResponse(Long choiceId, ChoiceContentResponse content, ChoiceOption choiceOption) {
+    public ChoiceResponse(Long choiceId, ChoiceContentResponse content, ChoiceOption choiceOption, int voteCount) {
         this.choiceId = choiceId;
         this.content = content;
         this.choiceOption = choiceOption;
+        this.voteCount = voteCount;
     }
 
     public static ChoiceResponse from(Choice choice) {
         return new ChoiceResponse(
                 choice.getId(),
                 choice.generateContentResponse(),
-                choice.getChoiceOption());
+                choice.getChoiceOption(),
+                choice.getVoteCount());
     }
 }

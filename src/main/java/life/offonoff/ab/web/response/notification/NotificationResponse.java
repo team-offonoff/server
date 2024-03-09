@@ -8,19 +8,25 @@ import lombok.Getter;
 @Getter
 public class NotificationResponse {
 
+    private Long id;
     private String type;
-    private Boolean checked;
+    private String receiverType;
+    private Boolean isRead;
     private NotificationMessage message;
 
     public NotificationResponse(Notification notification) {
+        this.id = notification.getId();
         this.type = notification.getType();
-        this.checked = notification.getChecked();
+        this.receiverType = notification.getReceiverType();
+        this.isRead = notification.getIsRead();
         this.message = NotificationMessageFactory.createNoticeMessage(notification);
     }
 
-    public NotificationResponse(String type, Boolean checked, NotificationMessage message) {
+    public NotificationResponse(Long id, String type, String receiverType, Boolean isRead, NotificationMessage message) {
+        this.id = id;
         this.type = type;
-        this.checked = checked;
+        this.receiverType = receiverType;
+        this.isRead = isRead;
         this.message = message;
     }
 }

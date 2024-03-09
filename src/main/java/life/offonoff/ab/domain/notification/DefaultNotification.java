@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static life.offonoff.ab.domain.notification.NotificationType.DEFAULT;
+import static life.offonoff.ab.domain.notification.ReceiverType.NONE;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,8 +19,8 @@ public class DefaultNotification extends Notification {
     private String title;
     private String content;
 
-    public DefaultNotification(Member receiver, String title, String content) {
-        super(receiver);
+    public DefaultNotification( Member receiver, String title, String content) {
+        super(NONE, receiver);
 
         this.title = title;
         this.content = content;

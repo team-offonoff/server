@@ -18,22 +18,29 @@ public abstract class Notification extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String receiverType; // TODO:필요에 따라 삭제하셔도 됩니다.
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member receiver;
 
     @ColumnDefault("false")
-    private Boolean checked = false;
+    private Boolean isRead = false;
 
-    public Notification(Member receiver) {
+    public Notification(String receiverType, Member receiver) {
+        this.receiverType = receiverType;
         this.receiver = receiver;
         receiver.addNotification(this);
     }
 
     //== Method ==//
-    public void check() {
-        this.checked = true;
+    public void read() {
+        this.isRead = true;
     }
 
     public abstract String getType();
+
+    public boolean isNotifiedTo(Member member) {
+        return this.receiver.equals(member);
+    }
 }
