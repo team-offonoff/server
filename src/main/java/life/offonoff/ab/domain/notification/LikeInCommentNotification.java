@@ -9,6 +9,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import static life.offonoff.ab.domain.notification.NotificationType.LIKE_IN_COMMENT_NOTIFICATION;
+import static life.offonoff.ab.domain.notification.ReceiverType.VOTER;
+
 // TODO:수정대상
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,7 +24,7 @@ public class LikeInCommentNotification extends Notification {
     private Comment comment;
 
     public LikeInCommentNotification(Comment comment) {
-        super(comment.getWriter());
+        super(VOTER, comment.getWriter());
 
         this.comment = comment;
     }

@@ -10,6 +10,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import static life.offonoff.ab.domain.notification.NotificationType.*;
+import static life.offonoff.ab.domain.notification.ReceiverType.AUTHOR;
+import static life.offonoff.ab.domain.notification.ReceiverType.VOTER;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,9 +24,17 @@ public class VoteResultNotification extends Notification {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Topic topic;
 
-    public VoteResultNotification(Member member, Topic topic) {
-        super(member);
+    public VoteResultNotification(String receiverType, Member member, Topic topic) {
+        super(receiverType, member);
         this.topic = topic;
+    }
+
+    public static VoteResultNotification createForVoter(Member voter, Topic topic) {
+        return new VoteResultNotification(VOTER, voter, topic);
+    }
+
+    public static VoteResultNotification createForAuthor(Topic topic) {
+        return new VoteResultNotification(AUTHOR, topic.getAuthor(), topic);
     }
 
     @Override

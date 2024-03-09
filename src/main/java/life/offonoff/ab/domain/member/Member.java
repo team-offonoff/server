@@ -198,8 +198,8 @@ public class Member extends BaseEntity {
                 .anyMatch(v -> v.isFor(topic));
     }
 
-    public void checkNotification(Notification notification) {
-        notification.check();
+    public void readNotification(Notification notification) {
+        notification.read();
     }
 
     public boolean joinCompleted() {

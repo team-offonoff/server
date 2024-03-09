@@ -2,8 +2,6 @@ package life.offonoff.ab.domain.notification;
 
 import jakarta.persistence.*;
 import life.offonoff.ab.domain.comment.Comment;
-import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.topic.Topic;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import static life.offonoff.ab.domain.notification.NotificationType.COMMENT_ON_TOPIC_NOTIFICATION;
+import static life.offonoff.ab.domain.notification.ReceiverType.AUTHOR;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,8 +26,8 @@ public class CommentOnTopicNotification extends Notification {
     private Comment comment;
 
     public CommentOnTopicNotification(Comment comment) {
-        super(comment.getTopic()
-                     .getAuthor());
+        super(AUTHOR, comment.getTopic()
+                             .getAuthor());
         this.comment = comment;
     }
 

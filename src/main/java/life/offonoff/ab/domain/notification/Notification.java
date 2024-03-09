@@ -18,7 +18,7 @@ public abstract class Notification extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String receiverType;
+    private String receiverType; // TODO:필요에 따라 삭제하셔도 됩니다.
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

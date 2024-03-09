@@ -1,13 +1,14 @@
 package life.offonoff.ab.application.notification;
 
+import life.offonoff.ab.application.service.request.NotificationRequest;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
-import life.offonoff.ab.domain.notification.CommentOnTopicNotification;
-import life.offonoff.ab.domain.notification.LikeInCommentNotification;
-import life.offonoff.ab.domain.notification.VoteCountOnTopicNotification;
-import life.offonoff.ab.domain.notification.VoteResultNotification;
+import life.offonoff.ab.domain.notification.*;
 import life.offonoff.ab.domain.topic.Topic;
+import life.offonoff.ab.exception.IllegalReceiverException;
+import life.offonoff.ab.exception.MemberByIdNotFoundException;
+import life.offonoff.ab.exception.NotificationByIdNotFoundException;
 import life.offonoff.ab.repository.member.MemberRepository;
 import life.offonoff.ab.repository.notfication.NotificationRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
@@ -32,6 +33,18 @@ public class NotificationService {
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
 
+    //== find ==//
+    public Notification findNotification(Long notificationId) {
+        return notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationByIdNotFoundException(notificationId));
+    }
+
+    private Member findMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberByIdNotFoundException(memberId));
+    }
+
+    //== notify ==//
     @Transactional
     public void notifyVoteResult(Topic topic) {
         // voters' notifications
@@ -47,10 +60,9 @@ public class NotificationService {
     private List<VoteResultNotification> createVotersNotifications(Topic topic, List<Member> voters) {
         return voters.stream()
                 .filter(Member::listenVoteResult)
-                .map(receiver -> {
-                            log.info("# Notification send / Topic(id = {}, total_vote_count = {}) Member(id = {})",
-                                    topic.getId(), topic.getVoteCount(), receiver.getId());
-                            return new VoteResultNotification(receiver, topic);
+                .map(voter -> {
+                            log.info("# Notification send / Topic(id = {}, total_vote_count = {}) Member(id = {})", topic.getId(), topic.getVoteCount(), voter.getId());
+                            return VoteResultNotification.createForVoter(voter, topic);
                         }
                 ).collect(Collectors.toList());
     }
@@ -59,7 +71,7 @@ public class NotificationService {
         Member author = topic.getAuthor();
 
         if (author.listenVoteResult()) {
-            VoteResultNotification authorsNotification = new VoteResultNotification(author, topic);
+            VoteResultNotification authorsNotification = VoteResultNotification.createForAuthor(topic);
             notifications.add(authorsNotification);
         }
     }
@@ -123,16 +135,39 @@ public class NotificationService {
         return voteCountDividedByUnit && authorListenVoteCountOnTopic;
     }
 
+    //== find ==//
+    public List<NotificationResponse> findAllByReceiverId(Long memberId, NotificationRequest request) {
+        return notificationRepository.findAllOrderByCreatedAtDesc(memberId, request)
+                .stream()
+                .map(NotificationResponse::new)
+                .toList();
+    }
+
     public List<NotificationResponse> findAllByReceiverId(Long memberId) {
-
-        return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(memberId)
-                                     .stream()
-                                     .map(NotificationResponse::new)
-                                     .toList();
+        return findAllByReceiverId(memberId, NotificationRequest.empty());
     }
 
+    //== count ==//
     public Integer countUncheckedByReceiverId(Long memberId) {
-        return notificationRepository.countByCheckedFalseAndReceiverId(memberId);
+        return notificationRepository.countByIsReadFalseAndReceiverId(memberId);
     }
+
+    //== read ==//
+    @Transactional
+    public void readNotification(Long memberId, Long notificationId) {
+        Member member = findMember(memberId);
+        Notification notification = findNotification(notificationId);
+
+        checkMemberCanReadNotification(member,notification);
+
+        member.readNotification(notification);
+    }
+
+    private void checkMemberCanReadNotification(Member member, Notification notification) {
+        if (!notification.isNotifiedTo(member)) {
+            throw new IllegalReceiverException(member.getId(), notification.getId());
+        }
+    }
+
 }
 
