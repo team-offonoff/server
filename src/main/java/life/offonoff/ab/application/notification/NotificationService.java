@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -45,7 +46,11 @@ public class NotificationService {
     }
 
     //== notify ==//
-    @Transactional
+
+    /**
+     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyVoteResult(Topic topic) {
         // voters' notifications
         List<Member> voters = memberRepository.findAllListeningVoteResultAndVotedTopicId(topic.getId());
@@ -76,7 +81,10 @@ public class NotificationService {
         }
     }
 
-    @Transactional
+    /**
+     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyLikeInComment(LikedComment likedComment) {
         if (shouldNotifyLikeInComment(likedComment)) {
             LikeInCommentNotification notification = new LikeInCommentNotification(likedComment.getComment());
@@ -97,7 +105,10 @@ public class NotificationService {
         return !likerIsWriter && writerListenLikeInComment;
     }
 
-    @Transactional
+    /**
+     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyCommentOnTopic(Comment comment) {
         if (shouldNotifyCommentOnTopic(comment)) {
             CommentOnTopicNotification notification = new CommentOnTopicNotification(comment);
@@ -117,7 +128,10 @@ public class NotificationService {
         return commenterIsNotAuthor && authorListenCommentOnTopic;
     }
 
-    @Transactional
+    /**
+     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyVoteCountOnTopic(Topic topic) {
         if (shouldNotifyVoteCountForTopic(topic)) {
             VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(topic);

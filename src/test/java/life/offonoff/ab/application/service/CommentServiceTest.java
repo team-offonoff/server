@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.service;
 
 import jakarta.persistence.EntityManager;
+import life.offonoff.ab.application.notification.NotificationService;
 import life.offonoff.ab.application.service.common.LengthInfo;
 import life.offonoff.ab.application.service.request.CommentRequest;
 import life.offonoff.ab.domain.TestEntityUtil;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,9 @@ class CommentServiceTest {
 
     @Mock
     MemberRepository memberRepository;
+
+    @MockBean
+    NotificationService notificationService;
 
     Member topicAuthor;
     Member voter;
