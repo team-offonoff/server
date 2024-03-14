@@ -81,10 +81,7 @@ public class NotificationService {
         }
     }
 
-    /**
-     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void notifyLikeInComment(LikedComment likedComment) {
         if (shouldNotifyLikeInComment(likedComment)) {
             LikeInCommentNotification notification = new LikeInCommentNotification(likedComment.getComment());
@@ -105,10 +102,7 @@ public class NotificationService {
         return !likerIsWriter && writerListenLikeInComment;
     }
 
-    /**
-     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void notifyCommentOnTopic(Comment comment) {
         if (shouldNotifyCommentOnTopic(comment)) {
             CommentOnTopicNotification notification = new CommentOnTopicNotification(comment);
@@ -128,10 +122,7 @@ public class NotificationService {
         return commenterIsNotAuthor && authorListenCommentOnTopic;
     }
 
-    /**
-     * Notification 생성 트랜잭션 분리하기 위해 새로운 트랜잭션에서 실행됨
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void notifyVoteCountOnTopic(Topic topic) {
         if (shouldNotifyVoteCountForTopic(topic)) {
             VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(topic);
