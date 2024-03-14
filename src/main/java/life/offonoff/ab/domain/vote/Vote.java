@@ -62,9 +62,7 @@ public class Vote extends BaseEntity {
 
     public void changeOption(ChoiceOption choiceOption, LocalDateTime modifiedAt) {
         // change option
-        this.topic.changeVotedChoiceOption(this.selectedOption, choiceOption);
         this.selectedOption = choiceOption;
-
         this.votedAt = modifiedAt;
     }
 }

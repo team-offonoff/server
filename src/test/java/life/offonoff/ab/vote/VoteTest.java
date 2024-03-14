@@ -2,15 +2,14 @@ package life.offonoff.ab.vote;
 
 import life.offonoff.ab.domain.member.Member;
 import life.offonoff.ab.domain.topic.Topic;
-import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.vote.Vote;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class VoteTest {
 
@@ -30,7 +29,7 @@ class VoteTest {
         // then
         assertAll(
                 () -> assertThat(member.getVotes()).contains(vote),
-                () -> assertThat(topic.getVoteCount()).isEqualTo(1)
+                () -> assertThat(topic.getVoteCount()).isNotEqualTo(1)
         );
     }
 }

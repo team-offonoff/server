@@ -199,6 +199,9 @@ public class TopicService {
 
         Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
+
+        topicRepository.increaseVoteCountOfTopic(topic.getId());
+        choiceRepository.increaseVoteCountOfChoice(topic.getId(), vote.getSelectedOption());
         voteRepository.save(vote);
 
         // publish VotedEvent
@@ -253,7 +256,11 @@ public class TopicService {
 
         deleteVotersComments(vote.getVoter(), vote.getTopic());
 
+        Long topicId = vote.getTopic().getId();
+        ChoiceOption priorOption = vote.getSelectedOption();
         vote.changeOption(modifiedOption, modifiedAt);
+        choiceRepository.decreaseVoteCountOfChoice(topicId, priorOption);
+        choiceRepository.increaseVoteCountOfChoice(topicId, modifiedOption);
 
         return VoteResponse.from(getLatestCommentOfTopic(vote.getTopic()), TopicResponse.from(vote.getTopic(), vote.getVoter()));
     }

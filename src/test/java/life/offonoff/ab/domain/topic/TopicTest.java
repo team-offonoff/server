@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class TopicTest {
 
     @Test
-    @DisplayName("투표 후에 choice의 voteCount가 증가한다.")
+    @DisplayName("투표 후에 choice의 voteCount가 증가하지 않는다. 후에 repository에서 수정된다.")
     void increase_choicesVoteCount_after_vote() {
         // given
         Topic topic = createRandomTopic();
@@ -27,11 +26,11 @@ class TopicTest {
         vote.associate(voter, topic);
 
         // then
-        assertThat(choice.getVoteCount()).isEqualTo(1);
+        assertThat(choice.getVoteCount()).isNotEqualTo(1);
     }
 
     @Test
-    @DisplayName("투표 수정 후에 이전 choice는 voteCount가 감소 / 수정 choice는 증가한다.")
+    @DisplayName("투표 수정 후에 이전 choice는 voteCount가 감소 / 수정 choice는 증가한다. (X) ")
     void choicesVoteCount_after_modify_vote() {
         // given
         Topic topic = createRandomTopic();
@@ -42,14 +41,5 @@ class TopicTest {
 
         Vote vote = createVote(choiceA.getChoiceOption());
         vote.associate(voter, topic);
-
-        // when
-        topic.changeVotedChoiceOption(choiceA.getChoiceOption(), choiceB.getChoiceOption());
-
-        // then
-        assertAll(
-                () -> assertThat(choiceA.getVoteCount()).isEqualTo(0),
-                () -> assertThat(choiceB.getVoteCount()).isEqualTo(1)
-        );
     }
 }

@@ -106,10 +106,6 @@ public class Topic extends BaseEntity {
 
     public void addVote(Vote vote) {
         votes.add(vote);
-        voteCount++;
-
-        Choice selectedChoice = getChoiceByOption(vote.getSelectedOption());
-        selectedChoice.increaseVoteCount();
     }
 
     private Choice getChoiceByOption(ChoiceOption option) {
@@ -117,18 +113,6 @@ public class Topic extends BaseEntity {
                            .filter(choice -> choice.isOptionOf(option))
                            .findFirst()
                            .get();
-    }
-
-    public void changeVotedChoiceOption(ChoiceOption beforeOption, ChoiceOption afterOption) {
-        for (Choice choice : choices) {
-            if (choice.isOptionOf(beforeOption)) {
-                choice.decreaseVoteCount();
-            }
-
-            if (choice.isOptionOf(afterOption)) {
-                choice.increaseVoteCount();
-            }
-        }
     }
 
     public void activate(boolean active) {
