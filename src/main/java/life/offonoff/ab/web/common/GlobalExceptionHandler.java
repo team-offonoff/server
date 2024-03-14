@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,8 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.stream.Collectors;
 
-import static life.offonoff.ab.exception.AbCode.INTERNAL_SERVER_ERROR;
-import static life.offonoff.ab.exception.AbCode.INVALID_FIELD;
+import static life.offonoff.ab.exception.AbCode.*;
 
 @Slf4j
 // 예외가 발생했을 때 json 형태로 반환할 때 사용하는 어노테이션
@@ -72,6 +72,20 @@ public class GlobalExceptionHandler {
             return handleAbException((AbException) cause);
         }
         return handleException(e);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    private ResponseEntity<ErrorWrapper> handleOptimisticLockingFailureException(
+            final ObjectOptimisticLockingFailureException e) {
+        log.warn("Unhandled Optimistic Lock! = ", e);
+        final String message = "서버 문제가 발생했습니다. 다시 시도해주세요.";
+        final ErrorWrapper errorWrapper = new ErrorWrapper(
+                CONCURRENCY_VIOLATION,
+                ErrorContent.of(message, HttpStatus.CONFLICT.value())
+        );
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(errorWrapper);
     }
 
     @ExceptionHandler(Exception.class)

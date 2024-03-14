@@ -18,14 +18,17 @@ import life.offonoff.ab.web.common.response.PageResponse;
 import life.offonoff.ab.web.response.CommentReactionResponse;
 import life.offonoff.ab.web.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static life.offonoff.ab.application.service.common.LengthInfo.COMMENT_CONTENT;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -92,8 +95,15 @@ public class CommentService {
     //== save ==//
     @Transactional
     public CommentResponse register(Long memberId, CommentRequest request) {
-
         Comment comment = createComment(memberId, request);
+
+        try {
+            // 토픽의 댓글수 먼저 업데이트
+            topicRepository.flush();
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn(e.getMessage());
+            throw new CommentConcurrencyException();
+        }
 
         commentRepository.save(comment);
 

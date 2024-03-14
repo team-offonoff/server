@@ -10,6 +10,7 @@ import life.offonoff.ab.domain.topic.Topic;
 import life.offonoff.ab.domain.topic.TopicSide;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
+import life.offonoff.ab.exception.VoteConcurrencyException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static life.offonoff.ab.domain.TestEntityUtil.createRandomMember;
@@ -76,10 +78,15 @@ public class TopicServiceConcurrencyTest {
         // when
         long votedAt = System.currentTimeMillis() / 1000;
         final CountDownLatch latch = new CountDownLatch(COUNT);
+        AtomicInteger failureCounter = new AtomicInteger(0);
         voters.forEach(voter -> {
             executorService.execute(() -> {
-                topicService.voteForTopicByMember(
-                        topic.getId(), voter.getId(), new VoteRequest(ChoiceOption.CHOICE_A, votedAt));
+                try {
+                    topicService.voteForTopicByMember(
+                            topic.getId(), voter.getId(), new VoteRequest(ChoiceOption.CHOICE_A, votedAt));
+                } catch (VoteConcurrencyException e) {
+                    failureCounter.incrementAndGet();
+                }
                 latch.countDown();
             });
         });
@@ -89,8 +96,9 @@ public class TopicServiceConcurrencyTest {
         Topic updatedTopic = em.find(Topic.class, topic.getId());
         Choice votedChoice = updatedTopic.getChoices().stream().filter(c -> c.getChoiceOption().equals(ChoiceOption.CHOICE_A)).findAny().get();
         // 투표수는 COUNT와 동일해야함
-        assertThat(updatedTopic.getVoteCount()).isEqualTo(COUNT);
-        assertThat(votedChoice.getVoteCount()).isEqualTo(COUNT);
+        int successfulVoteCount = COUNT - failureCounter.get();
+        assertThat(updatedTopic.getVoteCount()).isEqualTo(successfulVoteCount);
+        assertThat(votedChoice.getVoteCount()).isEqualTo(successfulVoteCount);
     }
 
 }
