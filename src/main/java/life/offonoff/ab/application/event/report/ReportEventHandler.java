@@ -31,7 +31,7 @@ public class ReportEventHandler {
         final int reportCount = event.getReportCount();
         return (reportCount > 0)
                 // 신고 누적 횟수가 배수가 될 때마다 알림
-                && ((reportCount % notificationStandard) != 0);
+                && ((reportCount % notificationStandard) == 0);
     }
 
     @EventListener
