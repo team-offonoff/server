@@ -1,5 +1,6 @@
 package life.offonoff.ab.application.service;
 
+import life.offonoff.ab.application.event.report.CommentReportEvent;
 import life.offonoff.ab.application.event.topic.CommentLikedEvent;
 import life.offonoff.ab.application.event.topic.CommentedEvent;
 import life.offonoff.ab.application.service.common.TextUtils;
@@ -227,6 +228,8 @@ public class CommentService {
         }
         comment.getReportedBy(member);
 
-        // TODO: 일단 댓글 신고는 임시 API라서 알림 받는 건 추후에 추가
+        eventPublisher.publishEvent(
+                new CommentReportEvent(CommentResponse.from(comment), comment.getReports().size())
+        );
     }
 }

@@ -1,6 +1,7 @@
 package life.offonoff.ab.application.event.report;
 
-interface ReportEvent {
+public interface ReportEvent {
     String getReportedContent();
     int getReportCount();
+    ReportType getReportType();
 }

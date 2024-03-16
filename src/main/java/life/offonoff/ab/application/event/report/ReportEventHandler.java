@@ -18,24 +18,28 @@ import static com.slack.api.webhook.WebhookPayloads.payload;
 public class ReportEventHandler {
     private final Slack slackClient = Slack.getInstance();
     private final String webhookReportUrl;
-    // 신고 누적 횟수가 배수가 될 때마다 알림
-    private final int topicReportStandard;
 
     public ReportEventHandler(
-            @Value("${slack.webhook.report-url}") String webhookReportUrl,
-            @Value("${slack.standard.topic-report}") Integer topicReportStandard
+            @Value("${slack.webhook.report-url}")
+            String webhookReportUrl
             ) {
         this.webhookReportUrl = webhookReportUrl;
-        this.topicReportStandard = (topicReportStandard == null || topicReportStandard == 0)
-                ? 10 : topicReportStandard;
+    }
+
+    private boolean shouldNotifyReport(ReportEvent event) {
+        final int notificationStandard = event.getReportType().getNotificationStandard();
+        final int reportCount = event.getReportCount();
+        return (reportCount > 0)
+                // 신고 누적 횟수가 배수가 될 때마다 알림
+                && ((reportCount % notificationStandard) != 0);
     }
 
     @EventListener
-    public void sendTopicReportNotification(TopicReportEvent event) {
-        if ((event.getReportCount() % topicReportStandard) != 0) {
+    public void sendTopicReportNotification(ReportEvent event) {
+        if (!shouldNotifyReport(event)) {
             return;
         }
-        sendSlackAlertErrorLog(generateSlackAttachment("🚨TOPIC REPORT🚨", event));
+        sendSlackAlertErrorLog(generateSlackAttachment(event.getReportType().name(), event));
     }
 
     private void sendSlackAlertErrorLog(Attachment attachment) {
@@ -52,7 +56,7 @@ public class ReportEventHandler {
     private Attachment generateSlackAttachment(String title, ReportEvent event) {
         return Attachment.builder()
                 .color("ff0000")  // 붉은 색
-                .title(title)
+                .title("🚨"+title+" REPORT🚨")
                 .fields(List.of(
                                 generateSlackField("신고 횟수", String.valueOf(event.getReportCount())),
                                 generateSlackField("내용", event.getReportedContent())

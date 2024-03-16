@@ -3,22 +3,23 @@ package life.offonoff.ab.application.event.report;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import life.offonoff.ab.web.response.topic.TopicResponse;
+import life.offonoff.ab.web.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TopicReportEvent implements ReportEvent{
-    private final TopicResponse topic;
+public class CommentReportEvent implements ReportEvent {
+    private final CommentResponse comment;
     private final int reportCount;
-    private static final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private static final ObjectMapper objectMapper
+            = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     public String getReportedContent() {
         String content;
         try {
-            content = objectMapper.writeValueAsString(topic);
+            content = objectMapper.writeValueAsString(comment);
         } catch (JsonProcessingException e) {
-            content = "topicId: "+topic.getTopicId() + "\ntopicTitle: "+topic.getTopicTitle();
+            content = "commentId: " + comment.getCommentId() + "\ncommentTitle: " + comment.getContent();
         }
         return content;
     }
@@ -30,6 +31,6 @@ public class TopicReportEvent implements ReportEvent{
 
     @Override
     public ReportType getReportType() {
-        return ReportType.TOPIC;
+        return ReportType.COMMENT;
     }
 }

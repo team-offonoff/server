@@ -54,7 +54,7 @@ public class Topic extends BaseEntity {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HiddenTopic> hides = new ArrayList<>();
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TopicReport> reports = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -154,13 +154,13 @@ public class Topic extends BaseEntity {
         this.status = TopicStatus.NOTICED;
     }
 
-    public boolean isReportedBy(Member member) {
+    public boolean isReportedBy(Member reporter) {
         return reports.stream()
-                .anyMatch(report -> report.isReportedBy(member));
+                .anyMatch(report -> report.isReportedBy(reporter));
     }
 
-    public void getReportedBy(Member member) {
-        reports.add(new TopicReport(member, this));
+    public void getReportedBy(Member reporter) {
+        reports.add(new TopicReport(reporter, this));
     }
 
     public void commented() {
