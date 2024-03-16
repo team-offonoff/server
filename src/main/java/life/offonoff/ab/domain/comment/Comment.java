@@ -39,7 +39,7 @@ public class Comment extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Topic topic;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentReport> reports = new ArrayList<>();
 
     private int likeCount = 0;
@@ -113,12 +113,12 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public boolean isReportedBy(Member member) {
+    public boolean isReportedBy(Member reporter) {
         return reports.stream()
-                .anyMatch(report -> report.isReportedBy(member));
+                .anyMatch(report -> report.isReportedBy(reporter));
     }
 
-    public void getReportedBy(Member member) {
-        reports.add(new CommentReport(member, this));
+    public void getReportedBy(Member reporter) {
+        reports.add(new CommentReport(reporter, this));
     }
 }
