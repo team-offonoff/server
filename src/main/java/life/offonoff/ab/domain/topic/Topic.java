@@ -60,6 +60,9 @@ public class Topic extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TopicStatus status = TopicStatus.VOTING;
 
+    @Version
+    private Integer version;
+
     private int commentCount = 0;
     private int voteCount = 0;
     private int hideCount = 0;

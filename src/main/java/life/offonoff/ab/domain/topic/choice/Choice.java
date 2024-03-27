@@ -28,6 +28,9 @@ public class Choice extends BaseEntity {
     @JoinColumn(name = "choice_content_id")
     private ChoiceContent content;
 
+    @Version
+    private Integer version;
+
     private int voteCount;
 
     //== Constructor ==//

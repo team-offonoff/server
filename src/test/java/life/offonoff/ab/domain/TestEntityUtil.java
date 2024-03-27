@@ -10,7 +10,6 @@ import life.offonoff.ab.domain.topic.TopicStatus;
 import life.offonoff.ab.domain.topic.choice.Choice;
 import life.offonoff.ab.domain.topic.choice.ChoiceOption;
 import life.offonoff.ab.domain.topic.choice.content.ChoiceContent;
-import life.offonoff.ab.domain.topic.choice.content.ImageTextChoiceContent;
 import life.offonoff.ab.domain.vote.Vote;
 import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
@@ -64,7 +63,11 @@ public class TestEntityUtil {
     }
 
     public static Topic createRandomTopicHavingChoices(ChoiceOption... options) {
-        Topic topic = createRandomTopic();
+        return createRandomTopicByMemberWithChoices(createRandomMember(), TopicSide.TOPIC_B, options);
+    }
+
+    public static Topic createRandomTopicByMemberWithChoices(Member author, TopicSide side, ChoiceOption... options) {
+        Topic topic = createRandomTopicByMember(author, side);
 
         for (var option : options) {
             createChoice(topic, option, null);

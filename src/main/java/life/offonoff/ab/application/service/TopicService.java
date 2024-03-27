@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,6 +200,15 @@ public class TopicService {
 
         Vote vote = new Vote(choiceOption, votedAt);
         vote.associate(member, topic);
+
+        try {
+            // 토픽의 투표수 먼저 업데이트
+            topicRepository.flush();
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn(e.getMessage());
+            throw new VoteConcurrencyException();
+        }
+
         voteRepository.save(vote);
 
         // publish VotedEvent
