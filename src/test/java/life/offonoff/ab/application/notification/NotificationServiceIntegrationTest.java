@@ -1,7 +1,6 @@
 package life.offonoff.ab.application.notification;
 
 import jakarta.persistence.EntityManager;
-import life.offonoff.ab.domain.TestEntityUtil.TestMember;
 import life.offonoff.ab.domain.comment.Comment;
 import life.offonoff.ab.domain.comment.LikedComment;
 import life.offonoff.ab.domain.member.Member;
@@ -17,18 +16,18 @@ import life.offonoff.ab.repository.topic.TopicRepository;
 import life.offonoff.ab.web.response.notification.NotificationResponse;
 import life.offonoff.ab.web.response.notification.message.CommentOnTopicNotificationMessage;
 import life.offonoff.ab.web.response.notification.message.VoteCountOnTopicNotificationMessage;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static life.offonoff.ab.domain.TestEntityUtil.*;
-import static life.offonoff.ab.domain.TestEntityUtil.createRandomMember;
-import static life.offonoff.ab.domain.TestEntityUtil.createRandomTopic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -48,6 +47,25 @@ public class NotificationServiceIntegrationTest {
     @Autowired
     EntityManager em;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    private static final String[] touchedTables
+            = {"notification", "comment", "topic", "member"};
+
+    @AfterEach
+    void tearDown() {
+        // 이미 있던 트랜잭션은 닫아줌
+        // 기존 트랜잭션이 롤백될 수도 있어서 테이블을 delete하려는 시도도 같이 롤백될 수가 있기 때문
+        TestTransaction.end();
+        TestTransaction.start();
+
+        // 남아있는 데이터 삭제
+        JdbcTestUtils.deleteFromTables(
+                jdbcTemplate, touchedTables);
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+    }
+
     @Test
     @DisplayName("VoteCountOnTopic 알림 생성한다.")
     void create_VoteCountOnTopicNotification() {
@@ -60,6 +78,8 @@ public class NotificationServiceIntegrationTest {
                 .voteCount(voteCountUnit)
                 .build().buildTopic();
         em.persist(topic);
+
+        commitTestTransactionAndRestart();
 
         notificationService.notifyVoteCountOnTopic(topic);
 
@@ -84,12 +104,15 @@ public class NotificationServiceIntegrationTest {
         Topic topic = createRandomTopic();
         em.persist(topic);
 
+        commitTestTransactionAndRestart();
+
         // notification
         VoteResultNotification voteResultNotification = VoteResultNotification.createForAuthor(topic);
         em.persist(voteResultNotification);
 
         // when
         topicRepository.delete(topic);
+        commitTestTransactionAndRestart();
 
         // then
         assertThat(notificationService.findAllByReceiverId(author.getId())).isEmpty();
@@ -110,12 +133,16 @@ public class NotificationServiceIntegrationTest {
         Topic topic = createRandomTopic();
         em.persist(topic);
 
+        commitTestTransactionAndRestart();
+
         // notification
         VoteCountOnTopicNotification notification = new VoteCountOnTopicNotification(topic);
         em.persist(notification);
 
         // when
         topicRepository.delete(topic);
+
+        commitTestTransactionAndRestart();
 
         // then
         assertThat(notificationService.findAllByReceiverId(author.getId())).isEmpty();
@@ -144,6 +171,8 @@ public class NotificationServiceIntegrationTest {
         Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
         em.persist(comment);
 
+        commitTestTransactionAndRestart();
+
         notificationService.notifyCommentOnTopic(comment);
 
         // when
@@ -170,6 +199,8 @@ public class NotificationServiceIntegrationTest {
 
         Comment comment = Comment.createAuthorsComment(author, topic, "content");
         em.persist(comment);
+
+        commitTestTransactionAndRestart();
 
         notificationService.notifyCommentOnTopic(comment);
 
@@ -204,11 +235,14 @@ public class NotificationServiceIntegrationTest {
         Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
         em.persist(comment);
 
+        commitTestTransactionAndRestart();
+
         notificationService.notifyCommentOnTopic(comment);
 
         // when
         comment.remove();
-        em.remove(comment);
+        em.remove(em.merge(comment));
+        commitTestTransactionAndRestart();
 
         // then
         assertThat(notificationService.findAllByReceiverId(author.getId())).isEmpty();
@@ -240,10 +274,13 @@ public class NotificationServiceIntegrationTest {
         Comment comment = new Comment(commenter, topic, ChoiceOption.CHOICE_A, "content");
         em.persist(comment);
 
+        commitTestTransactionAndRestart();
+
         notificationService.notifyCommentOnTopic(comment);
 
-        // when
-        em.remove(topic);
+        em.remove(em.merge(topic));
+
+        commitTestTransactionAndRestart();
 
         // then
         List<NotificationResponse> responses = notificationService.findAllByReceiverId(author.getId());
@@ -286,6 +323,8 @@ public class NotificationServiceIntegrationTest {
 
         LikedComment likedComment = new LikedComment(liker, comment);
 
+        commitTestTransactionAndRestart();
+
         notificationService.notifyLikeInComment(likedComment);
 
         // when
@@ -324,6 +363,8 @@ public class NotificationServiceIntegrationTest {
         em.persist(comment);
 
         LikedComment likedComment = new LikedComment(commenter, comment);
+
+        commitTestTransactionAndRestart();
 
         notificationService.notifyLikeInComment(likedComment);
 
@@ -370,11 +411,14 @@ public class NotificationServiceIntegrationTest {
 
         LikedComment likedComment = new LikedComment(commenter, comment);
 
+        commitTestTransactionAndRestart();
+
         notificationService.notifyLikeInComment(likedComment);
 
         // when
         comment.remove();
-        em.remove(comment);
+        em.remove(em.merge(comment));
+        commitTestTransactionAndRestart();
 
         // then
         List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
@@ -416,10 +460,13 @@ public class NotificationServiceIntegrationTest {
 
         LikedComment likedComment = new LikedComment(commenter, comment);
 
+        commitTestTransactionAndRestart();
+
         notificationService.notifyLikeInComment(likedComment);
 
         // when
-        em.remove(topic);
+        em.remove(em.merge(topic));
+        commitTestTransactionAndRestart();
 
         // then
         List<NotificationResponse> responses = notificationService.findAllByReceiverId(commenter.getId());
@@ -465,5 +512,15 @@ public class NotificationServiceIntegrationTest {
         // when
         assertThatThrownBy(() -> notificationService.readNotification(nonReceiver.getId(), notification.getId()))
                 .isInstanceOf(IllegalReceiverException.class);
+    }
+
+    private void commitTestTransactionAndRestart() {
+        // 현재 영속성 컨텍스트의 엔티티 상태 정보 db에 반영.
+        // 실제 운영 중 notificationService는 엔티티의 상태가 이미 반영된 상태에서만 알림을 보낼 것이므로
+        // 운영 상황과 같다.
+        // ! 주의할 점은 실제로 데이터베이스에 커밋되므로 수동으로 롤백해줘야한다.
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
     }
 }
